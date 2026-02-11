@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 import Field from "@/components/Field";
 import Button from "@/components/Button";
 
 const References = ({}) => {
+    const t = useTranslations("quiz");
     const [referenceLink, setReferenceLink] = useState("");
 
     return (
@@ -15,23 +17,23 @@ const References = ({}) => {
                 />
                 <Icon className="mb-1.5 fill-t-tertiary" name="camera" />
                 <div className="text-button text-t-secondary">
-                    Drag and drop images, or{" "}
-                    <span className="text-t-primary">Browse</span>
+                    {t("dragDrop")}{" "}
+                    <span className="text-t-primary">{t("browse")}</span>
                 </div>
             </div>
             <Field
                 className="mb-4"
-                label="Reference link"
+                label={t("referenceLink")}
                 value={referenceLink}
                 onChange={(e) => setReferenceLink(e.target.value)}
                 name="reference-link"
-                placeholder="Enter your URL"
+                placeholder={t("referenceLinkPlaceholder")}
                 isLarge
                 required
             />
             <Button className="px-5.5" isStroke>
                 <Icon className="mr-2" name="plus" />
-                Add link
+                {t("addLink")}
             </Button>
         </div>
     );

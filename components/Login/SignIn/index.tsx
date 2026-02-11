@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Image from "@/components/Image";
 import Field from "@/components/Field";
@@ -10,13 +11,14 @@ type Props = {
 };
 
 const SignIn = ({ onResetPassword, onSignUp, onLogin }: Props) => {
+    const t = useTranslations("login");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     return (
         <div className="">
             <div className="mb-10 text-center text-h3">
-                Sign in to Briefberry
+                {t("signInTitle")}
             </div>
             <Button className="w-full" isPrimary onClick={onLogin}>
                 <Image
@@ -26,15 +28,15 @@ const SignIn = ({ onResetPassword, onSignUp, onLogin }: Props) => {
                     height={24}
                     alt="Google"
                 />
-                Sign in with Google
+                {t("signInWithGoogle")}
             </Button>
             <div className="py-6 text-center text-small font-medium text-t-tertiary">
-                Or sign in with email
+                {t("orSignInWithEmail")}
             </div>
             <Field
                 className="mb-4"
-                label="Email"
-                placeholder="Enter email"
+                label={t("email")}
+                placeholder={t("emailPlaceholder")}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -42,8 +44,8 @@ const SignIn = ({ onResetPassword, onSignUp, onLogin }: Props) => {
             />
             <Field
                 className="mb-6"
-                label="Password"
-                placeholder="Enter password"
+                label={t("password")}
+                placeholder={t("passwordPlaceholder")}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -51,15 +53,15 @@ const SignIn = ({ onResetPassword, onSignUp, onLogin }: Props) => {
                 required
             />
             <Button className="w-full mb-4" isSecondary onClick={onLogin}>
-                Sign in
+                {t("signIn")}
             </Button>
             <div className="text-center text-hairline font-medium text-t-secondary">
-                Need an account?{" "}
+                {t("needAccount")}{" "}
                 <span
                     className="border-b border-t-primary text-t-primary cursor-pointer transition-colors hover:border-transparent"
                     onClick={onSignUp}
                 >
-                    Sign up
+                    {t("signUp")}
                 </span>
             </div>
         </div>

@@ -1,9 +1,11 @@
 import { useState, useRef, RefObject } from "react";
 import Link from "next/link";
 import { useOnClickOutside } from "usehooks-ts";
+import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 
 const Actions = ({}) => {
+    const t = useTranslations("brief");
     const [visible, setVisible] = useState(false);
     const ref = useRef<HTMLDivElement | null>(null);
     useOnClickOutside(ref as RefObject<HTMLElement>, () => setVisible(false));
@@ -12,7 +14,7 @@ const Actions = ({}) => {
 
     const actions = [
         {
-            title: "Create link",
+            titleKey: "createLink" as const,
             icon: "external-link",
             onClick: () => {
                 setVisible(!visible);
@@ -20,12 +22,12 @@ const Actions = ({}) => {
             },
         },
         {
-            title: "Download",
+            titleKey: "download" as const,
             icon: "download",
             onClick: () => console.log("Download"),
         },
         {
-            title: "Send email",
+            titleKey: "sendEmail" as const,
             icon: "envelope",
             onClick: () => {
                 const subject = "Brief from Briefberry";
@@ -37,7 +39,7 @@ const Actions = ({}) => {
             },
         },
         {
-            title: "Regenerate",
+            titleKey: "regenerate" as const,
             icon: "refresh",
             onClick: () => console.log("Regenerate"),
         },
@@ -63,7 +65,7 @@ const Actions = ({}) => {
                                 visible && index === 0 ? "opacity-100!" : ""
                             }`}
                         >
-                            {action.title}
+                            {t(action.titleKey)}
                         </div>
                     </button>
                     {index === 0 && (
@@ -76,7 +78,7 @@ const Actions = ({}) => {
                         >
                             <div className="flex justify-between items-center mb-5">
                                 <div className="text-body-lg-bold">
-                                    Your custom link
+                                    {t("yourCustomLink")}
                                 </div>
                                 <Link
                                     className="group flex"

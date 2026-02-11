@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "usehooks-ts";
+import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Image from "@/components/Image";
 
 const Start = () => {
+    const t = useTranslations("start");
     const [isMounted, setIsMounted] = useState(false);
     const { theme } = useTheme();
     const isTablet = useMediaQuery("(max-width: 1023px)");
@@ -34,14 +36,13 @@ const Start = () => {
                         <div className="relative z-2 pt-20 px-18 bg-b-subtle95 rounded-4xl overflow-hidden max-lg:pt-12 max-lg:px-8 max-md:pt-8 max-md:px-6">
                             <div className="mb-18 text-center max-lg:max-w-96 max-lg:mx-auto max-lg:mb-10 max-md:max-w-full max-md:text-left max-md:mb-12">
                                 <div className="mb-5 text-h1">
-                                    Start crafting brilliant briefs today
+                                    {t("title")}
                                 </div>
                                 <div className="mb-8 text-body-lg text-t-secondary max-md:mb-6">
-                                    Join thousands of designers and elevate your
-                                    project workflow for free
+                                    {t("subtitle")}
                                 </div>
                                 <Button isSecondary as="link" href="/quiz">
-                                    Get started for free
+                                    {t("getStarted")}
                                 </Button>
                             </div>
                             <div className="relative max-w-155 mx-auto rounded-t-3xl shadow-hover before:absolute before:top-10.5 before:-left-23 before:right-13 before:-bottom-29.5 before:rounded-2xl before:bg-b-box-shadow before:blur-2xl max-lg:max-w-139 max-lg:before:left-20 max-lg:before:-right-35 max-md:px-1 max-md:before:left-25 dark:before:-left-5 dark:before:-right-5">

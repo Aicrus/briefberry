@@ -1,8 +1,10 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 const Footer = () => {
     const pathname = usePathname();
+    const t = useTranslations("footer");
 
     return (
         <div className={`${pathname === "/" ? "max-md:h-18" : ""}`}>
@@ -12,14 +14,14 @@ const Footer = () => {
                 }`}
             >
                 <div className="text-small text-t-tertiary">
-                    © 2024, Robot Global FZCO / UI8
+                    {t("copyright")}
                 </div>
                 <div className="w-0.25 h-1 mx-4 bg-t-tertiary max-md:mx-auto"></div>
                 <Link
                     className="text-small text-t-secondary transition-colors hover:text-t-primary"
                     href="/"
                 >
-                    Terms & Licensing
+                    {t("termsLicensing")}
                 </Link>
             </div>
         </div>

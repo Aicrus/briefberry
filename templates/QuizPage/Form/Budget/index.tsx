@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Field from "@/components/Field";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
 
 const Budget = ({}) => {
+    const t = useTranslations("quiz");
     const [scopeOfWork, setScopeOfWork] = useState("");
     const [scopeOfWork1, setScopeOfWork1] = useState("");
     const [budget, setBudget] = useState("");
@@ -16,17 +18,17 @@ const Budget = ({}) => {
                     <Field
                         className="w-[calc(50%+0.0625rem)] -mr-0.25 max-md:grow"
                         classInput="relative rounded-r-none! focus:z-1"
-                        label="Scope of work"
+                        label={t("scopeOfWork")}
                         value={scopeOfWork}
                         onChange={(e) => setScopeOfWork(e.target.value)}
-                        placeholder="e.g Landing page design"
+                        placeholder={t("scopePlaceholder")}
                         isLarge
                         required
                     />
                     <Field
                         className="w-[calc(50%+0.0625rem)] -ml-0.25 max-md:w-30"
                         classInput="relative rounded-l-none! focus:z-1"
-                        label="Budget"
+                        label={t("budget")}
                         value={budget}
                         onChange={(e) => setBudget(e.target.value)}
                         placeholder="0"
@@ -41,17 +43,17 @@ const Budget = ({}) => {
                     <Field
                         className="w-[calc(50%+0.0625rem)] -mr-0.25 max-md:grow"
                         classInput="relative rounded-r-none! focus:z-1 group-hover:border-[#A8A8A8]/50"
-                        label="Scope of work"
+                        label={t("scopeOfWork")}
                         value={scopeOfWork1}
                         onChange={(e) => setScopeOfWork1(e.target.value)}
-                        placeholder="e.g Landing page design"
+                        placeholder={t("scopePlaceholder")}
                         isLarge
                         required
                     />
                     <Field
                         className="w-[calc(50%+0.0625rem)] -ml-0.25 max-md:w-30"
                         classInput="relative rounded-l-none! focus:z-1 group-hover:border-[#A8A8A8]/50"
-                        label="Budget"
+                        label={t("budget")}
                         value={budget1}
                         onChange={(e) => setBudget1(e.target.value)}
                         placeholder="0"
@@ -70,7 +72,7 @@ const Budget = ({}) => {
             </div>
             <Button className="px-5.5" isStroke>
                 <Icon className="mr-2" name="plus" />
-                Add more
+                {t("addMore")}
             </Button>
         </div>
     );

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { getLocale, getMessages } from "next-intl/server";
+import { NextIntlClientProvider } from "next-intl";
 import Providers from "./providers";
 import "./globals.css";
 
@@ -30,13 +32,16 @@ export const metadata: Metadata = {
     description: "AI Brief Generator Tailwind Kit",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const locale = await getLocale();
+    const messages = await getMessages();
+
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang={locale} suppressHydrationWarning>
             <head>
                 {/* Description no longer than 155 characters */}
                 <meta
@@ -126,7 +131,11 @@ export default function RootLayout({
             <body
                 className={`${satoshi.variable} bg-b-surface1 font-satoshi text-[1rem] text-t-primary antialiased`}
             >
-                <Providers>{children}</Providers>
+                <Providers>
+                    <NextIntlClientProvider locale={locale} messages={messages}>
+                        {children}
+                    </NextIntlClientProvider>
+                </Providers>
             </body>
         </html>
     );

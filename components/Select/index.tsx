@@ -17,6 +17,8 @@ type SelectProps = {
     value: SelectOption;
     onChange: (value: SelectOption) => void;
     options: SelectOption[];
+    disabled?: boolean;
+    "aria-label"?: string;
 };
 
 const Select = ({
@@ -25,6 +27,8 @@ const Select = ({
     value,
     onChange,
     options,
+    disabled,
+    "aria-label": ariaLabel,
 }: SelectProps) => {
     return (
         <Listbox
@@ -32,11 +36,13 @@ const Select = ({
             value={value}
             onChange={onChange}
             as="div"
+            disabled={disabled}
         >
             <ListboxButton
-                className={`group flex justify-between items-center w-full h-12 pl-5 pr-3 bg-b-surface2 rounded-full text-button text-t-secondary transition-all outline-0 data-hover:shadow-hover data-hover:text-t-primary data-open:shadow-none data-open:text-t-primary ${
+                className={`group flex justify-between items-center w-full h-12 pl-5 pr-3 bg-b-surface2 rounded-full text-button text-t-secondary transition-all outline-0 data-hover:shadow-hover data-hover:text-t-primary data-open:shadow-none data-open:text-t-primary disabled:opacity-50 disabled:cursor-not-allowed ${
                     classButton || ""
                 }`}
+                aria-label={ariaLabel}
             >
                 {value.name}
                 <Icon

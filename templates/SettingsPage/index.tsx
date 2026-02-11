@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Layout from "@/components/Layout";
 import Image from "@/components/Image";
 import Icon from "@/components/Icon";
@@ -8,6 +9,7 @@ import Field from "@/components/Field";
 import Button from "@/components/Button";
 
 const SettingsScreen = () => {
+    const t = useTranslations("settings");
     const [name, setName] = useState("Kohaku Tora");
     const [email, setEmail] = useState("kohaku.tora@email.com");
     const [currentPassword, setCurrentPassword] = useState("1234567");
@@ -19,10 +21,10 @@ const SettingsScreen = () => {
             <div className="px-6 py-12 max-md:py-8">
                 <div className="w-full max-w-lg mx-auto">
                     <div className="mb-15 text-h1 max-md:mb-8">
-                        Account settings
+                        {t("title")}
                     </div>
                     <div className="mb-15 max-md:mb-8">
-                        <div className="mb-8 text-h4">Profile</div>
+                        <div className="mb-8 text-h4">{t("profile")}</div>
                         <div className="flex items-center mb-5">
                             <div className="group relative shrink-0 size-20 rounded-full overflow-hidden bg-b-surface2 after:absolute after:inset-0 after:z-1 after:bg-[#141414]/30 after:opacity-0 after:transition-opacity hover:after:opacity-100">
                                 <Image
@@ -42,22 +44,20 @@ const SettingsScreen = () => {
                                 />
                             </div>
                             <div className="grow pl-4 text-hairline text-t-secondary max-md:[&_br]:hidden">
-                                Update your avatar by clicking the image{" "}
-                                <br></br>
-                                288x288 px size recommended in PNG or JPG format
-                                only.
+                                {t("updateAvatar")} <br></br>
+                                {t("avatarRecommendation")}
                             </div>
                         </div>
                         <div className="flex flex-col gap-5">
                             <Field
-                                label="Preferred name"
+                                label={t("preferredName")}
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 isLarge
                                 required
                             />
                             <Field
-                                label="Email"
+                                label={t("email")}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 type="email"
@@ -67,10 +67,10 @@ const SettingsScreen = () => {
                         </div>
                     </div>
                     <div className="mb-15 max-md:mb-8">
-                        <div className="mb-8 text-h4">Security</div>
+                        <div className="mb-8 text-h4">{t("security")}</div>
                         <div className="flex flex-col gap-5">
                             <Field
-                                label="Current password"
+                                label={t("currentPassword")}
                                 value={currentPassword}
                                 onChange={(e) =>
                                     setCurrentPassword(e.target.value)
@@ -80,7 +80,7 @@ const SettingsScreen = () => {
                                 required
                             />
                             <Field
-                                label="New password"
+                                label={t("newPassword")}
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 type="password"
@@ -88,7 +88,7 @@ const SettingsScreen = () => {
                                 required
                             />
                             <Field
-                                label="Confirm password"
+                                label={t("confirmPassword")}
                                 value={confirmPassword}
                                 onChange={(e) =>
                                     setConfirmPassword(e.target.value)
@@ -99,7 +99,7 @@ const SettingsScreen = () => {
                             />
                         </div>
                     </div>
-                    <Button isSecondary>Save changes</Button>
+                    <Button isSecondary>{t("saveChanges")}</Button>
                 </div>
             </div>
         </Layout>

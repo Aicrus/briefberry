@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Image from "@/components/Image";
 import Field from "@/components/Field";
@@ -9,12 +10,13 @@ type Props = {
 };
 
 const CreateAccount = ({ onSignIn, onCreateAccount }: Props) => {
+    const t = useTranslations("login");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     return (
         <div className="">
-            <div className="mb-10 text-center text-h3">Create an account</div>
+            <div className="mb-10 text-center text-h3">{t("createAccountTitle")}</div>
             <Button className="w-full" isPrimary onClick={onCreateAccount}>
                 <Image
                     className="w-6 mr-2 opacity-100"
@@ -23,15 +25,15 @@ const CreateAccount = ({ onSignIn, onCreateAccount }: Props) => {
                     height={24}
                     alt="Google"
                 />
-                Sign up with Google
+                {t("signUpWithGoogle")}
             </Button>
             <div className="py-6 text-center text-small font-medium text-t-tertiary">
-                Or use your email
+                {t("orUseEmail")}
             </div>
             <Field
                 className="mb-4"
-                label="Email"
-                placeholder="Enter email"
+                label={t("email")}
+                placeholder={t("emailPlaceholder")}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -39,8 +41,8 @@ const CreateAccount = ({ onSignIn, onCreateAccount }: Props) => {
             />
             <Field
                 className="mb-6"
-                label="Password"
-                placeholder="Enter password"
+                label={t("password")}
+                placeholder={t("passwordPlaceholder")}
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -51,15 +53,15 @@ const CreateAccount = ({ onSignIn, onCreateAccount }: Props) => {
                 isSecondary
                 onClick={onCreateAccount}
             >
-                Create account
+                {t("createAccount")}
             </Button>
             <div className="text-center text-hairline font-medium text-t-secondary">
-                Already have an account?{" "}
+                {t("alreadyHaveAccount")}{" "}
                 <span
                     className="border-b border-t-primary text-t-primary cursor-pointer transition-colors hover:border-transparent"
                     onClick={onSignIn}
                 >
-                    Sign in
+                    {t("signIn")}
                 </span>
             </div>
         </div>

@@ -1,40 +1,18 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 
 const types = [
-    {
-        id: 0,
-        title: "Web app",
-        icon: "align-right",
-    },
-    {
-        id: 1,
-        title: "UI/UI Design",
-        icon: "post",
-    },
-    {
-        id: 2,
-        title: "Mobile app",
-        icon: "mobile",
-    },
-    {
-        id: 3,
-        title: "Branding & logo",
-        icon: "bezier-curves",
-    },
-    {
-        id: 4,
-        title: "Illustration",
-        icon: "magic-pencil",
-    },
-    {
-        id: 5,
-        title: "3D Design",
-        icon: "cube",
-    },
+    { id: 0, titleKey: "typeWebApp" as const, icon: "align-right" },
+    { id: 1, titleKey: "typeUiDesign" as const, icon: "post" },
+    { id: 2, titleKey: "typeMobileApp" as const, icon: "mobile" },
+    { id: 3, titleKey: "typeBranding" as const, icon: "bezier-curves" },
+    { id: 4, titleKey: "typeIllustration" as const, icon: "magic-pencil" },
+    { id: 5, titleKey: "type3d" as const, icon: "cube" },
 ];
 
 const TypeBrief = ({}) => {
+    const t = useTranslations("quiz");
     const [active, setActive] = useState<number | null>(null);
 
     return (
@@ -46,14 +24,14 @@ const TypeBrief = ({}) => {
                             ? "border-stroke-focus! text-t-primary! fill-t-primary!"
                             : ""
                     }`}
-                    key={type.title}
+                    key={type.titleKey}
                     onClick={() => setActive(type.id)}
                 >
                     <Icon
                         className="mb-8 fill-inherit max-3xl:mb-5"
                         name={type.icon}
                     />
-                    <div className="">{type.title}</div>
+                    <div className="">{t(type.titleKey)}</div>
                 </div>
             ))}
         </div>

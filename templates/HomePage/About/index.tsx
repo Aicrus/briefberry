@@ -1,16 +1,26 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "usehooks-ts";
+import { useTranslations } from "next-intl";
 import Image from "@/components/Image";
 import Icon from "@/components/Icon";
 
-import { content } from "./content";
+import { aboutConfig } from "./content";
 
 const About = ({}) => {
     const [isMounted, setIsMounted] = useState(false);
     const { theme } = useTheme();
     const isTablet = useMediaQuery("(max-width: 1023px)");
     const isMobile = useMediaQuery("(max-width: 767px)");
+    const t = useTranslations("about");
+
+    const titleKeys = ["title1", "title2", "title3"] as const;
+    const contentKeys = ["content1", "content2", "content3"] as const;
+    const content = aboutConfig.map((config, index) => ({
+        ...config,
+        title: t(titleKeys[index]),
+        content: t(contentKeys[index]),
+    }));
 
     useEffect(() => {
         setTimeout(() => {
@@ -23,11 +33,10 @@ const About = ({}) => {
             <div className="mb-20 text-center max-lg:mb-12 max-md:mb-10 max-md:text-left">
                 <div className="center">
                     <div className="mb-5 text-h1">
-                        AI-powered briefs in seconds
+                        {t("sectionTitle")}
                     </div>
                     <div className="text-body-lg text-t-secondary/80">
-                        Save hours of preparation time with intelligent brief
-                        generation
+                        {t("sectionSubtitle")}
                     </div>
                 </div>
             </div>

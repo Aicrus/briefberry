@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Layout from "@/components/Layout";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
@@ -11,6 +12,7 @@ import Actions from "./Actions";
 import { content } from "./content";
 
 const BriefPage = () => {
+    const t = useTranslations("brief");
     const isPremiumPlan = useEventsStore((state) => state.isPremiumPlan);
 
     return (
@@ -41,19 +43,19 @@ const BriefPage = () => {
                         <BriefCategory value="ux-ui-design" />
                     </div>
                     <BriefSection
-                        title="Introduction"
+                        title={t("introduction")}
                         content={content.introduction}
                     />
-                    <BriefSection title="Goals" content={content.goals} />
-                    <BriefSection title="Timeline" content={content.timeline} />
-                    <BriefSection title="Budget" content={content.budget} />
+                    <BriefSection title={t("goals")} content={content.goals} />
+                    <BriefSection title={t("timeline")} content={content.timeline} />
+                    <BriefSection title={t("budget")} content={content.budget} />
                     <BriefSection
-                        title="References"
+                        title={t("references")}
                         content={content.references}
                         images={content.images}
                     />
                     <BriefSection
-                        title="Conclusion"
+                        title={t("conclusion")}
                         content={content.conclusion}
                     />
                 </div>

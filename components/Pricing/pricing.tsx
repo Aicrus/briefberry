@@ -1,44 +1,24 @@
 export const pricing = [
     {
-        title: "Free",
+        id: "free" as const,
         price: 0,
         features: [
-            {
-                title: "AI-generated project briefs",
-            },
-            {
-                title: "Basic editing",
-            },
-            {
-                title: "Shareable links",
-            },
-            {
-                generations: 5,
-            },
+            { titleKey: "featureAiBriefs" as const },
+            { titleKey: "featureBasicEditing" as const },
+            { titleKey: "featureShareableLinks" as const },
+            { generations: 5 },
         ],
     },
     {
-        title: "Premium",
+        id: "premium" as const,
         price: 3,
         features: [
-            {
-                title: "Including all free features",
-            },
-            {
-                title: "No watermarks on shared links",
-            },
-            {
-                title: "Section regeneration",
-            },
-            {
-                title: "PDF export",
-            },
-            {
-                title: "Email sharing",
-            },
-            {
-                generations: 25,
-            },
+            { titleKey: "featureIncludingFree" as const },
+            { titleKey: "featureNoWatermarks" as const },
+            { titleKey: "featureRegeneration" as const },
+            { titleKey: "featurePdfExport" as const },
+            { titleKey: "featureEmailSharing" as const },
+            { generations: 25 },
         ],
     },
 ];

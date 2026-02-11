@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Image from "@/components/Image";
 import Icon from "@/components/Icon";
 import Button from "@/components/Button";
@@ -16,6 +17,7 @@ type PricingProps = {
 };
 
 const Pricing = ({ className, title, hideCircleButton }: PricingProps) => {
+    const t = useTranslations("pricing");
     const [isModalPremiumOpen, setIsModalPremiumOpen] = useState(false);
     const [isModalFreeOpen, setIsModalFreeOpen] = useState(false);
 
@@ -43,7 +45,7 @@ const Pricing = ({ className, title, hideCircleButton }: PricingProps) => {
                                     "
                                 >
                                     <div className="relative z-2 pt-13 px-10 pb-8 max-lg:px-6 max-md:pt-6 max-md:pr-4 max-md:pl-6">
-                                        {item.title === "Premium" &&
+                                        {item.id === "premium" &&
                                             !hideCircleButton && (
                                                 <Button
                                                     className="absolute top-2 right-2 [&_svg]:-rotate-45"
@@ -59,7 +61,7 @@ const Pricing = ({ className, title, hideCircleButton }: PricingProps) => {
                                                 </Button>
                                             )}
                                         <div className="mb-8 text-h3">
-                                            {item.title}
+                                            {t(item.id)}
                                         </div>
                                         <ul className="flex flex-col gap-3">
                                             {item.features.map(
@@ -87,14 +89,14 @@ const Pricing = ({ className, title, hideCircleButton }: PricingProps) => {
                                                 /&nbsp;&nbsp;month
                                             </div>
                                         </div>
-                                        {item.title === "Premium" ? (
+                                        {item.id === "premium" ? (
                                             <Button
                                                 isSecondary
                                                 onClick={() =>
                                                     setIsModalPremiumOpen(true)
                                                 }
                                             >
-                                                Get started now
+                                                {t("getStartedNow")}
                                             </Button>
                                         ) : (
                                             <Button
@@ -103,11 +105,11 @@ const Pricing = ({ className, title, hideCircleButton }: PricingProps) => {
                                                     setIsModalFreeOpen(true)
                                                 }
                                             >
-                                                Create an account
+                                                {t("createAccountButton")}
                                             </Button>
                                         )}
                                     </div>
-                                    {item.title === "Premium" && (
+                                    {item.id === "premium" && (
                                         <div className="absolute right-0 bottom-0 max-md:-right-4 max-md:-bottom-4">
                                             <Image
                                                 src="/images/pricing-gradient.png"

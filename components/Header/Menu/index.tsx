@@ -1,27 +1,16 @@
 import Link from "next/link";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import { useTranslations } from "next-intl";
 import Image from "@/components/Image";
 import Icon from "@/components/Icon";
 import ThemeButton from "@/components/ThemeButton";
 import "react-circular-progressbar/dist/styles.css";
 
 const navigation = [
-    {
-        title: "My briefs",
-        icon: "documents",
-        url: "/my-briefs",
-    },
-    {
-        title: "Manage your plan",
-        icon: "star-stroke",
-        url: "/manage-plan",
-    },
-    {
-        title: "Account settings",
-        icon: "profile",
-        url: "/settings",
-    },
+    { titleKey: "myBriefs" as const, icon: "documents", url: "/my-briefs" },
+    { titleKey: "manageYourPlan" as const, icon: "star-stroke", url: "/manage-plan" },
+    { titleKey: "accountSettings" as const, icon: "profile", url: "/settings" },
 ];
 
 type Props = {
@@ -29,6 +18,7 @@ type Props = {
 };
 
 const UserMenu = ({ onLogout }: Props) => {
+    const t = useTranslations("menu");
     return (
         <Menu>
             <MenuButton className="relative flex size-12 border-4 border-b-surface2 rounded-full outline-0 before:absolute before:-inset-1 before:z-1 before:rounded-full before:border-[1.5px] before:border-stroke2 before:opacity-0 before:transition-opacity data-open:before:opacity-100">
@@ -57,7 +47,7 @@ const UserMenu = ({ onLogout }: Props) => {
                                         className="mr-4 fill-inherit"
                                         name={item.icon}
                                     />
-                                    {item.title}
+                                    {t(item.titleKey)}
                                 </Link>
                             </MenuItem>
                         ))}
@@ -74,20 +64,20 @@ const UserMenu = ({ onLogout }: Props) => {
                             />
                         </div>
                         <div className="">
-                            Credits: <span className="text-t-primary">1/5</span>
+                            {t("credits")}: <span className="text-t-primary">1/5</span>
                         </div>
                         <Link
                             className="ml-5 px-2 py-0.5 border-[1.5px] border-primary2/15 bg-primary2/5 rounded-full text-hairline font-medium text-primary2 transition-colors hover:border-primary2/25 hover:bg-primary2/10"
                             href="/manage-plan"
                         >
-                            Upgrade
+                            {t("upgrade")}
                         </Link>
                     </div>
                 </div>
                 <div className="p-3 border-t border-stroke-subtle">
                     <div className="hidden items-center w-full h-12 pl-3 text-hairline text-t-secondary max-md:flex">
                         <Icon className="mr-4 fill-t-secondary" name="bulb" />
-                        <div className="">Theme</div>
+                        <div className="">{t("theme")}</div>
                         <ThemeButton className="ml-auto" isHorizontal />
                     </div>
                     <button
@@ -95,7 +85,7 @@ const UserMenu = ({ onLogout }: Props) => {
                         onClick={onLogout}
                     >
                         <Icon className="mr-4 fill-inherit" name="logout" />
-                        Log out
+                        {t("logOut")}
                     </button>
                 </div>
             </MenuItems>

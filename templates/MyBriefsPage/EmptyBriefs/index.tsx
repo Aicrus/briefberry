@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
 import Image from "@/components/Image";
 
 const EmptyBriefs = ({}) => {
+    const t = useTranslations("myBriefs");
     const [isMounted, setIsMounted] = useState(false);
     const { theme } = useTheme();
 
@@ -31,9 +33,9 @@ const EmptyBriefs = ({}) => {
                     )}
                 </div>
             </div>
-            <div className="mb-2 text-h5">No brief found</div>
+            <div className="mb-2 text-h5">{t("noBriefFound")}</div>
             <div className="text-hairline text-t-secondary [&_span]:text-t-primary">
-                Try to adjust your filter or <span>create a new brief</span>
+                {t("adjustFilter")} <span>{t("createNewBrief")}</span>
             </div>
         </div>
     );

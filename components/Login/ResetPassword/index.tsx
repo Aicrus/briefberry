@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
 
@@ -8,15 +9,16 @@ type Props = {
 };
 
 const ResetPassword = ({ onLogin, onResetPassword }: Props) => {
+    const t = useTranslations("login");
     const [email, setEmail] = useState("");
 
     return (
         <div className="">
-            <div className="mb-10 text-center text-h3">Reset password</div>
+            <div className="mb-10 text-center text-h3">{t("resetPasswordTitle")}</div>
             <Field
                 className="mb-6"
-                label="Email"
-                placeholder="Enter email"
+                label={t("email")}
+                placeholder={t("emailPlaceholder")}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -27,15 +29,15 @@ const ResetPassword = ({ onLogin, onResetPassword }: Props) => {
                 isSecondary
                 onClick={onResetPassword}
             >
-                Reset password
+                {t("resetPassword")}
             </Button>
             <div className="text-center text-hairline font-medium text-t-secondary">
-                Have your password?{" "}
+                {t("havePassword")}{" "}
                 <span
                     className="border-b border-t-primary text-t-primary cursor-pointer transition-colors hover:border-transparent"
                     onClick={onLogin}
                 >
-                    Login
+                    {t("loginLink")}
                 </span>
             </div>
         </div>

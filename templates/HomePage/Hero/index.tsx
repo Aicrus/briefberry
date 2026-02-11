@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "usehooks-ts";
+import { useTranslations } from "next-intl";
 import Image from "@/components/Image";
 import Button from "@/components/Button";
 
 const Hero = () => {
+    const t = useTranslations("hero");
     const [isMounted, setIsMounted] = useState(false);
     const { theme } = useTheme();
     const isTablet = useMediaQuery("(max-width: 1023px)");
@@ -21,12 +23,10 @@ const Hero = () => {
             <div className="relative mb-12 before:absolute before:-top-6 before:left-0 before:right-0 before:h-[1.5px] before:bg-linear-(--gradient-horizontal) max-lg:before:-top-11 max-md:before:-top-4 after:absolute after:-bottom-6 after:left-0 after:right-0 after:h-[1.5px] after:bg-linear-(--gradient-horizontal) max-lg:after:-bottom-7 max-md:after:-bottom-4 max-md:mb-8">
                 <div className="center max-w-200 max-lg:max-w-175 max-md:max-w-full">
                     <h1 className="mb-5 text-hero max-lg:max-w-132 max-lg:mx-auto max-lg:mb-5 max-md:max-w-full">
-                        AI-powered project briefs for designers
+                        {t("title")}
                     </h1>
                     <div className="text-body-lg text-t-secondary">
-                        Transform your ideas into comprehensive project briefs
-                        in seconds! Let AI create your project brief while you
-                        focus on bringing your vision to life.
+                        {t("subtitle")}
                     </div>
                 </div>
             </div>
@@ -36,7 +36,7 @@ const Hero = () => {
                 as="link"
                 href="/quiz"
             >
-                Get started for free
+                {t("getStarted")}
             </Button>
             <div className="relative mb-12 before:absolute before:top-0 before:left-0 before:right-0 before:h-[1.5px] before:bg-linear-(--gradient-horizontal) after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[1.5px] after:bg-linear-(--gradient-horizontal)">
                 <div className="center">
@@ -126,7 +126,7 @@ const Hero = () => {
             </div>
             <div className="mt-12 max-lg:mt-10">
                 <div className="mb-3 text-heading-thin text-t-secondary max-md:text-center">
-                    Join 80,000+ designers
+                    {t("joinDesigners")}
                 </div>
                 <div className="flex items-center justify-center -mt-0.5">
                     <div className="flex">
