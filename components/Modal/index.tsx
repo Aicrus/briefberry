@@ -1,9 +1,4 @@
-import {
-    Dialog,
-    DialogPanel,
-    DialogBackdrop,
-    CloseButton,
-} from "@headlessui/react";
+import { Dialog, DialogPanel, DialogBackdrop } from "@headlessui/react";
 import Icon from "@/components/Icon";
 
 type ModalProps = {
@@ -11,9 +6,16 @@ type ModalProps = {
     open: boolean;
     onClose: () => void;
     children: React.ReactNode;
+    showCloseButton?: boolean;
 };
 
-const Modal = ({ classWrapper, open, onClose, children }: ModalProps) => {
+const Modal = ({
+    classWrapper,
+    open,
+    onClose,
+    children,
+    showCloseButton = true,
+}: ModalProps) => {
     return (
         <Dialog className="relative z-50" open={open} onClose={onClose}>
             <DialogBackdrop
@@ -22,15 +24,22 @@ const Modal = ({ classWrapper, open, onClose, children }: ModalProps) => {
             />
             <div className="fixed inset-0 flex p-4 overflow-y-auto max-md:p-0">
                 <DialogPanel
-                    className={`w-full max-w-120 m-auto p-16 rounded-4xl bg-b-surface1 duration-300 ease-out data-closed:opacity-0 max-md:px-6 max-md:pb-12 ${
+                    className={`w-full max-w-120 m-auto p-16 rounded-4xl bg-b-surface1 shadow-hover duration-300 ease-out data-closed:opacity-0 max-md:px-6 max-md:pb-12 ${
                         classWrapper || ""
                     }`}
                     transition
                 >
                     {children}
-                    <CloseButton className="group absolute top-5 right-5 z-15 size-12 bg-b-surface2 rounded-full text-0 fill-t-secondary transition-all hover:shadow-hover hover:fill-t-primary dark:bg-b-surface3 max-md:top-2 max-md:right-2">
-                        <Icon className="fill-inherit" name="close" />
-                    </CloseButton>
+                    {showCloseButton && (
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="group absolute top-5 right-5 z-15 size-12 bg-b-surface2 rounded-full text-0 fill-t-secondary transition-all hover:shadow-hover hover:fill-t-primary dark:bg-b-surface3 max-md:top-2 max-md:right-2"
+                            aria-label="Close"
+                        >
+                            <Icon className="fill-inherit" name="close" />
+                        </button>
+                    )}
                 </DialogPanel>
             </div>
         </Dialog>

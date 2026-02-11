@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useMediaQuery } from "usehooks-ts";
 import { useTranslations } from "next-intl";
 import Image from "@/components/Image";
 import Button from "@/components/Button";
+import Modal from "@/components/Modal";
+import FeatureSelector from "@/components/FeatureSelector";
+import type { FeatureKey } from "@/config/projectFlow";
 
 const Hero = () => {
     const t = useTranslations("hero");
+    const router = useRouter();
     const [isMounted, setIsMounted] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { theme } = useTheme();
     const isTablet = useMediaQuery("(max-width: 1023px)");
     const isMobile = useMediaQuery("(max-width: 767px)");
@@ -17,6 +23,18 @@ const Hero = () => {
             setIsMounted(true);
         }, 50);
     }, []);
+
+    const handleFeatureSelect = (feature: FeatureKey) => {
+        setIsModalOpen(false);
+        
+        if (feature === "create_proposal") {
+            router.push("/quiz");
+        } else if (feature === "create_contract") {
+            router.push("/quiz/contract");
+        } else if (feature === "create_prd") {
+            router.push("/quiz/prd");
+        }
+    };
 
     return (
         <div className="section section-lines pt-20 text-center max-md:pt-10 max-md:text-left before:-top-22! after:-top-22! max-lg:before:top-0! max-lg:after:top-0! max-md:before:bottom-4! max-md:after:bottom-4!">
@@ -33,8 +51,7 @@ const Hero = () => {
             <Button
                 className="mb-12 max-lg:mb-10 max-md:ml-6"
                 isSecondary
-                as="link"
-                href="/quiz"
+                onClick={() => setIsModalOpen(true)}
             >
                 {t("getStarted")}
             </Button>
@@ -158,6 +175,13 @@ const Hero = () => {
                     </div>
                 </div>
             </div>
+            <Modal
+                open={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                classWrapper="!max-w-[42rem] max-md:!max-w-full"
+            >
+                <FeatureSelector onSelect={handleFeatureSelect} />
+            </Modal>
         </div>
     );
 };

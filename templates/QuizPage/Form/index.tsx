@@ -7,7 +7,13 @@ import TypeBrief from "./TypeBrief";
 import References from "./References";
 import Budget from "./Budget";
 
-const STEP_KEYS = ["step0", "step1", "step2", "step3", "step4", "step5", "step6"] as const;
+const STEP_KEYS = ["step0", "step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9"] as const;
+const TOTAL_STEPS = 10;
+
+const cardClass = (active: boolean) =>
+    `w-[calc(50%-1rem)] mt-4 mx-2 px-6 py-5.5 border-[1.5px] border-stroke1 rounded-[1.25rem] text-heading font-medium! text-t-secondary fill-t-secondary hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary hover:fill-t-primary cursor-pointer transition-all max-md:w-[calc(50%-0.75rem)] max-md:mt-3 max-md:mx-1.5 ${
+        active ? "border-stroke-focus! text-t-primary! fill-t-primary!" : ""
+    }`;
 
 const Form = ({}) => {
     const t = useTranslations("quiz");
@@ -16,9 +22,12 @@ const Form = ({}) => {
     const [projectGoals, setProjectGoals] = useState("");
     const [yourBudget, setYourBudget] = useState("");
     const [date, setDate] = useState("");
+    const [billingModel, setBillingModel] = useState<number | null>(null);
+    const [paymentMethod, setPaymentMethod] = useState<number | null>(null);
+    const [currency, setCurrency] = useState<number | null>(null);
 
     const handleNext = () => {
-        if (activeId < 6) {
+        if (activeId < TOTAL_STEPS - 1) {
             setActiveId(activeId + 1);
         }
     };
@@ -36,7 +45,7 @@ const Form = ({}) => {
                     {t(STEP_KEYS[activeId])}
                 </div>
                 <div className="flex justify-center items-center shrink-0 w-16 h-7 mt-3 ml-8 border-[1.5px] border-primary2/15 bg-primary2/5 rounded-full text-button text-primary2 max-md:m-0 max-md:mb-4">
-                    {activeId + 1} / 7
+                    {activeId + 1} / {TOTAL_STEPS}
                 </div>
             </div>
             <div className="">
@@ -84,6 +93,45 @@ const Form = ({}) => {
                 )}
                 {activeId === 5 && <Budget />}
                 {activeId === 6 && <References />}
+                {activeId === 7 && (
+                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                        {[0, 1, 2].map((id) => (
+                            <div
+                                key={id}
+                                className={cardClass(billingModel === id)}
+                                onClick={() => setBillingModel(id)}
+                            >
+                                <div className="">{t(id === 0 ? "billingFixedPrice" : id === 1 ? "billingPerFeature" : "billingPerStage")}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {activeId === 8 && (
+                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                        {[0, 1].map((id) => (
+                            <div
+                                key={id}
+                                className={cardClass(paymentMethod === id)}
+                                onClick={() => setPaymentMethod(id)}
+                            >
+                                <div className="">{t(id === 0 ? "payment5050" : "paymentPerStage")}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+                {activeId === 9 && (
+                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                        {[0, 1].map((id) => (
+                            <div
+                                key={id}
+                                className={cardClass(currency === id)}
+                                onClick={() => setCurrency(id)}
+                            >
+                                <div className="">{id === 0 ? "BRL (R$)" : "USD ($)"}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
             <div className="flex mt-auto pt-10 max-md:-mx-1 max-md:pt-6">
                 {activeId > 0 && (
@@ -95,7 +143,7 @@ const Form = ({}) => {
                         {t("previous")}
                     </Button>
                 )}
-                {activeId === 6 ? (
+                {activeId === TOTAL_STEPS - 1 ? (
                     <Button
                         className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
                         isSecondary
