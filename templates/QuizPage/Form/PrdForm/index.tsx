@@ -39,7 +39,9 @@ const PrdForm = () => {
     const [languageOther, setLanguageOther] = useState("");
     const [platform, setPlatform] = useState<number | null>(null);
     const [webFramework, setWebFramework] = useState<number | null>(null);
+    const [webFrameworkOther, setWebFrameworkOther] = useState("");
     const [mobileFramework, setMobileFramework] = useState<number | null>(null);
+    const [mobileFrameworkOther, setMobileFrameworkOther] = useState("");
     const [backendTech, setBackendTech] = useState<number | null>(null);
     const [authentication, setAuthentication] = useState<number | null>(null);
 
@@ -51,7 +53,8 @@ const PrdForm = () => {
         featOffline: true,
         featExternalApis: true,
     });
-    const [otherFeatures, setOtherFeatures] = useState("");
+    const [otherFeaturesTags, setOtherFeaturesTags] = useState<string[]>([]);
+    const [otherFeaturesInput, setOtherFeaturesInput] = useState("");
 
     const [integrations, setIntegrations] = useState<Record<string, boolean>>({
         payments: false,
@@ -177,6 +180,17 @@ const PrdForm = () => {
                         </div>
                     </div>
                 )}
+                {activeId === 2 && webFramework === webFrameworks.length && (
+                    <div className="mt-6">
+                        <Field
+                            label=""
+                            value={webFrameworkOther}
+                            onChange={(e) => setWebFrameworkOther(e.target.value)}
+                            name="web-framework-other"
+                            placeholder={t("webFrameworkOtherPlaceholder")}
+                        />
+                    </div>
+                )}
 
                 {/* 3. Framework mobile */}
                 {activeId === 3 && (
@@ -196,6 +210,17 @@ const PrdForm = () => {
                         >
                             <div className="">{t("other")}</div>
                         </div>
+                    </div>
+                )}
+                {activeId === 3 && mobileFramework === mobileFrameworks.length && (
+                    <div className="mt-6">
+                        <Field
+                            label=""
+                            value={mobileFrameworkOther}
+                            onChange={(e) => setMobileFrameworkOther(e.target.value)}
+                            name="mobile-framework-other"
+                            placeholder={t("mobileFrameworkOtherPlaceholder")}
+                        />
                     </div>
                 )}
 
@@ -247,13 +272,50 @@ const PrdForm = () => {
                             ))}
                         </div>
                         <div className="mt-6">
-                            <Field
-                                label=""
-                                value={otherFeatures}
-                                onChange={(e) => setOtherFeatures(e.target.value)}
-                                name="other-features"
-                                placeholder={t("otherFeaturesPlaceholder")}
-                            />
+                            <div className="min-h-40 w-full rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1 px-4 py-4 focus-within:border-[#A8A8A8]/50">
+                                <div className="flex flex-wrap gap-2">
+                                    {otherFeaturesTags.map((tag, index) => (
+                                        <span
+                                            key={`${tag}-${index}`}
+                                            className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-stroke1 bg-b-surface2 pl-3 pr-1.5 py-1.5 text-body text-t-primary"
+                                        >
+                                            {tag}
+                                            <button
+                                                type="button"
+                                                onClick={() => setOtherFeaturesTags((prev) => prev.filter((_, i) => i !== index))}
+                                                className="flex size-6 items-center justify-center rounded-full fill-t-secondary transition-colors hover:bg-b-surface3 hover:fill-t-primary"
+                                                aria-label="Remover"
+                                            >
+                                                <Icon className="size-3.5 fill-inherit" name="close" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                    <input
+                                        type="text"
+                                        value={otherFeaturesInput}
+                                        onChange={(e) => setOtherFeaturesInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" || e.key === ",") {
+                                                e.preventDefault();
+                                                const parts = otherFeaturesInput.split(",").map((s) => s.trim()).filter(Boolean);
+                                                if (parts.length > 0) {
+                                                    setOtherFeaturesTags((prev) => [...prev, ...parts]);
+                                                    setOtherFeaturesInput("");
+                                                }
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            const parts = otherFeaturesInput.split(",").map((s) => s.trim()).filter(Boolean);
+                                            if (parts.length > 0) {
+                                                setOtherFeaturesTags((prev) => [...prev, ...parts]);
+                                                setOtherFeaturesInput("");
+                                            }
+                                        }}
+                                        placeholder={otherFeaturesTags.length === 0 ? t("otherFeaturesPlaceholder") : ""}
+                                        className="min-w-48 flex-1 shrink-0 border-0 bg-transparent px-1 py-1 text-body font-medium text-t-primary outline-0 placeholder:text-t-tertiary"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </>
                 )}

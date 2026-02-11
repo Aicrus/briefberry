@@ -141,7 +141,7 @@
         "featRealtime": "Atualizações em tempo real",
         "featOffline": "Modo offline",
         "featExternalApis": "Integrações com APIs externas",
-        "otherFeaturesPlaceholder": "Outras funcionalidades (opcional)",
+        "otherFeaturesPlaceholder": "Digite cada funcionalidade e separe por vírgula",
         "webFrameworkOtherPlaceholder": "ex: Angular, Vue.js, outro framework",
         "mobileFrameworkOtherPlaceholder": "ex: Xamarin, outro framework ou tecnologia",
         "designSystemYes": "Sim, gerar design system",
