@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
 import Icon from "@/components/Icon";
+import { formatCPF, formatCNPJ } from "@/lib/masks";
 
 const CONTRACTOR_TYPE_OPTIONS = [
     { id: 0, titleKey: "contractorPF" as const, icon: "profile" },
@@ -16,6 +17,7 @@ const STEP_KEYS = [
     "contractStep3",
     "contractStep4",
     "contractStep5",
+    "contractStep6",
 ] as const;
 
 const cardClass = (active: boolean) =>
@@ -31,22 +33,25 @@ const ContractForm = () => {
 
     // Step 1: Contractor data
     const [contractorName, setContractorName] = useState("");
+    const [contractorDocType, setContractorDocType] = useState<0 | 1 | 2>(0); // 0=CPF, 1=CNPJ, 2=Outro
     const [contractorDocument, setContractorDocument] = useState("");
     const [contractorEmail, setContractorEmail] = useState("");
 
     // Step 2: Client data
     const [clientName, setClientName] = useState("");
+    const [clientDocType, setClientDocType] = useState<0 | 1 | 2>(0);
     const [clientDocument, setClientDocument] = useState("");
     const [clientEmail, setClientEmail] = useState("");
 
     const [intellectualProperty, setIntellectualProperty] = useState<number | null>(null);
     const [changePolicy, setChangePolicy] = useState<number | null>(null);
     const [termination, setTermination] = useState<number | null>(null);
+    const [additionalTerms, setAdditionalTerms] = useState("");
+
+    const totalSteps = STEP_KEYS.length;
 
     const handleNext = () => {
-        if (activeId < 5) {
-            setActiveId(activeId + 1);
-        }
+        if (activeId < totalSteps - 1) setActiveId(activeId + 1);
     };
 
     const handlePrevious = () => {
@@ -62,7 +67,7 @@ const ContractForm = () => {
                     {t(STEP_KEYS[activeId])}
                 </div>
                 <div className="flex justify-center items-center shrink-0 w-16 h-7 mt-3 ml-8 border-[1.5px] border-primary2/15 bg-primary2/5 rounded-full text-button text-primary2 max-md:m-0 max-md:mb-4">
-                    {activeId + 1} / 6
+                    {activeId + 1} / {totalSteps}
                 </div>
             </div>
             <div className="">
@@ -93,17 +98,51 @@ const ContractForm = () => {
                             placeholder={t("contractorNamePlaceholder")}
                             isLarge
                             required
+                            maxLength={200}
                         />
                         <div className="mt-6">
-                            <Field
-                                label={t("contractorDocument")}
-                                value={contractorDocument}
-                                onChange={(e) => setContractorDocument(e.target.value)}
-                                name="contractor-document"
-                                placeholder={t("contractorDocumentPlaceholder")}
-                                isLarge
-                                required
-                            />
+                            <div className="mb-2 text-small font-medium text-t-primary">{t("documentTypeLabel")}</div>
+                            <div className="flex flex-wrap gap-2">
+                                {([0, 1, 2] as const).map((id) => (
+                                    <button
+                                        key={id}
+                                        type="button"
+                                        onClick={() => {
+                                            setContractorDocType(id);
+                                            setContractorDocument("");
+                                        }}
+                                        className={`rounded-full border-[1.5px] px-4 py-2 text-hairline font-medium transition-all ${
+                                            contractorDocType === id
+                                                ? "border-stroke-focus bg-b-surface2 text-t-primary"
+                                                : "border-stroke1 text-t-secondary hover:border-stroke-focus"
+                                        }`}
+                                    >
+                                        {id === 0 ? t("docTypeCpf") : id === 1 ? t("docTypeCnpj") : t("docTypeOther")}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="mt-3">
+                                <Field
+                                    label={t("contractorDocument")}
+                                    value={contractorDocument}
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        if (contractorDocType === 0) setContractorDocument(formatCPF(v));
+                                        else if (contractorDocType === 1) setContractorDocument(formatCNPJ(v));
+                                        else setContractorDocument(v);
+                                    }}
+                                    name="contractor-document"
+                                    placeholder={
+                                        contractorDocType === 2
+                                            ? t("docTypeOtherPlaceholder")
+                                            : t("contractorDocumentPlaceholder")
+                                    }
+                                    isLarge
+                                    required
+                                    onlyNumeric={contractorDocType !== 2}
+                                    maxLength={contractorDocType === 0 ? 14 : contractorDocType === 1 ? 18 : 100}
+                                />
+                            </div>
                         </div>
                         <div className="mt-6">
                             <Field
@@ -111,6 +150,7 @@ const ContractForm = () => {
                                 value={contractorEmail}
                                 onChange={(e) => setContractorEmail(e.target.value)}
                                 name="contractor-email"
+                                type="email"
                                 placeholder={t("contractorEmailPlaceholder")}
                                 isLarge
                                 required
@@ -128,17 +168,49 @@ const ContractForm = () => {
                             placeholder={t("clientNamePlaceholder")}
                             isLarge
                             required
+                            maxLength={200}
                         />
                         <div className="mt-6">
-                            <Field
-                                label={t("clientDocument")}
-                                value={clientDocument}
-                                onChange={(e) => setClientDocument(e.target.value)}
-                                name="client-document"
-                                placeholder={t("clientDocumentPlaceholder")}
-                                isLarge
-                                required
-                            />
+                            <div className="mb-2 text-small font-medium text-t-primary">{t("documentTypeLabel")}</div>
+                            <div className="flex flex-wrap gap-2">
+                                {([0, 1, 2] as const).map((id) => (
+                                    <button
+                                        key={id}
+                                        type="button"
+                                        onClick={() => {
+                                            setClientDocType(id);
+                                            setClientDocument("");
+                                        }}
+                                        className={`rounded-full border-[1.5px] px-4 py-2 text-hairline font-medium transition-all ${
+                                            clientDocType === id
+                                                ? "border-stroke-focus bg-b-surface2 text-t-primary"
+                                                : "border-stroke1 text-t-secondary hover:border-stroke-focus"
+                                        }`}
+                                    >
+                                        {id === 0 ? t("docTypeCpf") : id === 1 ? t("docTypeCnpj") : t("docTypeOther")}
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="mt-3">
+                                <Field
+                                    label={t("clientDocument")}
+                                    value={clientDocument}
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        if (clientDocType === 0) setClientDocument(formatCPF(v));
+                                        else if (clientDocType === 1) setClientDocument(formatCNPJ(v));
+                                        else setClientDocument(v);
+                                    }}
+                                    name="client-document"
+                                    placeholder={
+                                        clientDocType === 2 ? t("docTypeOtherPlaceholder") : t("clientDocumentPlaceholder")
+                                    }
+                                    isLarge
+                                    required
+                                    onlyNumeric={clientDocType !== 2}
+                                    maxLength={clientDocType === 0 ? 14 : clientDocType === 1 ? 18 : 100}
+                                />
+                            </div>
                         </div>
                         <div className="mt-6">
                             <Field
@@ -146,6 +218,7 @@ const ContractForm = () => {
                                 value={clientEmail}
                                 onChange={(e) => setClientEmail(e.target.value)}
                                 name="client-email"
+                                type="email"
                                 placeholder={t("clientEmailPlaceholder")}
                                 isLarge
                                 required
@@ -161,11 +234,11 @@ const ContractForm = () => {
                                 className={cardClass(intellectualProperty === id)}
                                 onClick={() => setIntellectualProperty(id)}
                             >
-                                <Icon
-                                    className="mb-8 fill-inherit max-3xl:mb-5"
-                                    name="lock"
-                                />
-                                <div className="">{t(id === 0 ? "ipAfterPayment" : "ipUntilPayment")}</div>
+                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name="lock" />
+                                <div className="text-body-bold">{t(id === 0 ? "ipAfterPayment" : "ipUntilPayment")}</div>
+                                <div className="mt-2 text-body text-t-secondary leading-snug">
+                                    {t(id === 0 ? "ipAfterPaymentDesc" : "ipUntilPaymentDesc")}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -178,11 +251,11 @@ const ContractForm = () => {
                                 className={cardClass(changePolicy === id)}
                                 onClick={() => setChangePolicy(id)}
                             >
-                                <Icon
-                                    className="mb-8 fill-inherit max-3xl:mb-5"
-                                    name={id === 0 ? "check" : "edit"}
-                                />
-                                <div className="">{t(id === 0 ? "changesWithinScope" : "changesExtraCharged")}</div>
+                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name={id === 0 ? "check" : "edit"} />
+                                <div className="text-body-bold">{t(id === 0 ? "changesWithinScope" : "changesExtraCharged")}</div>
+                                <div className="mt-2 text-body text-t-secondary leading-snug">
+                                    {t(id === 0 ? "changesWithinScopeDesc" : "changesExtraChargedDesc")}
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -195,14 +268,29 @@ const ContractForm = () => {
                                 className={cardClass(termination === id)}
                                 onClick={() => setTermination(id)}
                             >
-                                <Icon
-                                    className="mb-8 fill-inherit max-3xl:mb-5"
-                                    name={id === 0 ? "check" : "close-small"}
-                                />
-                                <div className="">{t(id === 0 ? "yes" : "no")}</div>
+                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name={id === 0 ? "check" : "close-small"} />
+                                <div className="text-body-bold">{t(id === 0 ? "yes" : "no")}</div>
+                                <div className="mt-2 text-body text-t-secondary leading-snug">
+                                    {t(id === 0 ? "terminationYesDesc" : "terminationNoDesc")}
+                                </div>
                             </div>
                         ))}
                     </div>
+                )}
+                {activeId === 6 && (
+                    <>
+                        <p className="mb-4 text-body text-t-secondary">{t("contractTermsHint")}</p>
+                        <Field
+                            label={t("contractStep6")}
+                            value={additionalTerms}
+                            onChange={(e) => setAdditionalTerms(e.target.value)}
+                            name="contract-additional-terms"
+                            placeholder={t("contractTermsPlaceholder")}
+                            isLarge
+                            isTextarea
+                            maxLength={1000}
+                        />
+                    </>
                 )}
             </div>
             <div className="flex mt-auto pt-10 max-md:-mx-1 max-md:pt-6">
@@ -215,7 +303,7 @@ const ContractForm = () => {
                         {t("previous")}
                     </Button>
                 )}
-                {activeId === 5 ? (
+                {activeId === totalSteps - 1 ? (
                     <Button
                         className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
                         isSecondary

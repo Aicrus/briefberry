@@ -30,6 +30,7 @@ const References = ({}) => {
                 placeholder={t("referenceLinkPlaceholder")}
                 isLarge
                 required
+                maxLength={500}
             />
             <Button className="px-5.5" isStroke>
                 <Icon className="mr-2" name="plus" />

@@ -137,6 +137,7 @@ const PrdForm = () => {
                                     onChange={(e) => setLanguageOther(e.target.value)}
                                     name="lang-other"
                                     placeholder={t("langPlaceholder")}
+                                    maxLength={200}
                                 />
                             </div>
                         )}
@@ -188,6 +189,7 @@ const PrdForm = () => {
                             onChange={(e) => setWebFrameworkOther(e.target.value)}
                             name="web-framework-other"
                             placeholder={t("webFrameworkOtherPlaceholder")}
+                            maxLength={200}
                         />
                     </div>
                 )}
@@ -220,6 +222,7 @@ const PrdForm = () => {
                             onChange={(e) => setMobileFrameworkOther(e.target.value)}
                             name="mobile-framework-other"
                             placeholder={t("mobileFrameworkOtherPlaceholder")}
+                            maxLength={200}
                         />
                     </div>
                 )}
@@ -390,16 +393,26 @@ const PrdForm = () => {
 
                 {/* 9. Regras */}
                 {activeId === 9 && (
-                    <Field
-                        label={t("customRules")}
-                        value={customRules}
-                        onChange={(e) => setCustomRules(e.target.value)}
-                        name="custom-rules"
-                        placeholder={t("customRulesPlaceholder")}
-                        isLarge
-                        isTextarea
-                        required
-                    />
+                    <>
+                        <p className="mb-4 text-body text-t-secondary">
+                            {t("customRulesHint")}
+                        </p>
+                        <Field
+                            label={t("customRules")}
+                            value={customRules}
+                            onChange={(e) => setCustomRules(e.target.value)}
+                            name="custom-rules"
+                            placeholder={t("customRulesPlaceholder")}
+                            isLarge
+                            isTextarea
+                            required
+                            minLength={100}
+                            maxLength={3000}
+                        />
+                        <p className="mt-1 text-hairline text-t-tertiary">
+                            {t("charCountMinMax", { min: 100, max: 3000 })}
+                        </p>
+                    </>
                 )}
             </div>
             <div className="flex mt-auto pt-10 max-md:-mx-1 max-md:pt-6">
@@ -413,14 +426,29 @@ const PrdForm = () => {
                     </Button>
                 )}
                 {activeId === totalSteps - 1 ? (
-                    <Button
-                        className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
-                        isSecondary
-                        as="link"
-                        href="/quiz-generating"
-                    >
-                        {t("continue")}
-                    </Button>
+                    customRules.length >= 100 ? (
+                        <Button
+                            className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
+                            isSecondary
+                            as="link"
+                            href="/quiz-generating"
+                        >
+                            {t("continue")}
+                        </Button>
+                    ) : (
+                        <div className="flex flex-col items-end ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1">
+                            <Button
+                                className="min-w-40 max-md:min-w-full"
+                                isSecondary
+                                disabled
+                            >
+                                {t("continue")}
+                            </Button>
+                            <p className="mt-2 text-hairline text-t-tertiary">
+                                {t("minCharsToContinue")}
+                            </p>
+                        </div>
+                    )
                 ) : (
                     <Button
                         className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"

@@ -10,6 +10,10 @@ type FieldProps = {
     onResetPassword?: () => void;
     isLarge?: boolean;
     currency?: string;
+    /** Mostra contador de caracteres (ex: "50 / 3000") quando maxLength está definido */
+    showCharCount?: boolean;
+    /** Restringe input a apenas dígitos (para máscaras numéricas) */
+    onlyNumeric?: boolean;
 };
 
 const Field = ({
@@ -21,12 +25,27 @@ const Field = ({
     onResetPassword,
     isLarge,
     currency,
+    showCharCount = false,
+    onlyNumeric = false,
+    onChange,
+    value = "",
+    maxLength,
     ...inputProps
 }: FieldProps &
     React.InputHTMLAttributes<HTMLInputElement> &
     React.TextareaHTMLAttributes<HTMLTextAreaElement>) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const error = false;
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (onlyNumeric) {
+            const next = e.target.value.replace(/\D/g, "");
+            e.target.value = next;
+        }
+        onChange?.(e);
+    };
+
+    const currentLength = typeof value === "string" ? value.length : 0;
 
     return (
         <div
@@ -53,8 +72,11 @@ const Field = ({
                                 ? "h-77 rounded-2xl text-heading-thin tracking-normal! max-md:h-65"
                                 : "h-32 rounded-3xl text-input"
                         } ${classInput || ""}`}
+                        value={value}
+                        onChange={handleChange}
+                        maxLength={maxLength}
                         {...inputProps}
-                    ></textarea>
+                    />
                 ) : (
                     <input
                         className={`w-full px-6.5 border-[1.5px] border-stroke1 text-t-primary font-medium transition-colors outline-0 placeholder:text-t-tertiary focus:border-[#A8A8A8]/50! max-md:text-[1rem] ${
@@ -73,10 +95,21 @@ const Field = ({
                                 ? isPasswordVisible
                                     ? "text"
                                     : "password"
+                                : onlyNumeric
+                                ? "text"
                                 : type
                         }
+                        inputMode={onlyNumeric ? "numeric" : undefined}
+                        value={value}
+                        onChange={handleChange}
+                        maxLength={maxLength}
                         {...inputProps}
                     />
+                )}
+                {showCharCount && maxLength != null && (
+                    <div className="mt-2 text-right text-hairline text-t-tertiary">
+                        {currentLength} / {maxLength}
+                    </div>
                 )}
                 {onResetPassword && (
                     <button

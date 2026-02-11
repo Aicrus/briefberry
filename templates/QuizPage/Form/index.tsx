@@ -48,7 +48,7 @@ const Form = ({}) => {
                     {activeId + 1} / {TOTAL_STEPS}
                 </div>
             </div>
-            <div className="">
+            <div className="flex-1 min-h-0 overflow-y-auto rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1/30 p-4 max-md:rounded-xl max-md:p-3">
                 {activeId === 0 && <TypeBrief />}
                 {activeId === 1 && (
                     <Field
@@ -59,6 +59,7 @@ const Form = ({}) => {
                         placeholder={t("projectNamePlaceholder")}
                         isLarge
                         required
+                        maxLength={200}
                     />
                 )}
                 {activeId === 2 && (
@@ -71,6 +72,7 @@ const Form = ({}) => {
                         isLarge
                         isTextarea
                         required
+                        maxLength={3000}
                     />
                 )}
                 {activeId === 3 && (
@@ -89,6 +91,7 @@ const Form = ({}) => {
                         currency="$"
                         isLarge
                         required
+                        onlyNumeric
                     />
                 )}
                 {activeId === 5 && <Budget />}
@@ -133,7 +136,7 @@ const Form = ({}) => {
                     </div>
                 )}
             </div>
-            <div className="flex mt-auto pt-10 max-md:-mx-1 max-md:pt-6">
+            <div className="flex shrink-0 pt-10 max-md:-mx-1 max-md:pt-6">
                 {activeId > 0 && (
                     <Button
                         className="min-w-40 max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
