@@ -138,5 +138,6 @@
         "1month": "1 mes",
         "3months": "3 meses"
     },
-    "language": { "label": "Idioma", "en": "English", "pt": "Português", "es": "Español" }
+    "language": { "label": "Idioma", "en": "English", "pt": "Português", "es": "Español" },
+    "projectFlow": { "selectFeature": "¿Qué te gustaría crear?", "createProposal": "Crear propuesta", "createContract": "Crear contrato", "createPrd": "Crear PRD" }
 }

@@ -110,4 +110,4 @@ const QuizGeneratingPage = () => {
     );
 };
 
-export default QuizquizGeneratingPage;
+export default QuizGeneratingPage;
