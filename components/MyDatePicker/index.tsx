@@ -1,8 +1,25 @@
 import { useMemo, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import DatePicker from "react-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { enGB } from "date-fns/locale/en-GB";
+import { ptBR } from "date-fns/locale/pt-BR";
+import { es } from "date-fns/locale/es";
+import { useLocale, useTranslations } from "next-intl";
 import Field from "@/components/Field";
 import "react-datepicker/dist/react-datepicker.css";
+
+const DATE_OPTION_KEYS = ["today", "tomorrow", "1week", "2weeks", "1month", "3months"] as const;
+
+const localeToDateLocale: Record<string, string> = {
+    en: "en-GB",
+    pt: "pt-BR",
+    es: "es",
+};
+
+// Registrar locales do date-fns para o calendário exibir meses/dias no idioma correto
+registerLocale("en-GB", enGB);
+registerLocale("pt-BR", ptBR);
+registerLocale("es", es);
 
 type MyDatePickerProps = {
     value: string;
@@ -10,13 +27,16 @@ type MyDatePickerProps = {
 };
 
 const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
+    const t = useTranslations("datePicker");
+    const locale = useLocale();
     const [activeOption, setActiveOption] = useState<string | null>(null);
 
     const today = new Date();
+    const dateLocale = localeToDateLocale[locale] ?? "en-GB";
 
     const formatDate = (date: Date | null): string => {
         if (date) {
-            return date.toLocaleDateString("en-GB", {
+            return date.toLocaleDateString(dateLocale, {
                 day: "2-digit",
                 month: "short",
                 year: "numeric",
@@ -40,39 +60,30 @@ const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
         setActiveOption(null);
     };
 
-    const handleOptionClick = (option: string) => {
+    const handleOptionClick = (optionKey: (typeof DATE_OPTION_KEYS)[number]) => {
         const newDate = new Date();
-        switch (option) {
-            case "Today":
+        switch (optionKey) {
+            case "today":
                 break;
-            case "Tomorrow":
+            case "tomorrow":
                 newDate.setDate(newDate.getDate() + 1);
                 break;
-            case "1 week":
+            case "1week":
                 newDate.setDate(newDate.getDate() + 7);
                 break;
-            case "2 weeks":
+            case "2weeks":
                 newDate.setDate(newDate.getDate() + 14);
                 break;
-            case "1 month":
+            case "1month":
                 newDate.setMonth(newDate.getMonth() + 1);
                 break;
-            case "3 months":
+            case "3months":
                 newDate.setMonth(newDate.getMonth() + 3);
                 break;
         }
         onChange({ target: { value: formatDate(newDate) } });
-        setActiveOption(option);
+        setActiveOption(optionKey);
     };
-
-    const options = [
-        "Today",
-        "Tomorrow",
-        "1 week",
-        "2 weeks",
-        "1 month",
-        "3 months",
-    ];
 
     return (
         <>
@@ -85,11 +96,11 @@ const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
                         >
                             <Field
                                 classInput="truncate cursor-pointer group-[[data-open]]:border-[#A8A8A8]/50!"
-                                label="Select date"
+                                label={t("label")}
                                 value={value}
                                 onChange={handleInputChange}
                                 name="date"
-                                placeholder="Write anytime here. e.g. tomorrow or 18 Oct 2024"
+                                placeholder={t("placeholder")}
                                 isLarge
                                 required
                             />
@@ -109,22 +120,23 @@ const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
                                     }}
                                     minDate={today}
                                     inline
+                                    locale={dateLocale}
                                 />
                             </div>
                             <div className="flex flex-col grow gap-3 -mt-0.5 ml-6 max-md:hidden">
-                                {options.map((option) => (
+                                {DATE_OPTION_KEYS.map((optionKey) => (
                                     <button
                                         className={`flex justify-center items-center w-full h-8 border-[1.5px] rounded-full text-hairline font-medium transition-all hover:border-stroke-highlight hover:text-t-primary ${
-                                            activeOption === option
+                                            activeOption === optionKey
                                                 ? "border-b-primary! text-t-primary!"
                                                 : "border-stroke1 text-t-secondary"
                                         }`}
-                                        key={option}
+                                        key={optionKey}
                                         onClick={() =>
-                                            handleOptionClick(option)
+                                            handleOptionClick(optionKey)
                                         }
                                     >
-                                        {option}
+                                        {t(optionKey)}
                                     </button>
                                 ))}
                             </div>

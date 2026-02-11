@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Layout from "@/components/Layout";
 import Image from "@/components/Image";
 import Icon from "@/components/Icon";
 import EmptyPage from "./EmptyPage";
 
-const QuizquizGeneratingPage = () => {
+const QuizGeneratingPage = () => {
+    const t = useTranslations("quizGenerating");
     const [countdown, setCountdown] = useState(5);
     const router = useRouter();
 
@@ -66,7 +68,7 @@ const QuizquizGeneratingPage = () => {
                         "
                     >
                         <div className="max-w-167.5 mx-auto mb-8 text-hero max-3xl:max-w-118 max-3xl:text-h1 max-lg:leading-12 max-md:text-h3">
-                            Your brief will be delivered in {countdown} seconds.
+                            {t("countdownMessage", { seconds: countdown })}
                         </div>
                         <div className="relative inline-flex p-2 rounded-[1.875rem] border-t-[0.5px] border-[#282828]/10 overflow-hidden shadow-[0px_-1px_0px_0px_rgba(255,255,255,0.8)_inset,0px_6px_13px_0px_rgba(24,24,24,0.03)_inset,0px_6px_4px_-4px_rgba(24,24,24,0.05)_inset,0px_4.5px_1.5px_-4px_rgba(24,24,24,0.07)_inset] dark:shadow-[0px_-1px_0px_0px_rgba(255,255,255,0.05)_inset,0px_6px_13px_0px_rgba(24,24,24,0.25)_inset,0px_6px_4px_-4px_rgba(24,24,24,0.50)_inset,0px_4.5px_1px_-4px_rgba(24,24,24,0.80)_inset]">
                             <div className="absolute top-0 left-0">
@@ -86,7 +88,7 @@ const QuizquizGeneratingPage = () => {
                                 "
                             >
                                 <span className="relative z-1 text-heading-thin font-bold text-t-primary/80">
-                                    Generating
+                                    {t("generating")}
                                 </span>
                                 <Icon
                                     className="relative z-1 size-4! fill-primary1 animate-rotate"

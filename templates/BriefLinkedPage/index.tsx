@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 import BriefSection from "@/components/BriefSection";
 import BriefCategory from "@/components/BriefCategory";
@@ -10,6 +11,7 @@ import UpButton from "@/components/UpButton";
 import { content } from "./content";
 
 const BriefLinkedPage = () => {
+    const t = useTranslations("brief");
     const isPremiumPlan = useEventsStore((state) => state.isPremiumPlan);
 
     return (
@@ -31,33 +33,33 @@ const BriefLinkedPage = () => {
                         <BriefCategory value="ux-ui-design" />
                     </div>
                     <BriefSection
-                        title="Introduction"
+                        title={t("introduction")}
                         content={content.introduction}
                         isOnlyView
                     />
                     <BriefSection
-                        title="Goals"
+                        title={t("goals")}
                         content={content.goals}
                         isOnlyView
                     />
                     <BriefSection
-                        title="Timeline"
+                        title={t("timeline")}
                         content={content.timeline}
                         isOnlyView
                     />
                     <BriefSection
-                        title="Budget"
+                        title={t("budget")}
                         content={content.budget}
                         isOnlyView
                     />
                     <BriefSection
-                        title="References"
+                        title={t("references")}
                         content={content.references}
                         images={content.images}
                         isOnlyView
                     />
                     <BriefSection
-                        title="Conclusion"
+                        title={t("conclusion")}
                         content={content.conclusion}
                         isOnlyView
                     />

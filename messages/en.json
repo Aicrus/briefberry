@@ -57,6 +57,10 @@
         "browse": "Browse",
         "addLink": "Add link"
     },
+    "quizGenerating": {
+        "countdownMessage": "Your brief will be delivered in {seconds} seconds.",
+        "generating": "Generating"
+    },
     "myBriefs": {
         "title": "My briefs",
         "allBriefs": "All briefs",
@@ -124,5 +128,15 @@
         "createAccountButton": "Create an account"
     },
     "home": { "pricingTitle": "Start for free and upgrade to unlock more features" },
+    "datePicker": {
+        "label": "Select date",
+        "placeholder": "Write anytime here. e.g. tomorrow or 18 Oct 2024",
+        "today": "Today",
+        "tomorrow": "Tomorrow",
+        "1week": "1 week",
+        "2weeks": "2 weeks",
+        "1month": "1 month",
+        "3months": "3 months"
+    },
     "language": { "label": "Language", "en": "English", "pt": "Português", "es": "Español" }
 }
