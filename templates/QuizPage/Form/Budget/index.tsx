@@ -3,13 +3,22 @@ import { useTranslations } from "next-intl";
 import Field from "@/components/Field";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
+import {
+    formatCurrencyFromDigits,
+    parseDigitsFromInput,
+    type CurrencyId,
+} from "@/lib/currency";
 
 const MAX_BUDGET_STAGES = 20;
 
 type BudgetItem = { id: number; scope: string; budget: string };
 
-const Budget = ({}) => {
+const CURRENCY_SYMBOL: Record<number, string> = { 0: "R$", 1: "$", 2: "€" };
+
+const Budget = ({ currency = null }: { currency?: number | null }) => {
     const t = useTranslations("quiz");
+    const symbol = currency !== null && CURRENCY_SYMBOL[currency] ? CURRENCY_SYMBOL[currency] : "$";
+    const currencyId = (currency ?? 1) as CurrencyId;
     const [items, setItems] = useState<BudgetItem[]>([
         { id: 1, scope: "", budget: "" },
         { id: 2, scope: "", budget: "" },
@@ -59,13 +68,13 @@ const Budget = ({}) => {
                             className="w-[calc(50%+0.0625rem)] -ml-0.25 max-md:w-30"
                             classInput={`relative ${index > 0 ? "rounded-l-none! focus:z-1 group-hover:border-[#A8A8A8]/50" : "rounded-l-none! focus:z-1"}`}
                             label={t("budget")}
-                            value={item.budget}
-                            onChange={(e) => updateItem(item.id, "budget", e.target.value)}
-                            placeholder="0"
-                            currency="$"
+                            value={formatCurrencyFromDigits(item.budget, currencyId)}
+                            onChange={(e) => updateItem(item.id, "budget", parseDigitsFromInput(e.target.value))}
+                            placeholder={currencyId === 1 ? "0.00" : "0,00"}
+                            currency={symbol}
                             isLarge
                             required
-                            onlyNumeric
+                            inputMode="decimal"
                         />
                     </div>
                     {items.length > 1 && (

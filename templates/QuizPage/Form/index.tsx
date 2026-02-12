@@ -6,9 +6,20 @@ import MyDatePicker from "@/components/MyDatePicker";
 import TypeBrief from "./TypeBrief";
 import References from "./References";
 import Budget from "./Budget";
+import {
+    formatCurrencyFromDigits,
+    parseDigitsFromInput,
+    type CurrencyId,
+} from "@/lib/currency";
 
 const STEP_KEYS = ["step0", "step1", "step2", "step3", "step4", "step5", "step6", "stepPayment"] as const;
 const TOTAL_STEPS = 8;
+
+const CURRENCY_OPTIONS: { id: number; label: string; symbol: string }[] = [
+    { id: 0, label: "BRL (R$)", symbol: "R$" },
+    { id: 1, label: "USD ($)", symbol: "$" },
+    { id: 2, label: "EUR (€)", symbol: "€" },
+];
 
 const cardClass = (active: boolean) =>
     `w-[calc(50%-1rem)] mt-4 mx-2 px-6 py-5.5 border-[1.5px] border-stroke1 rounded-[1.25rem] text-heading font-medium! text-t-secondary fill-t-secondary hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary hover:fill-t-primary cursor-pointer transition-all max-md:w-[calc(50%-0.75rem)] max-md:mt-3 max-md:mx-1.5 ${
@@ -48,7 +59,7 @@ const Form = ({}) => {
                     {activeId + 1} / {TOTAL_STEPS}
                 </div>
             </div>
-            <div className="">
+            <div className="flex-1 min-h-0 flex flex-col">
                 {activeId === 0 && <TypeBrief />}
                 {activeId === 1 && (
                     <Field
@@ -82,19 +93,35 @@ const Form = ({}) => {
                     />
                 )}
                 {activeId === 4 && (
-                    <Field
-                        label={t("yourBudget")}
-                        value={yourBudget}
-                        onChange={(e) => setYourBudget(e.target.value)}
-                        name="your-budget"
-                        placeholder="0"
-                        currency="$"
-                        isLarge
-                        required
-                        onlyNumeric
-                    />
+                    <div className="space-y-6">
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">{t("stepCurrencyLabel")}</div>
+                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                                {CURRENCY_OPTIONS.map((opt) => (
+                                    <div
+                                        key={opt.id}
+                                        className={cardClass(currency === opt.id)}
+                                        onClick={() => setCurrency(opt.id)}
+                                    >
+                                        <div className="">{opt.label}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <Field
+                            label={t("yourBudget")}
+                            value={formatCurrencyFromDigits(yourBudget, (currency ?? 1) as CurrencyId)}
+                            onChange={(e) => setYourBudget(parseDigitsFromInput(e.target.value))}
+                            name="your-budget"
+                            placeholder={(currency ?? 1) === 1 ? "0.00" : "0,00"}
+                            currency={CURRENCY_OPTIONS.find((o) => o.id === currency)?.symbol ?? "$"}
+                            isLarge
+                            required
+                            inputMode="decimal"
+                        />
+                    </div>
                 )}
-                {activeId === 5 && <Budget />}
+                {activeId === 5 && <Budget currency={currency} />}
                 {activeId === 6 && <References />}
                 {activeId === 7 && (
                     <div className="space-y-8">
@@ -129,13 +156,13 @@ const Form = ({}) => {
                         <div>
                             <div className="mb-3 text-body-bold text-t-primary">{t("stepCurrencyLabel")}</div>
                             <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                                {[0, 1].map((id) => (
+                                {CURRENCY_OPTIONS.map((opt) => (
                                     <div
-                                        key={id}
-                                        className={cardClass(currency === id)}
-                                        onClick={() => setCurrency(id)}
+                                        key={opt.id}
+                                        className={cardClass(currency === opt.id)}
+                                        onClick={() => setCurrency(opt.id)}
                                     >
-                                        <div className="">{id === 0 ? "BRL (R$)" : "USD ($)"}</div>
+                                        <div className="">{opt.label}</div>
                                     </div>
                                 ))}
                             </div>
@@ -143,7 +170,7 @@ const Form = ({}) => {
                     </div>
                 )}
             </div>
-            <div className="flex shrink-0 pt-10 max-md:-mx-1 max-md:pt-6">
+            <div className="flex shrink-0 mt-auto pt-10 max-md:-mx-1 max-md:pt-6">
                 {activeId > 0 && (
                     <Button
                         className="min-w-40 max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"

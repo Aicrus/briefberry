@@ -70,7 +70,7 @@ const ContractForm = () => {
                     {activeId + 1} / {totalSteps}
                 </div>
             </div>
-            <div className="">
+            <div className="flex-1 min-h-0 flex flex-col">
                 {activeId === 0 && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                         {CONTRACTOR_TYPE_OPTIONS.map((option) => (

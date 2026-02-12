@@ -24,6 +24,7 @@ const PAYMENT_OPTIONS = [
 const CURRENCY_OPTIONS = [
     { id: 0, label: "BRL (R$)" },
     { id: 1, label: "USD ($)" },
+    { id: 2, label: "EUR (€)" },
 ] as const;
 
 const REVISIONS_OPTIONS = [
@@ -62,7 +63,7 @@ const ProposalForm = () => {
                     {activeId + 1} / {totalSteps}
                 </div>
             </div>
-            <div className="">
+            <div className="flex-1 min-h-0 flex flex-col">
                 {activeId === 0 && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                         {BILLING_OPTIONS.map((opt) => (

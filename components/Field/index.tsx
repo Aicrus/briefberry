@@ -14,6 +14,8 @@ type FieldProps = {
     showCharCount?: boolean;
     /** Restringe input a apenas dígitos (para máscaras numéricas) */
     onlyNumeric?: boolean;
+    /** Com onlyNumeric + currency: aceita um separador decimal livre (vírgula ou ponto) conforme a moeda do usuário */
+    allowDecimalSeparator?: boolean;
 };
 
 const Field = ({
@@ -27,6 +29,7 @@ const Field = ({
     currency,
     showCharCount = false,
     onlyNumeric = false,
+    allowDecimalSeparator = false,
     onChange,
     value = "",
     maxLength,
@@ -39,7 +42,18 @@ const Field = ({
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         if (onlyNumeric) {
-            const next = e.target.value.replace(/\D/g, "");
+            let next = e.target.value;
+            if (allowDecimalSeparator || currency) {
+                // Aceita dígitos e no máximo um separador decimal (vírgula ou ponto), livre para a moeda do usuário
+                next = next.replace(/[^\d.,]/g, "");
+                const firstSep = next.search(/[.,]/);
+                if (firstSep >= 0 && next.slice(firstSep + 1).search(/[.,]/) >= 0) {
+                    // Já existe um separador; mantém o primeiro e remove os demais (só dígitos depois)
+                    next = next.slice(0, firstSep + 1) + next.slice(firstSep + 1).replace(/[.,]/g, "");
+                }
+            } else {
+                next = next.replace(/\D/g, "");
+            }
             e.target.value = next;
         }
         onChange?.(e);
@@ -89,7 +103,7 @@ const Field = ({
                             isLarge
                                 ? "h-16 rounded-2xl text-heading-thin tracking-normal!"
                                 : "h-12 rounded-3xl text-input"
-                        } ${currency ? "pl-10" : ""} ${classInput || ""}`}
+                        } ${currency ? (currency.length > 1 ? "pl-12" : "pl-10") : ""} ${classInput || ""}`}
                         type={
                             type === "password"
                                 ? isPasswordVisible
@@ -99,7 +113,7 @@ const Field = ({
                                 ? "text"
                                 : type
                         }
-                        inputMode={onlyNumeric ? "numeric" : undefined}
+                        inputMode={onlyNumeric && !(allowDecimalSeparator || currency) ? "numeric" : onlyNumeric ? "decimal" : undefined}
                         value={value}
                         onChange={handleChange}
                         maxLength={maxLength}
