@@ -1,9 +1,9 @@
 {
     "header": { "signIn": "Entrar", "newBrief": "Novo brief" },
     "menu": { "myBriefs": "Meus briefs", "manageYourPlan": "Gerenciar seu plano", "accountSettings": "Configurações da conta", "credits": "Créditos", "upgrade": "Atualizar", "theme": "Tema", "logOut": "Sair" },
-    "hero": { "title": "Briefs de projeto com IA para designers", "subtitle": "Transforme suas ideias em briefs de projeto completos em segundos! Deixe a IA criar seu brief enquanto você foca em dar vida à sua visão.", "getStarted": "Começar grátis", "joinDesigners": "Junte-se a mais de 80.000 designers" },
-    "start": { "title": "Comece a criar briefs brilhantes hoje", "subtitle": "Junte-se a milhares de designers e eleve seu fluxo de trabalho de graça", "getStarted": "Começar grátis" },
-    "about": { "sectionTitle": "Briefs com IA em segundos", "sectionSubtitle": "Economize horas de preparação com geração inteligente de briefs", "title1": "Crie briefs de projeto instantaneamente", "content1": "Economize horas de preparação com geração inteligente de briefs.", "title2": "Gestão de briefs", "content2": "Visualize, edite e atualize os detalhes do projeto com facilidade.", "title3": "Compartilhamento rápido", "content3": "Gere links compartilháveis para seus briefs na hora." },
+    "hero": { "title": "Pare de perder clientes por falta de um fluxo organizado", "subtitle": "Você perde projetos enquanto prepara a proposta. Seu concorrente já enviou a dele. Crie propostas profissionais em segundos. Contrato validado em 800+ projetos. PRD com tarefas organizadas no tempo de entrega. Tudo em minutos, não em dias. Design, apps, software. Nunca mais perca um cliente por demora.", "getStarted": "Começar grátis", "joinDesigners": "800+ projetos fechados sem dor de cabeça jurídica" },
+    "start": { "title": "Chega de perder prazos. Chega de medo de processo.", "subtitle": "Contrato validado em 800+ projetos. Você está protegido. PRD estruturado com tarefas organizadas no tempo de entrega. Seus clientes vão te respeitar. Você vai dormir tranquilo.", "getStarted": "Começar grátis" },
+    "about": { "sectionTitle": "Cada minuto perdido é dinheiro que não entra", "sectionSubtitle": "Proposta lenta = cliente perdido. Sem contrato = risco de processo. Sem planejamento = atraso e cliente insatisfeito.", "title1": "Feche antes do concorrente", "content1": "Enquanto você demora 3 dias para fazer a proposta, seu concorrente já fechou. Crie proposta profissional em 5 minutos. Cliente recebe, cliente aprova, você fatura.", "title2": "Durma tranquilo. Você está protegido.", "content2": "800+ projetos sem processo. Advogados criaram este contrato. IA adapta para o seu cliente. Direitos autorais, pagamento, cancelamento, tudo coberto. Brasil, EUA, Europa, funciona em qualquer lugar.", "title3": "Nunca mais atrase. Nunca mais improvise.", "content3": "Cliente reclama de atraso? Escopo muda toda hora? Acabou. PRD estruturado por profissionais mais tarefas organizadas, você entrega no prazo. Cliente feliz. Você sem estresse." },
     "footer": { "copyright": "© 2024, Robot Global FZCO / UI8", "termsLicensing": "Termos e licenciamento" },
     "login": {
         "signInTitle": "Entrar no Briefberry",
@@ -37,6 +37,10 @@
         "step7": "Modelo de cobrança",
         "step8": "Forma de pagamento",
         "step9": "Moeda",
+        "stepPayment": "Cobrança, pagamento e moeda",
+        "stepBillingLabel": "Como cobrar?",
+        "stepPaymentLabel": "Quando receber?",
+        "stepCurrencyLabel": "Moeda",
         "proposalStep0": "Qual modelo de cobrança?",
         "proposalStep1": "Como será o pagamento?",
         "proposalStep2": "Qual moeda?",
@@ -56,6 +60,7 @@
         "contractStep3": "Quando os direitos são transferidos?",
         "contractStep4": "Como tratar alterações de escopo?",
         "contractStep5": "Cancelamento sem reembolso?",
+        "contractStepClauses": "Cláusulas do contrato",
         "contractStep6": "Termos ou observações adicionais",
         "contractTermsHint": "Opcional. Cláusulas ou observações que devem constar no contrato.",
         "ipAfterPaymentDesc": "Direitos transferidos após o pagamento integral",
@@ -65,12 +70,19 @@
         "terminationYesDesc": "Cliente pode cancelar sem reembolso do já pago",
         "terminationNoDesc": "Cancelamento prevê reembolso proporcional",
         "prdStepLang": "Em qual idioma você quer o projeto?",
+        "prdStepDeadline": "Quando você quer que o projeto esteja pronto?",
+        "prdDeadlineHint": "As tarefas serão divididas conforme o tempo estipulado para o desenvolvimento do projeto.",
+        "prdStepLangAndDeadline": "Idioma e prazo",
+        "prdStepBackendAndAuth": "Backend e autenticação",
+        "prdStepFeaturesAndIntegrations": "Funcionalidades e integrações",
+        "prdSectionBackend": "Tecnologia backend",
+        "prdSectionAuth": "Autenticação",
         "prdStep0": "Qual tipo de plataforma você quer desenvolver?",
         "prdStep1": "Qual framework web você quer usar?",
         "prdStep2": "Qual framework para app nativo?",
         "prdStep3": "Qual tecnologia backend?",
         "prdStep4": "Como os usuários vão entrar?",
-        "prdStep5": "Quais funcionalidades principais você precisa?",
+        "prdStep5": "Funcionalidades principais",
         "prdStep6": "Quais integrações com serviços externos?",
         "prdStep7": "Design e tema",
         "prdStep8": "Regras de negócio e observações técnicas",
@@ -240,7 +252,7 @@
     "pricing": {
         "free": "Grátis",
         "premium": "Premium",
-        "featureAiBriefs": "Briefs de projeto com IA",
+        "featureAiBriefs": "Proposta + contrato jurídico + PRD com IA",
         "featureBasicEditing": "Edição básica",
         "featureShareableLinks": "Links compartilháveis",
         "featureIncludingFree": "Inclui todos os recursos grátis",
@@ -260,7 +272,7 @@
         "getStartedNow": "Começar agora",
         "createAccountButton": "Criar uma conta"
     },
-    "home": { "pricingTitle": "Comece grátis e atualize para desbloquear mais recursos" },
+    "home": { "pricingTitle": "Comece grátis. Feche mais projetos com menos esforço." },
     "datePicker": {
         "label": "Selecionar data",
         "placeholder": "Escreva quando quiser. ex: amanhã ou 18 out 2024",
@@ -272,5 +284,5 @@
         "3months": "3 meses"
     },
     "language": { "label": "Idioma", "en": "English", "pt": "Português", "es": "Español" },
-    "projectFlow": { "selectFeature": "O que você gostaria de criar?", "createProposal": "Criar proposta", "createProposalDesc": "Proposta com base no seu briefing", "createContract": "Criar contrato", "createContractDesc": "Contrato com dados do contratante e cliente", "createPrd": "Criar PRD", "createPrdDesc": "Requisitos do produto com detalhes técnicos" }
+    "projectFlow": { "selectFeature": "Qual problema você quer resolver agora?", "createProposal": "Proposta", "createProposalDesc": "Feche o cliente antes que ele escolha outro. Proposta profissional em minutos.", "createContract": "Contrato", "createContractDesc": "Proteja-se de processos. Contrato validado por advogados em 800+ projetos.", "createPrd": "PRD + Tarefas", "createPrdDesc": "Pare de atrasar entregas. Planejamento + tarefas para entregar no prazo." }
 }

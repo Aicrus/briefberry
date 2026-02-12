@@ -7,8 +7,8 @@ import TypeBrief from "./TypeBrief";
 import References from "./References";
 import Budget from "./Budget";
 
-const STEP_KEYS = ["step0", "step1", "step2", "step3", "step4", "step5", "step6", "step7", "step8", "step9"] as const;
-const TOTAL_STEPS = 10;
+const STEP_KEYS = ["step0", "step1", "step2", "step3", "step4", "step5", "step6", "stepPayment"] as const;
+const TOTAL_STEPS = 8;
 
 const cardClass = (active: boolean) =>
     `w-[calc(50%-1rem)] mt-4 mx-2 px-6 py-5.5 border-[1.5px] border-stroke1 rounded-[1.25rem] text-heading font-medium! text-t-secondary fill-t-secondary hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary hover:fill-t-primary cursor-pointer transition-all max-md:w-[calc(50%-0.75rem)] max-md:mt-3 max-md:mx-1.5 ${
@@ -48,7 +48,7 @@ const Form = ({}) => {
                     {activeId + 1} / {TOTAL_STEPS}
                 </div>
             </div>
-            <div className="flex-1 min-h-0 overflow-y-auto rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1/30 p-4 max-md:rounded-xl max-md:p-3">
+            <div className="">
                 {activeId === 0 && <TypeBrief />}
                 {activeId === 1 && (
                     <Field
@@ -97,42 +97,49 @@ const Form = ({}) => {
                 {activeId === 5 && <Budget />}
                 {activeId === 6 && <References />}
                 {activeId === 7 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {[0, 1, 2].map((id) => (
-                            <div
-                                key={id}
-                                className={cardClass(billingModel === id)}
-                                onClick={() => setBillingModel(id)}
-                            >
-                                <div className="">{t(id === 0 ? "billingFixedPrice" : id === 1 ? "billingPerFeature" : "billingPerStage")}</div>
+                    <div className="space-y-8">
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">{t("stepBillingLabel")}</div>
+                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                                {([0, 2] as const).map((id) => (
+                                    <div
+                                        key={id}
+                                        className={cardClass(billingModel === id)}
+                                        onClick={() => setBillingModel(id)}
+                                    >
+                                        <div className="">{t(id === 0 ? "billingFixedPrice" : "billingPerStage")}</div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                )}
-                {activeId === 8 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {[0, 1].map((id) => (
-                            <div
-                                key={id}
-                                className={cardClass(paymentMethod === id)}
-                                onClick={() => setPaymentMethod(id)}
-                            >
-                                <div className="">{t(id === 0 ? "payment5050" : "paymentPerStage")}</div>
+                        </div>
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">{t("stepPaymentLabel")}</div>
+                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                                {[0, 1].map((id) => (
+                                    <div
+                                        key={id}
+                                        className={cardClass(paymentMethod === id)}
+                                        onClick={() => setPaymentMethod(id)}
+                                    >
+                                        <div className="">{t(id === 0 ? "payment5050" : "paymentPerStage")}</div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                )}
-                {activeId === 9 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {[0, 1].map((id) => (
-                            <div
-                                key={id}
-                                className={cardClass(currency === id)}
-                                onClick={() => setCurrency(id)}
-                            >
-                                <div className="">{id === 0 ? "BRL (R$)" : "USD ($)"}</div>
+                        </div>
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">{t("stepCurrencyLabel")}</div>
+                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                                {[0, 1].map((id) => (
+                                    <div
+                                        key={id}
+                                        className={cardClass(currency === id)}
+                                        onClick={() => setCurrency(id)}
+                                    >
+                                        <div className="">{id === 0 ? "BRL (R$)" : "USD ($)"}</div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </div>
                     </div>
                 )}
             </div>

@@ -3,14 +3,15 @@ import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
 import Icon from "@/components/Icon";
+import MyDatePicker from "@/components/MyDatePicker";
 
 const STEP_KEYS = [
-    "prdStepLang",
     "prdStep0",
+    "prdStepLang",
+    "prdStepDeadline",
     "prdStep1",
     "prdStep2",
-    "prdStep3",
-    "prdStep4",
+    "prdStepBackendAndAuth",
     "prdStep5",
     "prdStep6",
     "prdStep7",
@@ -63,6 +64,7 @@ const PrdForm = () => {
         whatsapp: false,
     });
 
+    const [projectDeadline, setProjectDeadline] = useState("");
     const [designSystem, setDesignSystem] = useState<number | null>(null);
     const [theme, setTheme] = useState<number | null>(null);
     const [icons, setIcons] = useState<number | null>(null);
@@ -115,8 +117,25 @@ const PrdForm = () => {
                 </div>
             </div>
             <div className="">
-                {/* 0. Idioma */}
+                {/* 0. Plataforma */}
                 {activeId === 0 && (
+                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                        {PLATFORM_OPTIONS.map((opt) => (
+                            <div
+                                key={opt.id}
+                                className={cardClass(platform === opt.id)}
+                                onClick={() => setPlatform(opt.id)}
+                            >
+                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name={opt.icon} />
+                                <div className="text-body-bold">{t(opt.titleKey)}</div>
+                                <div className="mt-2 text-body text-t-secondary leading-snug">{t(opt.descKey)}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                {/* 1. Idioma */}
+                {activeId === 1 && (
                     <>
                         <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                             {langOptions.map((opt) => (
@@ -144,25 +163,21 @@ const PrdForm = () => {
                     </>
                 )}
 
-                {/* 1. Plataforma */}
-                {activeId === 1 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {PLATFORM_OPTIONS.map((opt) => (
-                            <div
-                                key={opt.id}
-                                className={cardClass(platform === opt.id)}
-                                onClick={() => setPlatform(opt.id)}
-                            >
-                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name={opt.icon} />
-                                <div className="text-body-bold">{t(opt.titleKey)}</div>
-                                <div className="mt-2 text-body text-t-secondary leading-snug">{t(opt.descKey)}</div>
-                            </div>
-                        ))}
-                    </div>
+                {/* 2. Quando quer que o projeto esteja pronto */}
+                {activeId === 2 && (
+                    <>
+                        <MyDatePicker
+                            value={projectDeadline}
+                            onChange={(e) => setProjectDeadline(e.target.value)}
+                        />
+                        <p className="mt-4 text-body text-t-secondary">
+                            {t("prdDeadlineHint")}
+                        </p>
+                    </>
                 )}
 
-                {/* 2. Framework web */}
-                {activeId === 2 && (
+                {/* 3. Framework web */}
+                {activeId === 3 && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                         {webFrameworks.map((name, id) => (
                             <div
@@ -181,7 +196,7 @@ const PrdForm = () => {
                         </div>
                     </div>
                 )}
-                {activeId === 2 && webFramework === webFrameworks.length && (
+                {activeId === 3 && webFramework === webFrameworks.length && (
                     <div className="mt-6">
                         <Field
                             label=""
@@ -194,8 +209,8 @@ const PrdForm = () => {
                     </div>
                 )}
 
-                {/* 3. Framework mobile */}
-                {activeId === 3 && (
+                {/* 4. Framework mobile */}
+                {activeId === 4 && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                         {mobileFrameworks.map((name, id) => (
                             <div
@@ -214,7 +229,7 @@ const PrdForm = () => {
                         </div>
                     </div>
                 )}
-                {activeId === 3 && mobileFramework === mobileFrameworks.length && (
+                {activeId === 4 && mobileFramework === mobileFrameworks.length && (
                     <div className="mt-6">
                         <Field
                             label=""
@@ -227,42 +242,44 @@ const PrdForm = () => {
                     </div>
                 )}
 
-                {/* 4. Backend */}
-                {activeId === 4 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {["Supabase", "Node.js", "Laravel", "Firebase"].map((name, id) => (
-                            <div
-                                key={id}
-                                className={cardClass(backendTech === id)}
-                                onClick={() => setBackendTech(id)}
-                            >
-                                <div className="">{name}</div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* 5. Autenticação */}
+                {/* 5. Backend e autenticação */}
                 {activeId === 5 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {[0, 1, 2].map((id) => (
-                            <div
-                                key={id}
-                                className={cardClass(authentication === id)}
-                                onClick={() => setAuthentication(id)}
-                            >
-                                <div className="">{t(id === 0 ? "authNone" : id === 1 ? "authEmailPassword" : "authSocialLogin")}</div>
+                    <div className="space-y-8">
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">{t("prdSectionBackend")}</div>
+                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                                {["Supabase", "Node.js", "Laravel", "Firebase"].map((name, id) => (
+                                    <div
+                                        key={id}
+                                        className={cardClass(backendTech === id)}
+                                        onClick={() => setBackendTech(id)}
+                                    >
+                                        <div className="">{name}</div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </div>
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">{t("prdSectionAuth")}</div>
+                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                                {[0, 1, 2].map((id) => (
+                                    <div
+                                        key={id}
+                                        className={cardClass(authentication === id)}
+                                        onClick={() => setAuthentication(id)}
+                                    >
+                                        <div className="">{t(id === 0 ? "authNone" : id === 1 ? "authEmailPassword" : "authSocialLogin")}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 )}
 
-                {/* 6. Funcionalidades principais (multi) */}
+                {/* 6. Funcionalidades principais */}
                 {activeId === 6 && (
                     <>
-                        <div className="mb-5 text-body text-t-secondary max-md:mb-4">
-                            {t("featuresHint")}
-                        </div>
+                        <div className="mb-5 text-body text-t-secondary max-md:mb-4">{t("featuresHint")}</div>
                         <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                             {FEATURE_KEYS.map((key) => (
                                 <div
@@ -323,12 +340,10 @@ const PrdForm = () => {
                     </>
                 )}
 
-                {/* 7. Integrações (multi) */}
+                {/* 7. Integrações */}
                 {activeId === 7 && (
                     <>
-                        <div className="mb-5 text-body text-t-secondary max-md:mb-4">
-                            {t("integrationsHint")}
-                        </div>
+                        <div className="mb-5 text-body text-t-secondary max-md:mb-4">{t("integrationsHint")}</div>
                         <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                             {INTEGRATION_KEYS.map((key) => (
                                 <div
@@ -425,7 +440,7 @@ const PrdForm = () => {
                         {t("previous")}
                     </Button>
                 )}
-                {activeId === totalSteps - 1 ? (
+                {activeId === 9 ? (
                     customRules.length >= 100 ? (
                         <Button
                             className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
