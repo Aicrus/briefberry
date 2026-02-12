@@ -153,20 +153,6 @@ const Form = ({}) => {
                                 ))}
                             </div>
                         </div>
-                        <div>
-                            <div className="mb-3 text-body-bold text-t-primary">{t("stepCurrencyLabel")}</div>
-                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                                {CURRENCY_OPTIONS.map((opt) => (
-                                    <div
-                                        key={opt.id}
-                                        className={cardClass(currency === opt.id)}
-                                        onClick={() => setCurrency(opt.id)}
-                                    >
-                                        <div className="">{opt.label}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
                 )}
             </div>
