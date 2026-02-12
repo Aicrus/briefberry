@@ -24,7 +24,10 @@ const LanguageSwitcher = () => {
         setMounted(true);
     }, []);
 
-    const options = LOCALES.map((l, id) => ({ id, name: t(l.labelKey) }));
+    const options = LOCALES.map((l, id) => ({
+        id,
+        name: l.value.toUpperCase(),
+    }));
     const currentOption =
         options[LOCALES.findIndex((l) => l.value === locale)] ?? options[0];
 
@@ -40,19 +43,19 @@ const LanguageSwitcher = () => {
     if (!mounted) {
         return (
             <div
-                className="min-w-32 max-md:min-w-28 h-10 min-h-10 pl-4 pr-3 flex justify-between items-center rounded-full bg-b-surface2 text-button text-t-secondary"
+                className="min-w-14 max-md:min-w-12 h-12 min-h-12 pl-4 pr-3 flex justify-between items-center rounded-full bg-b-surface2 text-button text-t-secondary"
                 aria-hidden
             >
                 <span>{currentOption.name}</span>
-                <Icon className="shrink-0 ml-3 fill-t-secondary" name="chevron" />
+                <Icon className="shrink-0 ml-2 fill-t-secondary" name="chevron" />
             </div>
         );
     }
 
     return (
         <Select
-            className="min-w-32 max-md:min-w-28"
-            classButton="h-10 min-h-10 pl-4 pr-3 text-hairline"
+            className="min-w-14 max-md:min-w-12"
+            classButton="h-12 min-h-12 pl-4 pr-3 text-hairline"
             value={currentOption}
             onChange={handleChange}
             options={options}

@@ -39,8 +39,8 @@ const Select = ({
             disabled={disabled}
         >
             <ListboxButton
-                className={`group flex justify-between items-center w-full h-12 pl-5 pr-3 bg-b-surface2 rounded-full text-button text-t-secondary transition-all outline-0 data-hover:shadow-hover data-hover:text-t-primary data-open:shadow-none data-open:text-t-primary disabled:opacity-50 disabled:cursor-not-allowed ${
-                    classButton || ""
+                className={`group flex justify-between items-center w-full min-h-10 pl-5 pr-3 max-md:pl-4 max-md:pr-2.5 bg-b-surface2 rounded-full text-button text-t-secondary transition-all outline-0 data-hover:shadow-hover data-hover:text-t-primary data-open:shadow-none data-open:text-t-primary disabled:opacity-50 disabled:cursor-not-allowed ${
+                    classButton || "h-12"
                 }`}
                 aria-label={ariaLabel}
             >
