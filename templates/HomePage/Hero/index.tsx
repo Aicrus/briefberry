@@ -178,7 +178,7 @@ const Hero = () => {
             <Modal
                 open={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                classWrapper="!max-w-[42rem] max-md:!max-w-full"
+                classWrapper="!max-w-5xl max-md:!max-w-full"
             >
                 <FeatureSelector onSelect={handleFeatureSelect} />
             </Modal>

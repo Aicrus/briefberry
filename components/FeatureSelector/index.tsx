@@ -46,10 +46,10 @@ const FeatureSelector = ({ onSelect }: FeatureSelectorProps) => {
     return (
         <div>
             <div className="mb-8 text-h3">{t("selectFeature")}</div>
-            <div className="flex flex-wrap -mt-5 -mx-2 max-md:-mt-4 max-md:-mx-1.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 max-md:gap-3">
                 {features.map((feature) => (
                     <div
-                        className={`w-[calc(33.333%-1rem)] mt-5 mx-2 min-h-36 px-6 py-5.5 border-[1.5px] border-stroke1 rounded-[1.25rem] fill-t-secondary hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary hover:fill-t-primary cursor-pointer transition-all max-md:w-[calc(50%-0.75rem)] max-md:mt-4 max-md:mx-1.5 max-md:min-h-0 max-md:py-5.5 text-t-secondary ${
+                        className={`min-w-0 min-h-36 px-6 py-5.5 border-[1.5px] border-stroke1 rounded-[1.25rem] fill-t-secondary hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary hover:fill-t-primary cursor-pointer transition-all max-md:min-h-0 max-md:py-5.5 text-t-secondary ${
                             active === feature.key
                                 ? "border-stroke-focus! text-t-primary! fill-t-primary!"
                                 : ""
@@ -64,7 +64,7 @@ const FeatureSelector = ({ onSelect }: FeatureSelectorProps) => {
                         <div className="text-body-bold leading-snug">
                             {t(feature.titleKey)}
                         </div>
-                        <div className="mt-3 text-body text-t-secondary leading-normal">
+                        <div className="mt-3 text-body text-t-secondary leading-normal min-w-0 break-words">
                             {t(feature.descriptionKey)}
                         </div>
                     </div>
