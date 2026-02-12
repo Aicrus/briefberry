@@ -29,15 +29,35 @@ export function formatCNPJ(value: string): string {
 }
 
 /**
+ * Máscara SSN (EUA): 000-00-0000 (máx 9 dígitos)
+ */
+export function formatSSN(value: string): string {
+    const digits = stripNonDigits(value).slice(0, 9);
+    return digits
+        .replace(/(\d{3})(\d)/, "$1-$2")
+        .replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+}
+
+/**
+ * Máscara EIN (EUA): 00-0000000 (máx 9 dígitos)
+ */
+export function formatEIN(value: string): string {
+    const digits = stripNonDigits(value).slice(0, 9);
+    return digits.replace(/(\d{2})(\d)/, "$1-$2");
+}
+
+/**
  * Aplica máscara conforme tipo: "cpf" | "cnpj" | "other"
  * "other" retorna o valor sem máscara (apenas strip se quiser, ou deixa livre)
  */
 export function formatDocument(
     value: string,
-    type: "cpf" | "cnpj" | "other"
+    type: "cpf" | "cnpj" | "ssn" | "ein" | "other"
 ): string {
     if (type === "cpf") return formatCPF(value);
     if (type === "cnpj") return formatCNPJ(value);
+    if (type === "ssn") return formatSSN(value);
+    if (type === "ein") return formatEIN(value);
     return value;
 }
 

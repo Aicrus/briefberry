@@ -3,7 +3,56 @@ import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
 import Icon from "@/components/Icon";
-import { formatCPF, formatCNPJ } from "@/lib/masks";
+import { formatCPF, formatCNPJ, formatSSN, formatEIN } from "@/lib/masks";
+
+/** 0=CPF, 1=CNPJ, 2=SSN (EUA), 3=EIN (EUA), 4=VAT/NIF (Europa), 5=Outro */
+const DOC_TYPE_IDS = [0, 1, 2, 3, 4, 5] as const;
+type DocTypeId = (typeof DOC_TYPE_IDS)[number];
+
+function getDocTypeLabelKey(id: DocTypeId): string {
+    const keys: Record<DocTypeId, string> = {
+        0: "docTypeCpf",
+        1: "docTypeCnpj",
+        2: "docTypeSsn",
+        3: "docTypeEin",
+        4: "docTypeVat",
+        5: "docTypeOther",
+    };
+    return keys[id];
+}
+
+function getDocPlaceholderKey(id: DocTypeId): string {
+    const keys: Record<DocTypeId, string> = {
+        0: "docTypeCpfPlaceholder",
+        1: "docTypeCnpjPlaceholder",
+        2: "docTypeSsnPlaceholder",
+        3: "docTypeEinPlaceholder",
+        4: "docTypeVatPlaceholder",
+        5: "docTypeOtherPlaceholder",
+    };
+    return keys[id];
+}
+
+function formatDocumentByType(value: string, docType: DocTypeId): string {
+    if (docType === 0) return formatCPF(value);
+    if (docType === 1) return formatCNPJ(value);
+    if (docType === 2) return formatSSN(value);
+    if (docType === 3) return formatEIN(value);
+    return value; // 4=VAT, 5=Outro: sem máscara
+}
+
+function getDocMaxLength(docType: DocTypeId): number {
+    if (docType === 0) return 14; // CPF com máscara
+    if (docType === 1) return 18; // CNPJ com máscara
+    if (docType === 2) return 11; // SSN 999-99-9999
+    if (docType === 3) return 10; // EIN 99-9999999
+    if (docType === 4) return 20; // VAT alfanumérico
+    return 100; // Outro
+}
+
+function isDocTypeNumeric(docType: DocTypeId): boolean {
+    return docType <= 3; // CPF, CNPJ, SSN, EIN
+}
 
 const CONTRACTOR_TYPE_OPTIONS = [
     { id: 0, titleKey: "contractorPF" as const, icon: "profile" },
@@ -33,13 +82,13 @@ const ContractForm = () => {
 
     // Step 1: Contractor data
     const [contractorName, setContractorName] = useState("");
-    const [contractorDocType, setContractorDocType] = useState<0 | 1 | 2>(0); // 0=CPF, 1=CNPJ, 2=Outro
+    const [contractorDocType, setContractorDocType] = useState<DocTypeId>(0);
     const [contractorDocument, setContractorDocument] = useState("");
     const [contractorEmail, setContractorEmail] = useState("");
 
     // Step 2: Client data
     const [clientName, setClientName] = useState("");
-    const [clientDocType, setClientDocType] = useState<0 | 1 | 2>(0);
+    const [clientDocType, setClientDocType] = useState<DocTypeId>(0);
     const [clientDocument, setClientDocument] = useState("");
     const [clientEmail, setClientEmail] = useState("");
 
@@ -103,7 +152,7 @@ const ContractForm = () => {
                         <div className="mt-6">
                             <div className="mb-2 text-small font-medium text-t-primary">{t("documentTypeLabel")}</div>
                             <div className="flex flex-wrap gap-2">
-                                {([0, 1, 2] as const).map((id) => (
+                                {DOC_TYPE_IDS.map((id) => (
                                     <button
                                         key={id}
                                         type="button"
@@ -117,7 +166,7 @@ const ContractForm = () => {
                                                 : "border-stroke1 text-t-secondary hover:border-stroke-focus"
                                         }`}
                                     >
-                                        {id === 0 ? t("docTypeCpf") : id === 1 ? t("docTypeCnpj") : t("docTypeOther")}
+                                        {t(getDocTypeLabelKey(id))}
                                     </button>
                                 ))}
                             </div>
@@ -125,22 +174,15 @@ const ContractForm = () => {
                                 <Field
                                     label={t("contractorDocument")}
                                     value={contractorDocument}
-                                    onChange={(e) => {
-                                        const v = e.target.value;
-                                        if (contractorDocType === 0) setContractorDocument(formatCPF(v));
-                                        else if (contractorDocType === 1) setContractorDocument(formatCNPJ(v));
-                                        else setContractorDocument(v);
-                                    }}
-                                    name="contractor-document"
-                                    placeholder={
-                                        contractorDocType === 2
-                                            ? t("docTypeOtherPlaceholder")
-                                            : t("contractorDocumentPlaceholder")
+                                    onChange={(e) =>
+                                        setContractorDocument(formatDocumentByType(e.target.value, contractorDocType))
                                     }
+                                    name="contractor-document"
+                                    placeholder={t(getDocPlaceholderKey(contractorDocType))}
                                     isLarge
                                     required
-                                    onlyNumeric={contractorDocType !== 2}
-                                    maxLength={contractorDocType === 0 ? 14 : contractorDocType === 1 ? 18 : 100}
+                                    onlyNumeric={isDocTypeNumeric(contractorDocType)}
+                                    maxLength={getDocMaxLength(contractorDocType)}
                                 />
                             </div>
                         </div>
@@ -173,7 +215,7 @@ const ContractForm = () => {
                         <div className="mt-6">
                             <div className="mb-2 text-small font-medium text-t-primary">{t("documentTypeLabel")}</div>
                             <div className="flex flex-wrap gap-2">
-                                {([0, 1, 2] as const).map((id) => (
+                                {DOC_TYPE_IDS.map((id) => (
                                     <button
                                         key={id}
                                         type="button"
@@ -187,7 +229,7 @@ const ContractForm = () => {
                                                 : "border-stroke1 text-t-secondary hover:border-stroke-focus"
                                         }`}
                                     >
-                                        {id === 0 ? t("docTypeCpf") : id === 1 ? t("docTypeCnpj") : t("docTypeOther")}
+                                        {t(getDocTypeLabelKey(id))}
                                     </button>
                                 ))}
                             </div>
@@ -195,20 +237,15 @@ const ContractForm = () => {
                                 <Field
                                     label={t("clientDocument")}
                                     value={clientDocument}
-                                    onChange={(e) => {
-                                        const v = e.target.value;
-                                        if (clientDocType === 0) setClientDocument(formatCPF(v));
-                                        else if (clientDocType === 1) setClientDocument(formatCNPJ(v));
-                                        else setClientDocument(v);
-                                    }}
-                                    name="client-document"
-                                    placeholder={
-                                        clientDocType === 2 ? t("docTypeOtherPlaceholder") : t("clientDocumentPlaceholder")
+                                    onChange={(e) =>
+                                        setClientDocument(formatDocumentByType(e.target.value, clientDocType))
                                     }
+                                    name="client-document"
+                                    placeholder={t(getDocPlaceholderKey(clientDocType))}
                                     isLarge
                                     required
-                                    onlyNumeric={clientDocType !== 2}
-                                    maxLength={clientDocType === 0 ? 14 : clientDocType === 1 ? 18 : 100}
+                                    onlyNumeric={isDocTypeNumeric(clientDocType)}
+                                    maxLength={getDocMaxLength(clientDocType)}
                                 />
                             </div>
                         </div>
