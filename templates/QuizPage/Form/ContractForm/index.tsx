@@ -57,8 +57,8 @@ function isDocTypeNumeric(docType: DocTypeId): boolean {
 const STEP_KEYS = [
     "contractStep1",
     "contractStep2",
+    "contractStep3",
     "contractStep5",
-    "contractStep6",
 ] as const;
 
 const cardClass = (active: boolean) =>
@@ -82,8 +82,10 @@ const ContractForm = () => {
     const [clientDocument, setClientDocument] = useState("");
     const [clientEmail, setClientEmail] = useState("");
 
+    const [projectProposalLink, setProjectProposalLink] = useState("");
+    const [projectDescription, setProjectDescription] = useState("");
+
     const [termination, setTermination] = useState<number | null>(null);
-    const [additionalTerms, setAdditionalTerms] = useState("");
 
     const totalSteps = STEP_KEYS.length;
 
@@ -235,6 +237,31 @@ const ContractForm = () => {
                     </>
                 )}
                 {activeId === 2 && (
+                    <>
+                        <Field
+                            label={t("projectProposalLink")}
+                            value={projectProposalLink}
+                            onChange={(e) => setProjectProposalLink(e.target.value)}
+                            name="project-proposal-link"
+                            placeholder={t("projectProposalLinkPlaceholder")}
+                            isLarge
+                        />
+                        <div className="mt-6">
+                            <p className="mb-4 text-body text-t-secondary">{t("projectDescriptionHint")}</p>
+                            <Field
+                                label={t("projectDescription")}
+                                value={projectDescription}
+                                onChange={(e) => setProjectDescription(e.target.value)}
+                                name="project-description"
+                                placeholder={t("projectDescriptionPlaceholder")}
+                                isLarge
+                                isTextarea
+                                maxLength={2000}
+                            />
+                        </div>
+                    </>
+                )}
+                {activeId === 3 && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                         {[0, 1].map((id) => (
                             <div
@@ -250,21 +277,6 @@ const ContractForm = () => {
                             </div>
                         ))}
                     </div>
-                )}
-                {activeId === 3 && (
-                    <>
-                        <p className="mb-4 text-body text-t-secondary">{t("contractTermsHint")}</p>
-                        <Field
-                            label={t("contractStep6")}
-                            value={additionalTerms}
-                            onChange={(e) => setAdditionalTerms(e.target.value)}
-                            name="contract-additional-terms"
-                            placeholder={t("contractTermsPlaceholder")}
-                            isLarge
-                            isTextarea
-                            maxLength={1000}
-                        />
-                    </>
                 )}
             </div>
             <div className="flex mt-auto pt-10 max-md:-mx-1 max-md:pt-6">
