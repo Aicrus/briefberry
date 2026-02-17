@@ -12,13 +12,13 @@ import {
     type CurrencyId,
 } from "@/lib/currency";
 
-const STEP_KEYS = ["step0", "step1", "step2", "step3", "step4", "step5", "step6", "stepPayment"] as const;
-const TOTAL_STEPS = 8;
+const STEP_KEYS = ["step0", "step1", "step3", "step4", "step5", "step6", "stepPayment"] as const;
+const TOTAL_STEPS = 7;
 
 const CURRENCY_OPTIONS: { id: number; label: string; symbol: string }[] = [
-    { id: 0, label: "BRL (R$)", symbol: "R$" },
     { id: 1, label: "USD ($)", symbol: "$" },
     { id: 2, label: "EUR (€)", symbol: "€" },
+    { id: 0, label: "BRL (R$)", symbol: "R$" },
 ];
 
 const cardClass = (active: boolean) =>
@@ -35,7 +35,7 @@ const Form = ({}) => {
     const [date, setDate] = useState("");
     const [billingModel, setBillingModel] = useState<number | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<number | null>(null);
-    const [currency, setCurrency] = useState<number | null>(null);
+    const [currency, setCurrency] = useState<number | null>(1);
 
     const handleNext = () => {
         if (activeId < TOTAL_STEPS - 1) {
@@ -62,38 +62,49 @@ const Form = ({}) => {
             <div className="flex-1 min-h-0 flex flex-col">
                 {activeId === 0 && <TypeBrief />}
                 {activeId === 1 && (
-                    <Field
-                        label={t("projectName")}
-                        value={projectName}
-                        onChange={(e) => setProjectName(e.target.value)}
-                        name="project-name"
-                        placeholder={t("projectNamePlaceholder")}
-                        isLarge
-                        required
-                        maxLength={200}
-                    />
+                    <div className="space-y-6">
+                        <Field
+                            label={t("projectName")}
+                            value={projectName}
+                            onChange={(e) => setProjectName(e.target.value)}
+                            name="project-name"
+                            placeholder={t("projectNamePlaceholder")}
+                            isLarge
+                            required
+                            maxLength={200}
+                        />
+                        <Field
+                            label={t("projectGoals")}
+                            value={projectGoals}
+                            onChange={(e) => setProjectGoals(e.target.value)}
+                            name="project-goals"
+                            placeholder={t("projectGoalsPlaceholder")}
+                            isLarge
+                            isTextarea
+                            required
+                            maxLength={3000}
+                        />
+                    </div>
                 )}
                 {activeId === 2 && (
-                    <Field
-                        label={t("projectGoals")}
-                        value={projectGoals}
-                        onChange={(e) => setProjectGoals(e.target.value)}
-                        name="project-goals"
-                        placeholder={t("projectGoalsPlaceholder")}
-                        isLarge
-                        isTextarea
-                        required
-                        maxLength={3000}
-                    />
-                )}
-                {activeId === 3 && (
                     <MyDatePicker
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
                     />
                 )}
-                {activeId === 4 && (
+                {activeId === 3 && (
                     <div className="space-y-6">
+                        <Field
+                            label={t("yourBudget")}
+                            value={formatCurrencyFromDigits(yourBudget, (currency ?? 1) as CurrencyId)}
+                            onChange={(e) => setYourBudget(parseDigitsFromInput(e.target.value))}
+                            name="your-budget"
+                            placeholder={(currency ?? 1) === 1 ? "0.00" : "0,00"}
+                            currency={CURRENCY_OPTIONS.find((o) => o.id === currency)?.symbol ?? "$"}
+                            isLarge
+                            required
+                            inputMode="decimal"
+                        />
                         <div>
                             <div className="mb-3 text-body-bold text-t-primary">{t("stepCurrencyLabel")}</div>
                             <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
@@ -108,22 +119,11 @@ const Form = ({}) => {
                                 ))}
                             </div>
                         </div>
-                        <Field
-                            label={t("yourBudget")}
-                            value={formatCurrencyFromDigits(yourBudget, (currency ?? 1) as CurrencyId)}
-                            onChange={(e) => setYourBudget(parseDigitsFromInput(e.target.value))}
-                            name="your-budget"
-                            placeholder={(currency ?? 1) === 1 ? "0.00" : "0,00"}
-                            currency={CURRENCY_OPTIONS.find((o) => o.id === currency)?.symbol ?? "$"}
-                            isLarge
-                            required
-                            inputMode="decimal"
-                        />
                     </div>
                 )}
-                {activeId === 5 && <Budget currency={currency} />}
-                {activeId === 6 && <References />}
-                {activeId === 7 && (
+                {activeId === 4 && <Budget currency={currency} />}
+                {activeId === 5 && <References />}
+                {activeId === 6 && (
                     <div className="space-y-8">
                         <div>
                             <div className="mb-3 text-body-bold text-t-primary">{t("stepBillingLabel")}</div>
