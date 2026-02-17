@@ -113,26 +113,29 @@ const References = ({}) => {
                     ))}
                 </ul>
             )}
-            <Field
-                className="mb-4"
-                label={t("referenceLink")}
-                value={referenceLink}
-                onChange={(e) => setReferenceLink(e.target.value)}
-                name="reference-link"
-                placeholder={t("referenceLinkPlaceholder")}
-                isLarge
-                required
-                maxLength={500}
-            />
-            <Button
-                className="px-5.5"
-                isStroke
-                onClick={handleAddLink}
-                disabled={referenceLinks.length >= MAX_LINKS}
-            >
-                <Icon className="mr-2" name="plus" />
-                {t("addLink")}
-            </Button>
+            {referenceLinks.length < MAX_LINKS && (
+                <>
+                    <Field
+                        className="mb-4"
+                        label={t("referenceLink")}
+                        value={referenceLink}
+                        onChange={(e) => setReferenceLink(e.target.value)}
+                        name="reference-link"
+                        placeholder={t("referenceLinkPlaceholder")}
+                        isLarge
+                        required
+                        maxLength={500}
+                    />
+                    <Button
+                        className="px-5.5"
+                        isStroke
+                        onClick={handleAddLink}
+                    >
+                        <Icon className="mr-2" name="plus" />
+                        {t("addLink")}
+                    </Button>
+                </>
+            )}
             {referenceLinks.length > 0 && (
                 <ul className="mt-4 space-y-2">
                     {referenceLinks.map((link, index) => (

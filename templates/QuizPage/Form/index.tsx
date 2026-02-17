@@ -12,7 +12,7 @@ import {
     type CurrencyId,
 } from "@/lib/currency";
 
-const STEP_KEYS = ["step0", "step1", "step3", "step4", "step5", "step6", "stepPayment"] as const;
+const STEP_KEYS = ["step0", "step1", "step3", "step4", "stepPayment", "step5", "step6"] as const;
 const TOTAL_STEPS = 7;
 
 const CURRENCY_OPTIONS: { id: number; label: string; symbol: string }[] = [
@@ -20,6 +20,8 @@ const CURRENCY_OPTIONS: { id: number; label: string; symbol: string }[] = [
     { id: 2, label: "EUR (€)", symbol: "€" },
     { id: 0, label: "BRL (R$)", symbol: "R$" },
 ];
+
+const BILLING_OPTIONS = [0, 2] as const; // 0 fixed, 2 per stage
 
 const cardClass = (active: boolean) =>
     `w-[calc(50%-1rem)] mt-4 mx-2 px-6 py-5.5 border-[1.5px] border-stroke1 rounded-[1.25rem] text-heading font-medium! text-t-secondary fill-t-secondary hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary hover:fill-t-primary cursor-pointer transition-all max-md:w-[calc(50%-0.75rem)] max-md:mt-3 max-md:mx-1.5 ${
@@ -35,6 +37,7 @@ const Form = ({}) => {
     const [date, setDate] = useState("");
     const [billingModel, setBillingModel] = useState<number | null>(null);
     const [paymentMethod, setPaymentMethod] = useState<number | null>(null);
+    const [billingAndPaymentOther, setBillingAndPaymentOther] = useState("");
     const [currency, setCurrency] = useState<number | null>(1);
 
     const handleNext = () => {
@@ -121,14 +124,12 @@ const Form = ({}) => {
                         </div>
                     </div>
                 )}
-                {activeId === 4 && <Budget currency={currency} />}
-                {activeId === 5 && <References />}
-                {activeId === 6 && (
+                {activeId === 4 && (
                     <div className="space-y-8">
                         <div>
                             <div className="mb-3 text-body-bold text-t-primary">{t("stepBillingLabel")}</div>
                             <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                                {([0, 2] as const).map((id) => (
+                                {BILLING_OPTIONS.map((id) => (
                                     <div
                                         key={id}
                                         className={cardClass(billingModel === id)}
@@ -148,13 +149,37 @@ const Form = ({}) => {
                                         className={cardClass(paymentMethod === id)}
                                         onClick={() => setPaymentMethod(id)}
                                     >
-                                        <div className="">{t(id === 0 ? "payment5050" : "paymentPerStage")}</div>
+                                        <div className="">
+                                            {t(
+                                                id === 0
+                                                    ? "payment5050"
+                                                    : id === 1
+                                                    ? "paymentPerStage"
+                                                    : ""
+                                            )}
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">
+                                {t("billingPaymentOtherLabel")}
+                            </div>
+                            <Field
+                                label=""
+                                value={billingAndPaymentOther}
+                                onChange={(e) => setBillingAndPaymentOther(e.target.value)}
+                                name="billing-payment-other"
+                                placeholder={t("billingPaymentOtherPlaceholder")}
+                                isLarge
+                                maxLength={300}
+                            />
+                        </div>
                     </div>
                 )}
+                {activeId === 5 && <Budget currency={currency} />}
+                {activeId === 6 && <References />}
             </div>
             <div className="flex shrink-0 mt-auto pt-10 max-md:-mx-1 max-md:pt-6">
                 {activeId > 0 && (
