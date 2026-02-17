@@ -58,8 +58,14 @@ const Images = ({ images, edit }: Props) => {
         handleFiles(e.dataTransfer.files);
     };
 
+    if (!edit && localImages.length === 0) {
+        return null;
+    }
+
     return (
-        <div className="flex items-stretch min-h-24 -mx-12 overflow-auto scrollbar-none max-md:-mx-8 before:shrink-0 before:w-12 after:shrink-0 after:w-12 max-md:before:w-8 max-md:after:w-8">
+        <div className={`flex items-stretch -mx-12 overflow-auto scrollbar-none max-md:-mx-8 before:shrink-0 before:w-12 after:shrink-0 after:w-12 max-md:before:w-8 max-md:after:w-8 ${
+            edit || localImages.length > 0 ? "min-h-24" : ""
+        }`}>
             {edit && (
                 <div
                     className={`relative flex items-center justify-center shrink-0 w-32 h-24 mr-3 rounded-2xl border-[1.5px] border-transparent ${

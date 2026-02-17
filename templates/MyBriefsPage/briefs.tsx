@@ -1,7 +1,7 @@
 export const myBriefs = [
     {
         id: "0",
-        title: "Studio Modelo 2024",
+        title: "Studio Modelo 2026",
         category: "ux-ui-design",
         time: "Updated 10 mins ago",
     },

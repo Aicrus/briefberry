@@ -9,6 +9,13 @@ const BriefCategory = ({ value }: Props) => (
         <Icon
             className="fill-t-secondary"
             name={
+                value === "proposal"
+                    ? "post"
+                    : value === "contract"
+                    ? "documents"
+                    : value === "prd"
+                    ? "align-right"
+                    : 
                 value === "ux-ui-design"
                     ? "post"
                     : value === "mobile-app"
@@ -22,7 +29,13 @@ const BriefCategory = ({ value }: Props) => (
                     : "align-right"
             }
         />
-        {value === "ux-ui-design"
+        {value === "proposal"
+            ? "Proposta"
+            : value === "contract"
+            ? "Contrato"
+            : value === "prd"
+            ? "PRD"
+            : value === "ux-ui-design"
             ? "UI/UI Design"
             : value === "mobile-app"
             ? "Mobile App"

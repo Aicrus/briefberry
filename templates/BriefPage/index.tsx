@@ -12,6 +12,108 @@ import Actions from "./Actions";
 
 import { content } from "./content";
 
+const contractContent = {
+    introduction: (
+        <>
+            Este contrato formaliza a prestação de serviços entre contratada e
+            contratante, definindo escopo, responsabilidades e regras de
+            execução para garantir segurança jurídica em todas as etapas do
+            projeto.
+        </>
+    ),
+    goals: (
+        <>
+            O objetivo principal é proteger as duas partes com cláusulas claras
+            sobre entregas, pagamento, direitos autorais, revisões,
+            confidencialidade e cancelamento, reduzindo riscos e ambiguidades.
+        </>
+    ),
+    timeline: (
+        <>
+            A vigência considera início na assinatura e término após a entrega
+            final aprovada, com marcos intermediários vinculados às etapas
+            definidas na proposta comercial.
+        </>
+    ),
+    budget: (
+        <>
+            O valor contratado seguirá o modelo de cobrança acordado, com
+            condições de pagamento, multas por atraso e política de reembolso
+            detalhadas para evitar conflitos financeiros.
+        </>
+    ),
+    references: (
+        <>
+            <p>
+                Este documento é baseado nas informações preenchidas pelas partes
+                e na proposta do projeto.
+            </p>
+            <p>
+                Caso existam anexos (escopo, cronograma, requisitos técnicos),
+                eles passam a integrar este contrato para efeito de interpretação
+                e execução.
+            </p>
+        </>
+    ),
+    conclusion: (
+        <>
+            Com as cláusulas definidas, o contrato estabelece uma relação
+            profissional mais previsível, garantindo segurança legal e clareza
+            operacional do início ao encerramento do projeto.
+        </>
+    ),
+};
+
+const prdContent = {
+    introduction: (
+        <>
+            Este PRD descreve a visão do produto, requisitos funcionais e
+            critérios de entrega para orientar design, desenvolvimento e
+            validação do projeto de ponta a ponta.
+        </>
+    ),
+    goals: (
+        <>
+            O documento busca alinhar objetivos de negócio e produto, com foco
+            em experiência do usuário, escopo técnico viável e definição de
+            prioridades para execução em ciclos.
+        </>
+    ),
+    timeline: (
+        <>
+            O cronograma organiza discovery, arquitetura, implementação,
+            testes e entrega, com checkpoints por sprint para acompanhar avanço,
+            riscos e ajustes de prioridade.
+        </>
+    ),
+    budget: (
+        <>
+            O investimento é distribuído por fases de produto, contemplando
+            design, desenvolvimento, QA, integrações e ajustes pós-lançamento
+            conforme o volume e a complexidade das funcionalidades.
+        </>
+    ),
+    references: (
+        <>
+            <p>
+                As referências visuais e técnicas servem de base para decisões
+                de UX, arquitetura e identidade do produto.
+            </p>
+            <p>
+                Incluem benchmarks, fluxos parecidos, padrões de interface e
+                integrações que orientam as escolhas durante a execução.
+            </p>
+        </>
+    ),
+    conclusion: (
+        <>
+            Com requisitos, prioridades e critérios definidos, o PRD reduz
+            retrabalho, aumenta previsibilidade e acelera a entrega com mais
+            qualidade e alinhamento entre time e cliente.
+        </>
+    ),
+};
+
 const BriefPage = () => {
     const t = useTranslations("brief");
     const isPremiumPlan = useEventsStore((state) => state.isPremiumPlan);
@@ -36,6 +138,18 @@ const BriefPage = () => {
             : featureType === "prd"
             ? t("prdTitle")
             : t("proposalTitle");
+    const displayedContent =
+        featureType === "contract"
+            ? contractContent
+            : featureType === "prd"
+            ? prdContent
+            : content;
+    const categoryValue =
+        featureType === "contract"
+            ? "contract"
+            : featureType === "prd"
+            ? "prd"
+            : "proposal";
 
     return (
         <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>
@@ -62,23 +176,23 @@ const BriefPage = () => {
                             />
                             {documentTitle}
                         </div>
-                        <BriefCategory value="ux-ui-design" />
+                        <BriefCategory value={categoryValue} />
                     </div>
                     <BriefSection
                         title={t("introduction")}
-                        content={content.introduction}
+                        content={displayedContent.introduction}
                     />
-                    <BriefSection title={t("goals")} content={content.goals} />
-                    <BriefSection title={t("timeline")} content={content.timeline} />
-                    <BriefSection title={t("budget")} content={content.budget} />
+                    <BriefSection title={t("goals")} content={displayedContent.goals} />
+                    <BriefSection title={t("timeline")} content={displayedContent.timeline} />
+                    <BriefSection title={t("budget")} content={displayedContent.budget} />
                     <BriefSection
                         title={t("references")}
-                        content={content.references}
+                        content={displayedContent.references}
                         images={content.images}
                     />
                     <BriefSection
                         title={t("conclusion")}
-                        content={content.conclusion}
+                        content={displayedContent.conclusion}
                     />
                 </div>
             </div>

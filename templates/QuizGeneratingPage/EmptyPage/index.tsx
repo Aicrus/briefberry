@@ -21,7 +21,7 @@ const EmptyPage = ({ className }: EmptyPageProps) => {
                     <div className="shrink-0 size-3 mr-2 bg-primary2 rounded-full max-md:size-1.75 max-md:mr-1"></div>
                     <div className="">{tMyBriefs("title")}</div>
                     <div className="mx-2 max-md:mx-1">/</div>
-                    <div className="text-t-primary/80">Studio Modelo 2024</div>
+                    <div className="text-t-primary/80">Studio Modelo 2026</div>
                 </div>
                 <div className="text-hairline text-t-secondary max-md:text-[0.5rem]">
                     {tQuiz("typeUiDesign")}

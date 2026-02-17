@@ -28,7 +28,7 @@ const BriefLinkedPage = () => {
                                 }`}
                                 name={isPremiumPlan ? "verification" : "lock"}
                             />
-                            Studio Modelo 2024
+                            Studio Modelo 2026
                         </div>
                         <BriefCategory value="ux-ui-design" />
                     </div>
