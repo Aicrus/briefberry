@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import Field from "@/components/Field";
 import Button from "@/components/Button";
@@ -10,7 +10,7 @@ import {
 } from "@/lib/currency";
 
 const MAX_BUDGET_STAGES = 20;
-const SCROLL_THRESHOLD = 4;
+const SCROLL_THRESHOLD = 3;
 
 type BudgetItem = { id: number; scope: string; budget: string };
 
@@ -24,6 +24,9 @@ const Budget = ({ currency = null }: { currency?: number | null }) => {
         { id: 1, scope: "", budget: "" },
         { id: 2, scope: "", budget: "" },
     ]);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+    const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
+    const [lastAddedId, setLastAddedId] = useState<number | null>(null);
 
     const updateItem = (id: number, field: "scope" | "budget", value: string) => {
         setItems((prev) =>
@@ -38,27 +41,43 @@ const Budget = ({ currency = null }: { currency?: number | null }) => {
 
     const addItem = () => {
         if (items.length >= MAX_BUDGET_STAGES) return;
+        const nextId = Math.max(0, ...items.map((i) => i.id)) + 1;
         setItems((prev) => [
             ...prev,
-            { id: Math.max(0, ...prev.map((i) => i.id)) + 1, scope: "", budget: "" },
+            { id: nextId, scope: "", budget: "" },
         ]);
+        setLastAddedId(nextId);
     };
 
     const canAddMore = items.length < MAX_BUDGET_STAGES;
     const hasInternalScroll = items.length > SCROLL_THRESHOLD;
 
+    useEffect(() => {
+        if (!lastAddedId) return;
+        const container = scrollContainerRef.current;
+        const target = itemRefs.current[lastAddedId];
+        if (container && target) {
+            target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
+        setLastAddedId(null);
+    }, [items, lastAddedId]);
+
     return (
         <div className="">
             <div
+                ref={scrollContainerRef}
                 className={
                     hasInternalScroll
-                        ? "max-h-[25rem] overflow-y-auto overflow-x-hidden p-4 pr-6 [scrollbar-gutter:stable] [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.18)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/35"
+                        ? "max-h-[18rem] overflow-y-auto overflow-x-hidden p-4 pr-4 [scrollbar-gutter:stable] [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.18)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/35"
                         : ""
                 }
             >
                 {items.map((item, index) => (
                     <div
                         key={item.id}
+                        ref={(el) => {
+                            itemRefs.current[item.id] = el;
+                        }}
                         className={`relative ${index > 0 ? "mt-5" : ""} ${items.length > 1 ? "group" : ""}`}
                     >
                         <div className="flex">
