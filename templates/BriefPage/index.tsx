@@ -6,8 +6,10 @@ import { useSearchParams } from "next/navigation";
 import Layout from "@/components/Layout";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
+import Image from "@/components/Image";
 import BriefSection from "@/components/BriefSection";
 import BriefCategory from "@/components/BriefCategory";
+import SignaturePadModal from "@/components/SignaturePadModal";
 import useEventsStore from "@/store/useEventsStore";
 import Actions from "./Actions";
 
@@ -15,53 +17,222 @@ import { content } from "./content";
 
 const contractContent = {
     introduction: (
-        <>
-            Este contrato formaliza a prestação de serviços entre contratada e
-            contratante, definindo escopo, responsabilidades e regras de
-            execução para garantir segurança jurídica em todas as etapas do
-            projeto.
-        </>
+        <div className="whitespace-pre-wrap">
+            {`CONTRATO DE PRESTAÇÃO DE SERVIÇO E
+DESENVOLVIMENTO DE APLICATIVO
+Pelo presente instrumento particular de contrato, de um lado,
+doravante denominada simplesmente CONTRATANTE, pela pessoa
+jurídica BEST SOLUTIONS GROUP USA LLC com sede em
+WESTSIDE VLG LP, cidade de WINDERMERE/ estado FLÓRIDA Nº
+12803, ZIP CODE 34786, inscrita no EIN Nº 99-0779895, e seu
+representante legal ALEXANDRE LUIS CAMARGO SOLE, E-MAIL:
+alexlcamargo75@gmail.com
+Com o objetivo de agilizar o processo e aumentar a precisão, a empresa
+delega ao parceiro, Mario Marcio Albino Pavão, identificado pelo ID
+A415-553-78-442-0, as funções de gestão do projeto, incluindo a
+comunicação com a equipe de desenvolvimento. Todas as informações e
+reportagens serão conduzidas por ele, residente no endereço 1910
+Celebration Blvd, apt 205, CEP 34747, Celebration-FL, e acessível
+através do e-mail marcio@best4send.com. Mario Marcio Albino Pavão
+também se torna responsável oficial pelo projeto, conforme estabelecido
+neste contrato.
+E, de outro lado, doravante denominada CONTRATADA AICRUS com
+sede em São Paulo à rua MMDC, CEP 05510-000, inscrita no CPF/
+CNPJ N° 36.501.721/0001-22, e seu representante legal PAULO
+MORALES inscrito no CPF Nº 029.328.682-50 tem entre si, justo e
+contratado o que segue:`}
+        </div>
     ),
     goals: (
-        <>
-            O objetivo principal é proteger as duas partes com cláusulas claras
-            sobre entregas, pagamento, direitos autorais, revisões,
-            confidencialidade e cancelamento, reduzindo riscos e ambiguidades.
-        </>
+        <div className="whitespace-pre-wrap">
+            {`DO OBJETO DO CONTRATO
+CLÁUSULA 1ª - Constitui objeto deste contrato a prestação dos
+serviços pela CONTRATADA à CONTRATANTE o desenvolvimento de:
+Desenvolvimento de uma plataforma de meios de pagamentos, câmbio e
+remessa internacional "BEST 4SEND” completa com todas as funções e
+integrações necessárias para sua operação, entregues em aplicação WEB
+e Mobile para utilização em computadores e aplicativos Android e IOS
+hospedados e funcionais nas respectivas plataformas.
+Aplicativo funcional para (Android, iOS) com entrega de código- fonte
+d o p r o j e t o p a r a r e g i s t r o d e p a t e n t e n o s
+ó r g ã o s c o m p e t e n t e s (Código Dart) e transferência para a
+conta do CONTRATANTE.
+EXECUÇÃO DOS SERVIÇOS
+Os serviços objeto deste contrato serão executados pelo CONTRATADO,
+observando o disposto na proposta apresentada, conforme descrito a
+seguir sobre suas principais funcionalidades:
+I – Trata-se de uma abrangente plataforma de pagamentos internacionais
+que visa integrar serviços de geração de links de pagamento, gateways de
+pagamento, operações de câmbio e cartões pré-pagos com uma experiência
+segura e em conformidade com os regulamentos financeiros internacionais.
+Principais funcionalidades descritas abaixo:
+• Geração de Links de Pagamento e Checkout
+• Conta master plataforma com Dashboards e relatórios de gestão
+completa
+• Contas de cliente com Dashboards e Relatórios individuais
+• Cotas de cartão de débito/pré-pago com Dashboards e relatórios master
+e individuais (API)
+• Configurações Gerenciais, Permissionamentos e taxas.
+• Integrações Externas com Gateway de pagamento, corretora de cambio/
+remessa internacional e emissor de cartão pré-pago
+• Painel de gestão de afiliados com configuração de comissão e geração
+link de divulgação para abertura de contas
+• API documentada com manual intuitivo para integração de terceiros
+• Adoção de padrões de segurança global e conformidade com
+regulamentos financeiros dos EUA e Brasil (A segurança na aplicação e
+APIs foca no controle de acesso dos usuários, excluindo segurança em
+integrações com terceiros)
+• Monitoramento transacional ponta a ponta com reconciliação em tempo
+real e periódicas para prevenção de fraudes e erros nas transformações
+seguindo regras de segurança e compilasse.
+• Desempenho e Escalabilidade
+• Arquitetura Modular Micro Serviços
+• Tecnologia FlutterFlow e Supabase/PostgreSQL
+• PARÁGRAFO ÚNICO - Este projeto possui 60 (dias) de garantia para
+eventuais ajustes e correção de bugs.
+• Após o término do período de garantia de 60 dias, quaisquer correções ou
+ajustes necessários não incorrerão em custos adicionais, já que estão
+inclusos no plano anual de suporte, o qual tem um valor de R$ 3.600
+reais. Além disso, ao se tornar nosso cliente anual, você terá direito a um
+desconto de 30% em futuras funcionalidades, tanto no front-end quanto
+no back-end.`}
+        </div>
     ),
     timeline: (
-        <>
-            A vigência considera início na assinatura e término após a entrega
-            final aprovada, com marcos intermediários vinculados às etapas
-            definidas na proposta comercial.
-        </>
+        <div className="whitespace-pre-wrap">
+            {`DAS OBRIGAÇÕES DA CONTRATANTE
+PARÁGRAFO PRIMEIRO - Para que a CONTRATADA possa executar os
+trabalhos de criação e desenvolvimento do projeto referidos no caput
+desta cláusula, o CONTRATANTE deverá fornecer briefing, do projeto
+para ser desenvolvido, materiais fornecidos pela CONTRATANTE
+preferencialmente por escrito, dos produtos/serviços sobre os quais e
+para os quais os trabalhos serão realizados.
+PARÁGRAFO SEGUNDO – Desenvolvimento e hospedagem diretamente
+nos ambientes gerenciados serão custeados pela CONTRATANTE como:
+Conta FlutterFlow, conta Supabase, GitHub e outros utilizados no
+processo de desenvolvimento e entrega, com ambientes configurados e
+prontos para continuidade de ajustes, manutenção e implementação de
+novos módulos em a necessidade de configurar novos ambientes.
+PARÁGRAFO TERCEIRO — Os custos associados a servidores, serviços
+de e-mail, SMS, bem como outras ferramentas e softwares essenciais
+para a operacionalização do sistema ficarão sob a responsabilidade do
+CONTRATANTE.
+DAS OBRIGAÇÕES DA CONTRATADA
+CLÁUSULA 2ª - Dentro do prazo de 2 dias a contar da assinatura deste
+contrato, a CONTRATADA deverá proceder à criação de uma primeira
+ideia ou primeiro esboços ou conceito, apresentando- os à
+CONTRATANTE, que, a contar do seu recebimento, deverá aprová-los ou
+não, sempre por escrito, no prazo de 1 dia.
+CLÁUSULA 3ª - As PARTES comprometem-se a utilizar as informações
+confidenciais apenas no âmbito do desenvolvimento e da execução do
+projeto de colaboração, sendo vedada tanto a sua divulgação à terceiros,
+quanto qualquer outra utilização que não seja expressamente permitida
+pela PARTE REVELADORA.`}
+        </div>
     ),
     budget: (
-        <>
-            O valor contratado seguirá o modelo de cobrança acordado, com
-            condições de pagamento, multas por atraso e política de reembolso
-            detalhadas para evitar conflitos financeiros.
-        </>
+        <div className="whitespace-pre-wrap">
+            {`DO CUSTO E DA FORMA DE PAGAMENTO
+CLÁUSULA 4ª - Pela prestação de serviços referidos na cláusula 1 supra,
+bem como pela concessão na sua utilização mencionada a
+CONTRATANTE pagará a CONTRATADA uma única vez um total de R$
+80.400 (Setenta e cinco mil reais) pagos da seguinte forma:
+O valor do contrato, inclui monitoramento e o bom funcionamento e a
+manutenção contínua anual, é de R$ 3.600 (três mil e seiscentos) reais,
+garantindo a operacionalidade do sistema atualizações regulares e suporte
+técnico especializado.
+Além disso, abrange R$ 1.800 (mil e oitocentos) reais para disponibilizar o
+aplicativo na App Store e Google Play Store, assegurando sua presença
+nas principais plataformas móveis.
+Duas parcelas iguais no valor de R$ 40.200 (quarenta mil e duzentos)
+reais. A ser pago pelo CONTRATANTE à CONTRATADA primeira parcela
+no dia 27 de Fevereiro de 2024 e segunda parcela de 50% à ser paga
+após a finalização e entrega do App.
+O código-fonte permanecerá fora do servidor do Contratante até que o
+pagamento integral seja efetuado.
+O valor deverá ser repassado ao Contratado através de transferência
+PIX ou transferência bancária brasileira, conta americana ou Europeia
+fornecida pela CONTRATADA.
+DO PRAZO
+PARÁGRAFO TERCEIRO: o presente contrato possui prazo de até 60
+(DIAS) ÚTEIS a partir da assinatura deste contrato, iniciando-se em 27 de
+Janeiro de 2024 e finalizando-se em 20 de Maio de 2024 com
+possibilidade de entrega antes deste prazo.`}
+        </div>
     ),
     references: (
-        <>
-            <p>
-                Este documento é baseado nas informações preenchidas pelas partes
-                e na proposta do projeto.
-            </p>
-            <p>
-                Caso existam anexos (escopo, cronograma, requisitos técnicos),
-                eles passam a integrar este contrato para efeito de interpretação
-                e execução.
-            </p>
-        </>
+        <div className="whitespace-pre-wrap">
+            {`DA RESCISÃO
+CLÁUSULA 5ª - A rescisão do presente instrumento não extinguirá os
+direitos e obrigações que as partes tenham entre si e para com terceiros,
+não havendo estorno do valor já pago, caso está já tenha iniciado o
+projeto.
+CLÁUSULA 6ª - A CONTRATADA agirá segundo as normas do Código de Ética da Associação dos Designes Gráficos, e também assume obrigação
+e o compromisso de manter em sigilo todas as informações que. lhe forem
+prestadas pela CONTRATANTE para que possa proceder ao
+desenvolvimento do projeto gráfico, assim também em relação ao trabalho
+em desenvolvimento.
+DOS DIREITOS À PROPRIEDADE INDUSTRIAL
+CLÁUSULA 7ª - Caso a consultoria resulte invenção, descobertas,
+aperfeiçoamentos ou inovações, os direitos de propriedade pertencerão à
+CONTRATANTE autor do trabalho que gerou desenvolvimento
+tecnológico, nos termos da Lei n° 9.279/96 (Código de Propriedade
+Industrial) ou legislação aplicável 1.
+CLAUSULA 8ª - A equipe envolvida neste projeto se compromete a manter
+sigilo sobre os dados e informações decorrentes da consecução do
+presente contrato, salvo o CONTRATANTE autorize em contrário.
+O App seguirá toda legislação brasileira, inclusive a lei de proteção de dados.
+PARÁGRAFO ÚNICO - Não se considera Recuperação
+Judicial, até mesmo a branca, Falência ou Liquidação/Encerramento
+de Sociedade Empresarial ou Civil como justo motivo para rescisão
+unilateral do contrato sem a implicação das penalizares ajustadas
+neste contrato DAS CONDIÇÕES GERAIS.
+CLÁUSULA 9ª - A CONTRATADA não possuirá horário fixo de entrada e
+saída na empresa, uma vez que não existirá vínculo empregatício.
+CLÁUSULA 10ª - É livre à CONTRATADA ter seus próprios clientes, fora do
+âmbito deste contrato.
+CLÁUSULA 11ª - A CONTRATADA tem total direito de não dar
+continuidade ao serviço oferecida ao CONTRATANTE caso não haja o
+cumprimento das obrigações referidas na 1a página deste contrato.`}
+        </div>
     ),
     conclusion: (
-        <>
-            Com as cláusulas definidas, o contrato estabelece uma relação
-            profissional mais previsível, garantindo segurança legal e clareza
-            operacional do início ao encerramento do projeto.
-        </>
+        <div className="whitespace-pre-wrap">
+            {`DO FORO
+CLÁUSULA 12ª
+-
+Para dirimir quaisquer controvérsias
+oriundas do contrato, as partes elegem o foro da comarca de SÃO
+PAULO/SP.
+As partes acima já qualificadas ora contratadas, resolvem na melhor
+forma de direito firmar o presente contrato.
+São Paulo/SP 27/02/2024
+ACORDANTE 1
+BEST SOLUTIONS GROUP USA LLC
+AC
+ALEXANDRE LUIS CAMARGO SOLE
+TESTEMUNHA
+MARIO MARCIO ALBINO PAVÃO
+ACORDANTE 2
+AICRUS
+Aicrus T
+PAULO MORALES DIAZ DA COSTA
+TESTEMUNHA
+Taina S
+TAINÁ EVANGELISTA DA SILVA
+Autenticação eletrônica 6/7
+Data e horários em GMT -3:00 Sao Paulo
+Última atualização em 27 fev 2024 às 18:49
+Identificador: 6c0e1f1b42ab2a8b57eabfac7abfdb3b3668ce67972be1f1c
+Página de assinaturas
+Aicrus T Taina S
+Aicrus Tech Taina Silva
+Aicrus
+Signatário Signatário
+Alexandre C
+Mario Pavao Alexandre Camargo
+Signatário Signatário`}
+        </div>
     ),
 };
 
@@ -160,12 +331,12 @@ const BriefPage = () => {
         () =>
             featureType === "contract"
                 ? {
-                      introduction: tQuiz("contractStep1"),
-                      goals: tQuiz("contractStep2"),
-                      timeline: tQuiz("contractStep3"),
-                      budget: tQuiz("contractTerms"),
-                      references: tQuiz("contractStepClauses"),
-                      conclusion: tQuiz("contractStep5"),
+                      introduction: "Partes Contratantes",
+                      goals: "Objeto do Contrato e Escopo",
+                      timeline: "Execução e Obrigações",
+                      budget: "Termos e Condições de Pagamento",
+                      references: "Rescisão, Sigilo e Direitos",
+                      conclusion: "Foro e Assinaturas",
                   }
                 : featureType === "prd"
                 ? {
@@ -192,7 +363,7 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "PRD"
             : "Proposta";
-    const storageKey = `briefberry:doc-edit:${featureType}`;
+    const storageKey = `briefberry:doc-edit:${featureType}:v2`;
     const persistedDraft = useMemo(() => {
         if (typeof window === "undefined") return null;
         try {
@@ -239,8 +410,14 @@ const BriefPage = () => {
             }
     );
     const [editableReferenceImages, setEditableReferenceImages] = useState<string[]>(
-        () => persistedDraft?.referenceImages ?? content.images
+        () =>
+            persistedDraft?.referenceImages ??
+            (featureType === "proposal" ? content.images : [])
     );
+    const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+    const [signatureModalVersion, setSignatureModalVersion] = useState(0);
+    const [activeSigner, setActiveSigner] = useState("");
+    const [signatures, setSignatures] = useState<Record<string, string>>({});
     const [isEditingDocumentTitle, setIsEditingDocumentTitle] = useState(false);
     const [isEditingSubtitle, setIsEditingSubtitle] = useState(false);
 
@@ -269,13 +446,19 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "prd"
             : "proposal";
+    const signerList =
+        featureType === "contract"
+            ? ["ACORDANTE 1", "ACORDANTE 2", "TESTEMUNHA 1", "TESTEMUNHA 2"]
+            : featureType === "prd"
+            ? ["RESPONSÁVEL PELO PRODUTO", "RESPONSÁVEL TÉCNICO"]
+            : ["CONTRATANTE", "CONTRATADA"];
 
     return (
         <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>
             <div className="pt-34 px-6 pb-38 max-2xl:pt-32 max-2xl:px-11 max-2xl:pb-33 max-xl:pt-30 max-lg:pt-28 max-md:pt-22 max-md:px-4 max-md:pb-24">
                 <div
                     key={featureType}
-                    className="relative max-w-170 mx-auto p-12 shadow-hover bg-b-surface4 rounded-4xl before:absolute before:top-full before:left-6 before:right-6 before:-z-1 before:h-3.75 before:rounded-b-4xl before:bg-b-surface2 max-md:px-8 max-md:pb-4 max-md:before:hidden"
+                    className="relative max-w-220 mx-auto p-12 shadow-hover bg-b-surface4 rounded-4xl before:absolute before:top-full before:left-6 before:right-6 before:-z-1 before:h-3.75 before:rounded-b-4xl before:bg-b-surface2 max-md:px-8 max-md:pb-4 max-md:before:hidden"
                 >
                     <Button
                         className="absolute! top-2 right-2 shadow-hover"
@@ -444,7 +627,11 @@ const BriefPage = () => {
                                 references: nextContent || null,
                             }))
                         }
-                        images={editableReferenceImages}
+                        images={
+                            featureType === "proposal"
+                                ? editableReferenceImages
+                                : undefined
+                        }
                         onImagesChange={setEditableReferenceImages}
                     />
                     <BriefSection
@@ -467,9 +654,60 @@ const BriefPage = () => {
                             }))
                         }
                     />
+                    <div className="mt-10 border-t border-stroke2 pt-8">
+                        <div className="mb-4 text-h5">Assinaturas</div>
+                        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+                            {signerList.map((signer) => (
+                                <div
+                                    key={signer}
+                                    className="rounded-2xl border border-stroke2 bg-b-surface1 p-4"
+                                >
+                                    <div className="mb-3 text-small text-t-secondary">
+                                        {signer}
+                                    </div>
+                                    {signatures[signer] ? (
+                                        <Image
+                                            src={signatures[signer]}
+                                            alt={`Assinatura ${signer}`}
+                                            width={280}
+                                            height={56}
+                                            className="mb-3 h-14 w-auto object-contain"
+                                        />
+                                    ) : (
+                                        <div className="mb-3 h-14 w-full rounded-lg border border-dashed border-stroke2" />
+                                    )}
+                                    <Button
+                                        isPrimary
+                                        onClick={() => {
+                                            setActiveSigner(signer);
+                                            setSignatureModalVersion((prev) => prev + 1);
+                                            setSignatureModalOpen(true);
+                                        }}
+                                    >
+                                        {signatures[signer]
+                                            ? "Assinar novamente"
+                                            : "Clique para assinar"}
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
             <Actions featureType={featureType} />
+            <SignaturePadModal
+                key={signatureModalVersion}
+                open={signatureModalOpen}
+                onClose={() => setSignatureModalOpen(false)}
+                title="Assinatura eletrônica"
+                signerName={activeSigner}
+                onSave={(dataUrl) =>
+                    setSignatures((prev) => ({
+                        ...prev,
+                        [activeSigner]: dataUrl,
+                    }))
+                }
+            />
         </Layout>
     );
 };
