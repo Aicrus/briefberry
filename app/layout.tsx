@@ -55,7 +55,7 @@ export default async function RootLayout({
                 />
                 {/* Twitter Card data */}
                 <meta name="twitter:card" content="summary" />
-                <meta name="twitter:site" content="@ui8" />
+                <meta name="twitter:site" content="@briefberryapp" />
                 <meta
                     name="twitter:title"
                     content="AI Brief Generator Tailwind Kit"
@@ -64,7 +64,7 @@ export default async function RootLayout({
                     name="twitter:description"
                     content="Build AI powered brief generation tools with ready to use Tailwind code"
                 />
-                <meta name="twitter:creator" content="@ui8" />
+                <meta name="twitter:creator" content="@briefberryapp" />
                 {/* Twitter Summary card images must be at least 120x120px */}
                 <meta
                     name="twitter:image"
@@ -78,7 +78,7 @@ export default async function RootLayout({
                 <meta property="og:type" content="Article" />
                 <meta
                     property="og:url"
-                    content="https://ui8.net/ui8/products/briefberry-ai-powered-brief-generation-ui-kit-coded"
+                    content="https://briefberry.app"
                 />
                 <meta
                     property="og:image"
@@ -100,7 +100,7 @@ export default async function RootLayout({
                 />
                 <meta
                     property="og:url"
-                    content="https://ui8.net/ui8/products/briefberry-ai-powered-brief-generation-ui-kit-coded"
+                    content="https://briefberry.app"
                 />
                 <meta
                     property="og:image"
@@ -117,7 +117,7 @@ export default async function RootLayout({
                 />
                 <meta
                     property="og:url"
-                    content="https://ui8.net/ui8/products/briefberry-ai-powered-brief-generation-ui-kit-coded"
+                    content="https://briefberry.app"
                 />
                 <meta
                     property="og:image"

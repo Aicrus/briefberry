@@ -28,7 +28,7 @@ const BriefLinkedPage = () => {
                                 }`}
                                 name={isPremiumPlan ? "verification" : "lock"}
                             />
-                            UI8 Studio 2024
+                            Studio Modelo 2024
                         </div>
                         <BriefCategory value="ux-ui-design" />
                     </div>

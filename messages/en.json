@@ -4,7 +4,7 @@
     "hero": { "title": "Organize your workflow and stop losing clients", "subtitle": "Slow proposal, competitor wins. Create professional proposals in seconds. Contract validated in 800+ projects. PRD with tasks on schedule. All in minutes—design, apps, software. Never lose a client to delays again.", "getStarted": "Get started for free", "joinDesigners": "800+ projects closed without legal headaches" },
     "start": { "title": "Stop missing deadlines. Stop fearing lawsuits.", "subtitle": "Contract validated in 800+ projects. You're protected. Structured PRD with tasks organized by delivery time. Your clients will respect you. You'll sleep peacefully.", "getStarted": "Get started for free" },
     "about": { "sectionTitle": "Every wasted minute is money that doesn't come in", "sectionSubtitle": "Slow proposal = lost client. No contract = lawsuit risk. No planning = delays and unhappy clients.", "title1": "Close before your competitor does", "content1": "While you take 3 days to prepare a proposal, your competitor already closed the deal. Create professional proposal in 5 minutes. Client receives, client approves, you get paid.", "title2": "Sleep peacefully. You're protected.", "content2": "800+ projects without lawsuits. Lawyers created this contract. AI adapts to your client. Copyright, payment, cancellation, all covered. Brazil, USA, Europe, works anywhere.", "title3": "Never delay again. Never improvise again.", "content3": "Client complaining about delays? Scope changing constantly? It's over. PRD structured by professionals plus organized tasks, you deliver on time. Happy client. No stress for you." },
-    "footer": { "copyright": "© 2024, Robot Global FZCO / UI8", "termsLicensing": "Terms & Licensing" },
+    "footer": { "copyright": "© 2024, Robot Global FZCO / Briefberry", "termsLicensing": "Terms & Licensing" },
     "login": {
         "signInTitle": "Sign in to Briefberry",
         "signInWithGoogle": "Sign in with Google",
@@ -89,7 +89,7 @@
         "integrationsHint": "Select all that apply",
         "featuresHint": "Uncheck only the ones you don't need",
         "projectName": "Project name",
-        "projectNamePlaceholder": "e.g. UI8 Studio Web Design",
+        "projectNamePlaceholder": "e.g. Studio Exemplo Web Design",
         "projectGoals": "Project goals",
         "projectGoalsPlaceholder": "e.g. Create a user-friendly mobile app to help people track their daily water intake",
         "yourBudget": "Your budget",

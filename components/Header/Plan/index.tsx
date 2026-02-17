@@ -10,7 +10,7 @@ const Plan = ({}) => {
             {isPremiumPlan ? (
                 <div className="flex items-center gap-2 text-body-bold">
                     <Icon className="fill-primary2" name="verification" />
-                    <div className="">UI8 Studio 2024</div>
+                    <div className="">Studio Modelo 2024</div>
                 </div>
             ) : (
                 <>
@@ -19,7 +19,7 @@ const Plan = ({}) => {
                             className="fill-t-tertiary transition-colors group-hover:fill-t-primary"
                             name="lock"
                         />
-                        <div className="">UI8 Studio 2024</div>
+                        <div className="">Studio Modelo 2024</div>
                     </button>
                     <div className="absolute top-full left-1/2 w-115 pt-4 -translate-x-1/2 invisible opacity-0 transition-all group-hover:opacity-100 group-hover:visible">
                         <div className="dropdown-arrow-up relative flex p-6 rounded-4xl bg-b-surface2 shadow-hover">

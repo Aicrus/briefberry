@@ -42,7 +42,7 @@ export const content = {
         <>
             <p>
                 To get the creative juices flowing, we&apos;ve collected some
-                inspiration. Our reference from UI8 has shown us the direction
+                inspiration. Our design reference has shown us the direction
                 we&apos;d like to head in. Similarly, the Dribbble link served
                 as a mood setter.
             </p>
