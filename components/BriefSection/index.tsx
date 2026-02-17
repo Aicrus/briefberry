@@ -39,7 +39,7 @@ const BriefSection = ({
         editedContentProp ?? null
     );
     const draftContentHtmlRef = useRef("");
-    const [didEditContent, setDidEditContent] = useState(false);
+    const didEditContentRef = useRef(false);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [draftTitle, setDraftTitle] = useState(title);
 
@@ -54,7 +54,7 @@ const BriefSection = ({
 
     useOnClickOutside(ref as RefObject<HTMLElement>, () => {
         if (!edit) return;
-        if (!didEditContent) {
+        if (!didEditContentRef.current) {
             setEdit(false);
             return;
         }
@@ -62,7 +62,7 @@ const BriefSection = ({
         setEditedContent(next || null);
         onContentChange?.(next);
         setEdit(false);
-        setDidEditContent(false);
+        didEditContentRef.current = false;
     });
 
     const handleRegenerate = async () => {
@@ -84,13 +84,53 @@ const BriefSection = ({
         }
     };
 
-    const handleStartEdit = () => {
+    const focusEditorAtPoint = (x: number, y: number) => {
+        const editable = editableDivRef.current;
+        if (!editable) return;
+
+        editable.focus();
+
+        const selection = window.getSelection();
+        if (!selection) return;
+
+        let range: Range | null = null;
+        const doc = document as Document & {
+            caretPositionFromPoint?: (
+                px: number,
+                py: number
+            ) => { offsetNode: Node; offset: number } | null;
+            caretRangeFromPoint?: (px: number, py: number) => Range | null;
+        };
+
+        if (doc.caretPositionFromPoint) {
+            const caret = doc.caretPositionFromPoint(x, y);
+            if (caret) {
+                range = document.createRange();
+                range.setStart(caret.offsetNode, caret.offset);
+                range.collapse(true);
+            }
+        } else if (doc.caretRangeFromPoint) {
+            range = doc.caretRangeFromPoint(x, y);
+        }
+
+        if (!range) {
+            range = document.createRange();
+            range.selectNodeContents(editable);
+            range.collapse(false);
+        }
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+    };
+
+    const handleStartEditAtPoint = (e: React.MouseEvent<HTMLDivElement>) => {
         if (isOnlyView || edit) return;
         const currentHtml = editedContent ?? contentRef.current?.innerHTML ?? "";
         draftContentHtmlRef.current = currentHtml;
-        setDidEditContent(false);
+        didEditContentRef.current = false;
+        const { clientX, clientY } = e;
         setEdit(true);
-        setTimeout(() => editableDivRef.current?.focus(), 0);
+        setTimeout(() => focusEditorAtPoint(clientX, clientY), 0);
     };
 
     const handleStartEditTitle = () => {
@@ -139,7 +179,7 @@ const BriefSection = ({
                         } ${isRegenerate && !edit ? "border-stroke2!" : ""} ${
                             edit ? "border-primary1!" : ""
                         }`}
-                        onClick={handleStartEdit}
+                        onClick={handleStartEditAtPoint}
                         ref={ref}
                     >
                         {edit ? (
@@ -154,7 +194,7 @@ const BriefSection = ({
                                 onInput={(e) => {
                                     draftContentHtmlRef.current =
                                         e.currentTarget.innerHTML;
-                                    setDidEditContent(true);
+                                    didEditContentRef.current = true;
                                 }}
                                 onClick={(e) => e.stopPropagation()}
                             />
