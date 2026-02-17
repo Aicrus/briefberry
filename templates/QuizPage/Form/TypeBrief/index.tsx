@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 import Field from "@/components/Field";
+import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 const types = [
     { id: 0, titleKey: "typeWebApp" as const, icon: "align-right" },
@@ -13,8 +14,19 @@ const types = [
 
 const TypeBrief = ({}) => {
     const t = useTranslations("quiz");
-    const [active, setActive] = useState<number | null>(null);
-    const [otherType, setOtherType] = useState("");
+    const initialDraft = useMemo(
+        () =>
+            loadDraft<{ active: number | null; otherType: string }>(
+                DRAFT_KEYS.proposalTypeBrief
+            ),
+        []
+    );
+    const [active, setActive] = useState<number | null>(initialDraft?.active ?? null);
+    const [otherType, setOtherType] = useState(initialDraft?.otherType ?? "");
+
+    useEffect(() => {
+        saveDraft(DRAFT_KEYS.proposalTypeBrief, { active, otherType });
+    }, [active, otherType]);
 
     return (
         <>

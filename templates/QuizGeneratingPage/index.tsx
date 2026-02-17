@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Layout from "@/components/Layout";
 import Image from "@/components/Image";
@@ -12,6 +12,8 @@ const QuizGeneratingPage = () => {
     const t = useTranslations("quizGenerating");
     const [countdown, setCountdown] = useState(5);
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const feature = searchParams.get("feature");
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -19,7 +21,10 @@ const QuizGeneratingPage = () => {
                 if (prev <= 1) {
                     clearInterval(timer);
                     setTimeout(() => {
-                        router.push("/brief");
+                        const target = feature
+                            ? `/brief?feature=${feature}`
+                            : "/brief";
+                        router.push(target);
                     });
                     return 1;
                 }
@@ -28,7 +33,7 @@ const QuizGeneratingPage = () => {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, [router]);
+    }, [feature, router]);
 
     return (
         <Layout isFixedHeader isHiddenFooter isLoggedIn>

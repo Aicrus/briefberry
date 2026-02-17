@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
+import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 const STEP_KEYS = ["proposalStep0", "proposalStep1", "proposalStep2", "proposalStep3"] as const;
 
@@ -36,12 +38,45 @@ const REVISIONS_OPTIONS = [
 
 const ProposalForm = () => {
     const t = useTranslations("quiz");
-    const [activeId, setActiveId] = useState(0);
+    const searchParams = useSearchParams();
+    const isEditMode = searchParams.get("edit") === "1";
+    const initialDraft = useMemo(
+        () =>
+            loadDraft<{
+                activeId: number;
+                billingModel: number | null;
+                paymentMethod: number | null;
+                currency: number | null;
+                revisions: number | null;
+            }>(DRAFT_KEYS.proposalSimple),
+        []
+    );
+    const [activeId, setActiveId] = useState(
+        isEditMode ? 0 : (initialDraft?.activeId ?? 0)
+    );
 
-    const [billingModel, setBillingModel] = useState<number | null>(null);
-    const [paymentMethod, setPaymentMethod] = useState<number | null>(null);
-    const [currency, setCurrency] = useState<number | null>(null);
-    const [revisions, setRevisions] = useState<number | null>(null);
+    const [billingModel, setBillingModel] = useState<number | null>(
+        initialDraft?.billingModel ?? null
+    );
+    const [paymentMethod, setPaymentMethod] = useState<number | null>(
+        initialDraft?.paymentMethod ?? null
+    );
+    const [currency, setCurrency] = useState<number | null>(
+        initialDraft?.currency ?? null
+    );
+    const [revisions, setRevisions] = useState<number | null>(
+        initialDraft?.revisions ?? null
+    );
+
+    useEffect(() => {
+        saveDraft(DRAFT_KEYS.proposalSimple, {
+            activeId,
+            billingModel,
+            paymentMethod,
+            currency,
+            revisions,
+        });
+    }, [activeId, billingModel, paymentMethod, currency, revisions]);
 
     const totalSteps = STEP_KEYS.length;
 
@@ -134,7 +169,7 @@ const ProposalForm = () => {
                         className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
                         isSecondary
                         as="link"
-                        href="/quiz-generating"
+                        href="/quiz-generating?feature=proposal"
                     >
                         {t("continue")}
                     </Button>

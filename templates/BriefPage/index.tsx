@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import Layout from "@/components/Layout";
 import Button from "@/components/Button";
 import Icon from "@/components/Icon";
@@ -14,6 +15,15 @@ import { content } from "./content";
 const BriefPage = () => {
     const t = useTranslations("brief");
     const isPremiumPlan = useEventsStore((state) => state.isPremiumPlan);
+    const searchParams = useSearchParams();
+    const feature = searchParams.get("feature");
+
+    const editHref =
+        feature === "contract"
+            ? "/quiz/contract?edit=1"
+            : feature === "prd"
+            ? "/quiz/prd?edit=1"
+            : "/quiz?edit=1";
 
     return (
         <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>
@@ -24,7 +34,7 @@ const BriefPage = () => {
                         isCircle
                         isPrimary
                         as="link"
-                        href="/quiz"
+                        href={editHref}
                     >
                         <Icon name="edit" />
                     </Button>

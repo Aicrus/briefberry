@@ -76,7 +76,7 @@ const Field = ({
                     {label}
                 </div>
             )}
-            <div className={`relative ${isTextarea ? "flex" : ""}`}>
+            <div className={`relative ${isTextarea ? "flex flex-col" : ""}`}>
                 {isTextarea ? (
                     <textarea
                         className={`w-full px-6.5 py-4 border-[1.5px] border-stroke1 text-t-primary font-medium transition-colors resize-none outline-0 placeholder:text-t-tertiary focus:border-[#A8A8A8]/50! max-md:text-[1rem] ${

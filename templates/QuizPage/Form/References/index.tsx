@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 import Field from "@/components/Field";
 import Button from "@/components/Button";
+import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 const MAX_IMAGES = 4;
 const MAX_LINKS = 2;
@@ -10,7 +11,9 @@ const MAX_LINKS = 2;
 const References = ({}) => {
     const t = useTranslations("quiz");
     const [referenceLink, setReferenceLink] = useState("");
-    const [referenceLinks, setReferenceLinks] = useState<string[]>([]);
+    const [referenceLinks, setReferenceLinks] = useState<string[]>(
+        () => loadDraft<string[]>(DRAFT_KEYS.proposalReferences) ?? []
+    );
     const [images, setImages] = useState<File[]>([]);
     const [previews, setPreviews] = useState<string[]>([]);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -24,6 +27,10 @@ const References = ({}) => {
             nextPreviews.forEach((url) => URL.revokeObjectURL(url));
         };
     }, [images]);
+
+    useEffect(() => {
+        saveDraft(DRAFT_KEYS.proposalReferences, referenceLinks);
+    }, [referenceLinks]);
 
     const handleFiles = (fileList: FileList | null) => {
         if (!fileList) return;

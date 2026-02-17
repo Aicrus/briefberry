@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
 import Icon from "@/components/Icon";
 import MyDatePicker from "@/components/MyDatePicker";
+import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 const STEP_KEYS = [
     "prdStep0",
@@ -34,41 +36,140 @@ const INTEGRATION_KEYS = ["payments", "ai", "external_api", "whatsapp"] as const
 
 const PrdForm = () => {
     const t = useTranslations("quiz");
-    const [activeId, setActiveId] = useState(0);
+    const searchParams = useSearchParams();
+    const isEditMode = searchParams.get("edit") === "1";
+    const initialDraft = useMemo(
+        () =>
+            loadDraft<{
+                activeId: number;
+                language: number | null;
+                languageOther: string;
+                platform: number | null;
+                webFramework: number | null;
+                webFrameworkOther: string;
+                mobileFramework: number | null;
+                mobileFrameworkOther: string;
+                backendTech: number | null;
+                authentication: number | null;
+                features: Record<string, boolean>;
+                otherFeaturesTags: string[];
+                otherFeaturesInput: string;
+                integrations: Record<string, boolean>;
+                projectDeadline: string;
+                designSystem: number | null;
+                theme: number | null;
+                icons: number | null;
+                customRules: string;
+            }>(DRAFT_KEYS.prdWizard),
+        []
+    );
+    const [activeId, setActiveId] = useState(
+        isEditMode ? 0 : (initialDraft?.activeId ?? 0)
+    );
 
-    const [language, setLanguage] = useState<number | null>(null);
-    const [languageOther, setLanguageOther] = useState("");
-    const [platform, setPlatform] = useState<number | null>(null);
-    const [webFramework, setWebFramework] = useState<number | null>(null);
-    const [webFrameworkOther, setWebFrameworkOther] = useState("");
-    const [mobileFramework, setMobileFramework] = useState<number | null>(null);
-    const [mobileFrameworkOther, setMobileFrameworkOther] = useState("");
-    const [backendTech, setBackendTech] = useState<number | null>(null);
-    const [authentication, setAuthentication] = useState<number | null>(null);
+    const [language, setLanguage] = useState<number | null>(
+        initialDraft?.language ?? null
+    );
+    const [languageOther, setLanguageOther] = useState(initialDraft?.languageOther ?? "");
+    const [platform, setPlatform] = useState<number | null>(initialDraft?.platform ?? null);
+    const [webFramework, setWebFramework] = useState<number | null>(
+        initialDraft?.webFramework ?? null
+    );
+    const [webFrameworkOther, setWebFrameworkOther] = useState(
+        initialDraft?.webFrameworkOther ?? ""
+    );
+    const [mobileFramework, setMobileFramework] = useState<number | null>(
+        initialDraft?.mobileFramework ?? null
+    );
+    const [mobileFrameworkOther, setMobileFrameworkOther] = useState(
+        initialDraft?.mobileFrameworkOther ?? ""
+    );
+    const [backendTech, setBackendTech] = useState<number | null>(
+        initialDraft?.backendTech ?? null
+    );
+    const [authentication, setAuthentication] = useState<number | null>(
+        initialDraft?.authentication ?? null
+    );
 
-    const [features, setFeatures] = useState<Record<string, boolean>>({
-        featAuth: true,
-        featPayments: true,
-        featUpload: true,
-        featRealtime: true,
-        featOffline: true,
-        featExternalApis: true,
-    });
-    const [otherFeaturesTags, setOtherFeaturesTags] = useState<string[]>([]);
-    const [otherFeaturesInput, setOtherFeaturesInput] = useState("");
+    const [features, setFeatures] = useState<Record<string, boolean>>(
+        initialDraft?.features ?? {
+            featAuth: true,
+            featPayments: true,
+            featUpload: true,
+            featRealtime: true,
+            featOffline: true,
+            featExternalApis: true,
+        }
+    );
+    const [otherFeaturesTags, setOtherFeaturesTags] = useState<string[]>(
+        initialDraft?.otherFeaturesTags ?? []
+    );
+    const [otherFeaturesInput, setOtherFeaturesInput] = useState(
+        initialDraft?.otherFeaturesInput ?? ""
+    );
 
-    const [integrations, setIntegrations] = useState<Record<string, boolean>>({
-        payments: false,
-        ai: false,
-        external_api: false,
-        whatsapp: false,
-    });
+    const [integrations, setIntegrations] = useState<Record<string, boolean>>(
+        initialDraft?.integrations ?? {
+            payments: false,
+            ai: false,
+            external_api: false,
+            whatsapp: false,
+        }
+    );
 
-    const [projectDeadline, setProjectDeadline] = useState("");
-    const [designSystem, setDesignSystem] = useState<number | null>(null);
-    const [theme, setTheme] = useState<number | null>(null);
-    const [icons, setIcons] = useState<number | null>(null);
-    const [customRules, setCustomRules] = useState("");
+    const [projectDeadline, setProjectDeadline] = useState(
+        initialDraft?.projectDeadline ?? ""
+    );
+    const [designSystem, setDesignSystem] = useState<number | null>(
+        initialDraft?.designSystem ?? null
+    );
+    const [theme, setTheme] = useState<number | null>(initialDraft?.theme ?? null);
+    const [icons, setIcons] = useState<number | null>(initialDraft?.icons ?? null);
+    const [customRules, setCustomRules] = useState(initialDraft?.customRules ?? "");
+
+    useEffect(() => {
+        saveDraft(DRAFT_KEYS.prdWizard, {
+            activeId,
+            language,
+            languageOther,
+            platform,
+            webFramework,
+            webFrameworkOther,
+            mobileFramework,
+            mobileFrameworkOther,
+            backendTech,
+            authentication,
+            features,
+            otherFeaturesTags,
+            otherFeaturesInput,
+            integrations,
+            projectDeadline,
+            designSystem,
+            theme,
+            icons,
+            customRules,
+        });
+    }, [
+        activeId,
+        language,
+        languageOther,
+        platform,
+        webFramework,
+        webFrameworkOther,
+        mobileFramework,
+        mobileFrameworkOther,
+        backendTech,
+        authentication,
+        features,
+        otherFeaturesTags,
+        otherFeaturesInput,
+        integrations,
+        projectDeadline,
+        designSystem,
+        theme,
+        icons,
+        customRules,
+    ]);
 
     const totalSteps = STEP_KEYS.length;
 
@@ -446,7 +547,7 @@ const PrdForm = () => {
                             className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
                             isSecondary
                             as="link"
-                            href="/quiz-generating"
+                            href="/quiz-generating?feature=prd"
                         >
                             {t("continue")}
                         </Button>

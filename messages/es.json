@@ -1,10 +1,45 @@
 {
-    "header": { "signIn": "Iniciar sesión", "newBrief": "Nuevo brief" },
-    "menu": { "myBriefs": "Mis briefs", "manageYourPlan": "Gestionar tu plan", "accountSettings": "Configuración de la cuenta", "credits": "Créditos", "upgrade": "Actualizar", "theme": "Tema", "logOut": "Cerrar sesión" },
-    "hero": { "title": "Deja de perder clientes por falta de un flujo organizado", "subtitle": "Pierdes proyectos mientras preparas la propuesta. Tu competidor ya envió la suya. Crea propuestas profesionales en segundos. Contrato validado en 800+ proyectos. PRD con tareas organizadas en el tiempo de entrega. Todo en minutos, no en días. Diseño, apps, software. Nunca más pierdas un cliente por demora.", "getStarted": "Empezar gratis", "joinDesigners": "800+ proyectos cerrados sin dolores de cabeza legales" },
-    "start": { "title": "Basta de perder plazos. Basta de miedo a demandas.", "subtitle": "Contrato validado en 800+ proyectos. Estás protegido. PRD estructurado con tareas organizadas en el tiempo de entrega. Tus clientes te respetarán. Dormirás tranquilo.", "getStarted": "Empezar gratis" },
-    "about": { "sectionTitle": "Cada minuto perdido es dinero que no entra", "sectionSubtitle": "Propuesta lenta = cliente perdido. Sin contrato = riesgo de demanda. Sin planificación = retraso y cliente insatisfecho.", "title1": "Cierra antes que tu competidor", "content1": "Mientras tardas 3 días en hacer la propuesta, tu competidor ya cerró. Crea propuesta profesional en 5 minutos. Cliente recibe, cliente aprueba, tú cobras.", "title2": "Duerme tranquilo. Estás protegido.", "content2": "800+ proyectos sin demandas. Abogados crearon este contrato. IA adapta a tu cliente. Derechos de autor, pago, cancelación, todo cubierto. Brasil, USA, Europa, funciona en cualquier lugar.", "title3": "Nunca más retrases. Nunca más improvises.", "content3": "¿Cliente se queja de retrasos? ¿Alcance cambia todo el tiempo? Se acabó. PRD estructurado por profesionales más tareas organizadas, entregas a tiempo. Cliente feliz. Tú sin estrés." },
-    "footer": { "copyright": "© 2024, Robot Global FZCO / Briefberry", "termsLicensing": "Términos y licencias" },
+    "header": {
+        "signIn": "Iniciar sesión",
+        "newBrief": "Nuevo brief",
+        "newProposal": "Nueva propuesta",
+        "newContract": "Nuevo contrato",
+        "newPrd": "Nuevo PRD"
+    },
+    "menu": {
+        "myBriefs": "Mis briefs",
+        "manageYourPlan": "Gestionar tu plan",
+        "accountSettings": "Configuración de la cuenta",
+        "credits": "Créditos",
+        "upgrade": "Actualizar",
+        "theme": "Tema",
+        "logOut": "Cerrar sesión"
+    },
+    "hero": {
+        "title": "Deja de perder clientes por falta de un flujo organizado",
+        "subtitle": "Pierdes proyectos mientras preparas la propuesta. Tu competidor ya envió la suya. Crea propuestas profesionales en segundos. Contrato validado en 800+ proyectos. PRD con tareas organizadas en el tiempo de entrega. Todo en minutos, no en días. Diseño, apps, software. Nunca más pierdas un cliente por demora.",
+        "getStarted": "Empezar gratis",
+        "joinDesigners": "800+ proyectos cerrados sin dolores de cabeza legales"
+    },
+    "start": {
+        "title": "Basta de perder plazos. Basta de miedo a demandas.",
+        "subtitle": "Contrato validado en 800+ proyectos. Estás protegido. PRD estructurado con tareas organizadas en el tiempo de entrega. Tus clientes te respetarán. Dormirás tranquilo.",
+        "getStarted": "Empezar gratis"
+    },
+    "about": {
+        "sectionTitle": "Cada minuto perdido es dinero que no entra",
+        "sectionSubtitle": "Propuesta lenta = cliente perdido. Sin contrato = riesgo de demanda. Sin planificación = retraso y cliente insatisfecho.",
+        "title1": "Cierra antes que tu competidor",
+        "content1": "Mientras tardas 3 días en hacer la propuesta, tu competidor ya cerró. Crea propuesta profesional en 5 minutos. Cliente recibe, cliente aprueba, tú cobras.",
+        "title2": "Duerme tranquilo. Estás protegido.",
+        "content2": "800+ proyectos sin demandas. Abogados crearon este contrato. IA adapta a tu cliente. Derechos de autor, pago, cancelación, todo cubierto. Brasil, USA, Europa, funciona en cualquier lugar.",
+        "title3": "Nunca más retrases. Nunca más improvises.",
+        "content3": "¿Cliente se queja de retrasos? ¿Alcance cambia todo el tiempo? Se acabó. PRD estructurado por profesionales más tareas organizadas, entregas a tiempo. Cliente feliz. Tú sin estrés."
+    },
+    "footer": {
+        "copyright": "© 2024, Robot Global FZCO / Briefberry",
+        "termsLicensing": "Términos y licencias"
+    },
     "login": {
         "signInTitle": "Iniciar sesión en Briefberry",
         "signInWithGoogle": "Iniciar sesión con Google",
@@ -244,7 +279,9 @@
         "confirmPassword": "Confirmar contraseña",
         "saveChanges": "Guardar cambios"
     },
-    "managePlan": { "title": "Gestionar tu plan" },
+    "managePlan": {
+        "title": "Gestionar tu plan"
+    },
     "brief": {
         "introduction": "Introducción",
         "goals": "Objetivos",
@@ -256,7 +293,11 @@
         "download": "Descargar",
         "sendEmail": "Enviar por correo",
         "regenerate": "Regenerar",
-        "yourCustomLink": "Tu enlace personalizado"
+        "yourCustomLink": "Tu enlace personalizado",
+        "regenerating": "Regenerando...",
+        "regenerateModalTitle": "¿Cómo quieres reescribir esta sección?",
+        "regenerateModalDescription": "Describe el ajuste que quieres en este párrafo de esta etapa.",
+        "regenerateModalPlaceholder": "Ej: haz la introducción más directa, ajusta el cronograma a 8 semanas y enfoca más en conversión."
     },
     "pricing": {
         "free": "Gratis",
@@ -281,7 +322,9 @@
         "getStartedNow": "Empezar ahora",
         "createAccountButton": "Crear una cuenta"
     },
-    "home": { "pricingTitle": "Empieza gratis. Cierra más proyectos con menos esfuerzo." },
+    "home": {
+        "pricingTitle": "Empieza gratis. Cierra más proyectos con menos esfuerzo."
+    },
     "datePicker": {
         "label": "Seleccionar fecha",
         "placeholder": "Escribe cuando quieras. ej: mañana o 18 oct 2024",
@@ -292,6 +335,19 @@
         "1month": "1 mes",
         "3months": "3 meses"
     },
-    "language": { "label": "Idioma", "en": "English", "pt": "Português", "es": "Español" },
-    "projectFlow": { "selectFeature": "¿Qué problema quieres resolver ahora?", "createProposal": "Propuesta", "createProposalDesc": "Cierra al cliente antes de que elija a otro. Propuesta profesional en minutos.", "createContract": "Contrato", "createContractDesc": "Protégete de demandas. Contrato validado por abogados en 800+ proyectos.", "createPrd": "PRD + Tareas", "createPrdDesc": "Deja de retrasar entregas. Planificación + tareas para entregar a tiempo." }
+    "language": {
+        "label": "Idioma",
+        "en": "English",
+        "pt": "Português",
+        "es": "Español"
+    },
+    "projectFlow": {
+        "selectFeature": "¿Qué problema quieres resolver ahora?",
+        "createProposal": "Propuesta",
+        "createProposalDesc": "Cierra al cliente antes de que elija a otro. Propuesta profesional en minutos.",
+        "createContract": "Contrato",
+        "createContractDesc": "Protégete de demandas. Contrato validado por abogados en 800+ proyectos.",
+        "createPrd": "PRD + Tareas",
+        "createPrdDesc": "Deja de retrasar entregas. Planificación + tareas para entregar a tiempo."
+    }
 }

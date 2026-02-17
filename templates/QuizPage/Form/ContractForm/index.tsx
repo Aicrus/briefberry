@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
 import Icon from "@/components/Icon";
 import { formatCPF, formatCNPJ, formatSSN, formatEIN } from "@/lib/masks";
+import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 /** 0=CPF, 1=CNPJ, 2=SSN (EUA), 3=EIN (EUA), 4=VAT/NIF (Europa), 5=Outro */
 const DOC_TYPE_IDS = [2, 3, 4, 1, 0, 5] as const;
@@ -68,24 +70,88 @@ const cardClass = (active: boolean) =>
 
 const ContractForm = () => {
     const t = useTranslations("quiz");
-    const [activeId, setActiveId] = useState(0);
+    const searchParams = useSearchParams();
+    const isEditMode = searchParams.get("edit") === "1";
+    const initialDraft = useMemo(
+        () =>
+            loadDraft<{
+                activeId: number;
+                contractorName: string;
+                contractorDocType: DocTypeId;
+                contractorDocument: string;
+                contractorEmail: string;
+                clientName: string;
+                clientDocType: DocTypeId;
+                clientDocument: string;
+                clientEmail: string;
+                projectProposalLink: string;
+                projectDescription: string;
+                termination: number | null;
+            }>(DRAFT_KEYS.contractWizard),
+        []
+    );
+    const [activeId, setActiveId] = useState(
+        isEditMode ? 0 : (initialDraft?.activeId ?? 0)
+    );
 
     // Step 1: Contractor data
-    const [contractorName, setContractorName] = useState("");
-    const [contractorDocType, setContractorDocType] = useState<DocTypeId>(DOC_TYPE_IDS[0]);
-    const [contractorDocument, setContractorDocument] = useState("");
-    const [contractorEmail, setContractorEmail] = useState("");
+    const [contractorName, setContractorName] = useState(initialDraft?.contractorName ?? "");
+    const [contractorDocType, setContractorDocType] = useState<DocTypeId>(
+        initialDraft?.contractorDocType ?? DOC_TYPE_IDS[0]
+    );
+    const [contractorDocument, setContractorDocument] = useState(
+        initialDraft?.contractorDocument ?? ""
+    );
+    const [contractorEmail, setContractorEmail] = useState(initialDraft?.contractorEmail ?? "");
 
     // Step 2: Client data
-    const [clientName, setClientName] = useState("");
-    const [clientDocType, setClientDocType] = useState<DocTypeId>(DOC_TYPE_IDS[0]);
-    const [clientDocument, setClientDocument] = useState("");
-    const [clientEmail, setClientEmail] = useState("");
+    const [clientName, setClientName] = useState(initialDraft?.clientName ?? "");
+    const [clientDocType, setClientDocType] = useState<DocTypeId>(
+        initialDraft?.clientDocType ?? DOC_TYPE_IDS[0]
+    );
+    const [clientDocument, setClientDocument] = useState(initialDraft?.clientDocument ?? "");
+    const [clientEmail, setClientEmail] = useState(initialDraft?.clientEmail ?? "");
 
-    const [projectProposalLink, setProjectProposalLink] = useState("");
-    const [projectDescription, setProjectDescription] = useState("");
+    const [projectProposalLink, setProjectProposalLink] = useState(
+        initialDraft?.projectProposalLink ?? ""
+    );
+    const [projectDescription, setProjectDescription] = useState(
+        initialDraft?.projectDescription ?? ""
+    );
 
-    const [termination, setTermination] = useState<number | null>(null);
+    const [termination, setTermination] = useState<number | null>(
+        initialDraft?.termination ?? null
+    );
+
+    useEffect(() => {
+        saveDraft(DRAFT_KEYS.contractWizard, {
+            activeId,
+            contractorName,
+            contractorDocType,
+            contractorDocument,
+            contractorEmail,
+            clientName,
+            clientDocType,
+            clientDocument,
+            clientEmail,
+            projectProposalLink,
+            projectDescription,
+            termination,
+        });
+    }, [
+        activeId,
+        contractorName,
+        contractorDocType,
+        contractorDocument,
+        contractorEmail,
+        clientName,
+        clientDocType,
+        clientDocument,
+        clientEmail,
+        projectProposalLink,
+        projectDescription,
+        termination,
+    ]);
 
     const totalSteps = STEP_KEYS.length;
 
@@ -294,7 +360,7 @@ const ContractForm = () => {
                         className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
                         isSecondary
                         as="link"
-                        href="/quiz-generating"
+                        href="/quiz-generating?feature=contract"
                     >
                         {t("continue")}
                     </Button>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
@@ -11,6 +12,7 @@ import {
     parseDigitsFromInput,
     type CurrencyId,
 } from "@/lib/currency";
+import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 const STEP_KEYS = ["step0", "step1", "step3", "step4", "stepPayment", "step5", "step6"] as const;
 const TOTAL_STEPS = 7;
@@ -30,15 +32,64 @@ const cardClass = (active: boolean) =>
 
 const Form = ({}) => {
     const t = useTranslations("quiz");
-    const [activeId, setActiveId] = useState(0);
-    const [projectName, setProjectName] = useState("");
-    const [projectGoals, setProjectGoals] = useState("");
-    const [yourBudget, setYourBudget] = useState("");
-    const [date, setDate] = useState("");
-    const [billingModel, setBillingModel] = useState<number | null>(null);
-    const [paymentMethod, setPaymentMethod] = useState<number | null>(null);
-    const [billingAndPaymentOther, setBillingAndPaymentOther] = useState("");
-    const [currency, setCurrency] = useState<number | null>(1);
+    const searchParams = useSearchParams();
+    const isEditMode = searchParams.get("edit") === "1";
+    const initialDraft = useMemo(
+        () =>
+            loadDraft<{
+                activeId: number;
+                projectName: string;
+                projectGoals: string;
+                yourBudget: string;
+                date: string;
+                billingModel: number | null;
+                paymentMethod: number | null;
+                billingAndPaymentOther: string;
+                currency: number | null;
+            }>(DRAFT_KEYS.proposalWizard),
+        []
+    );
+    const [activeId, setActiveId] = useState(
+        isEditMode ? 0 : (initialDraft?.activeId ?? 0)
+    );
+    const [projectName, setProjectName] = useState(initialDraft?.projectName ?? "");
+    const [projectGoals, setProjectGoals] = useState(initialDraft?.projectGoals ?? "");
+    const [yourBudget, setYourBudget] = useState(initialDraft?.yourBudget ?? "");
+    const [date, setDate] = useState(initialDraft?.date ?? "");
+    const [billingModel, setBillingModel] = useState<number | null>(
+        initialDraft?.billingModel ?? null
+    );
+    const [paymentMethod, setPaymentMethod] = useState<number | null>(
+        initialDraft?.paymentMethod ?? null
+    );
+    const [billingAndPaymentOther, setBillingAndPaymentOther] = useState(
+        initialDraft?.billingAndPaymentOther ?? ""
+    );
+    const [currency, setCurrency] = useState<number | null>(initialDraft?.currency ?? 1);
+
+    useEffect(() => {
+        saveDraft(DRAFT_KEYS.proposalWizard, {
+            activeId,
+            projectName,
+            projectGoals,
+            yourBudget,
+            date,
+            billingModel,
+            paymentMethod,
+            billingAndPaymentOther,
+            currency,
+        });
+    }, [
+        activeId,
+        projectName,
+        projectGoals,
+        yourBudget,
+        date,
+        billingModel,
+        paymentMethod,
+        billingAndPaymentOther,
+        currency,
+    ]);
 
     const handleNext = () => {
         if (activeId < TOTAL_STEPS - 1) {
@@ -196,7 +247,7 @@ const Form = ({}) => {
                         className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
                         isSecondary
                         as="link"
-                        href="/quiz-generating"
+                        href="/quiz-generating?feature=proposal"
                     >
                         {t("continue")}
                     </Button>

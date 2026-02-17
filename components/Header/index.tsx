@@ -1,12 +1,17 @@
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Image from "@/components/Image";
 import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import Login from "@/components/Login";
+import {
+    clearFeatureDrafts,
+    FEATURE_ROUTES,
+    type FeatureType,
+} from "@/lib/draftStorage";
 import Menu from "./Menu";
 import Plan from "./Plan";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -28,7 +33,24 @@ const Header = ({
 }: HeaderProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const router = useRouter();
     const t = useTranslations("header");
+
+    const queryFeature = searchParams.get("feature");
+    const currentFeature: FeatureType =
+        pathname === "/quiz/contract" || queryFeature === "contract"
+            ? "contract"
+            : pathname === "/quiz/prd" || queryFeature === "prd"
+            ? "prd"
+            : "proposal";
+
+    const newLabelKey =
+        currentFeature === "contract"
+            ? "newContract"
+            : currentFeature === "prd"
+            ? "newPrd"
+            : "newProposal";
 
     return (
         <>
@@ -62,11 +84,13 @@ const Header = ({
                                 pathname !== "/quiz-generating" && (
                                     <Button
                                         className="max-md:w-12! max-md:gap-0! max-md:p-0! max-md:text-0!"
-                                        href="/quiz"
-                                        as="link"
                                         isSecondary
+                                        onClick={() => {
+                                            clearFeatureDrafts(currentFeature);
+                                            router.push(FEATURE_ROUTES[currentFeature]);
+                                        }}
                                     >
-                                        {t("newBrief")}
+                                        {t(newLabelKey)}
                                         <Icon
                                             className="hidden! ml-2 max-md:ml-0 max-md:inline-block!"
                                             name="plus"

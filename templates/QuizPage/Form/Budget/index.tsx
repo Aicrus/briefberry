@@ -8,6 +8,7 @@ import {
     parseDigitsFromInput,
     type CurrencyId,
 } from "@/lib/currency";
+import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 const MAX_BUDGET_STAGES = 20;
 const SCROLL_THRESHOLD = 3;
@@ -20,10 +21,13 @@ const Budget = ({ currency = null }: { currency?: number | null }) => {
     const t = useTranslations("quiz");
     const symbol = currency !== null && CURRENCY_SYMBOL[currency] ? CURRENCY_SYMBOL[currency] : "$";
     const currencyId = (currency ?? 1) as CurrencyId;
-    const [items, setItems] = useState<BudgetItem[]>([
-        { id: 1, scope: "", budget: "" },
-        { id: 2, scope: "", budget: "" },
-    ]);
+    const [items, setItems] = useState<BudgetItem[]>(
+        () =>
+            loadDraft<BudgetItem[]>(DRAFT_KEYS.proposalBudget) ?? [
+                { id: 1, scope: "", budget: "" },
+                { id: 2, scope: "", budget: "" },
+            ]
+    );
     const scrollContainerRef = useRef<HTMLDivElement | null>(null);
     const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
     const [lastAddedId, setLastAddedId] = useState<number | null>(null);
@@ -61,6 +65,10 @@ const Budget = ({ currency = null }: { currency?: number | null }) => {
         }
         setLastAddedId(null);
     }, [items, lastAddedId]);
+
+    useEffect(() => {
+        saveDraft(DRAFT_KEYS.proposalBudget, items);
+    }, [items]);
 
     return (
         <div className="">
