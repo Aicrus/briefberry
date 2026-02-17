@@ -73,7 +73,6 @@ const ContractForm = () => {
         () =>
             loadDraft<{
                 activeId: number;
-                contractType: string;
                 contractorName: string;
                 contractorDocType: DocTypeId;
                 contractorDocument: string;
@@ -89,7 +88,6 @@ const ContractForm = () => {
         []
     );
     const [activeId, setActiveId] = useState(0);
-    const [contractType, setContractType] = useState(initialDraft?.contractType ?? "");
 
     // Step 1: Contractor data
     const [contractorName, setContractorName] = useState(initialDraft?.contractorName ?? "");
@@ -123,7 +121,6 @@ const ContractForm = () => {
     useEffect(() => {
         saveDraft(DRAFT_KEYS.contractWizard, {
             activeId,
-            contractType,
             contractorName,
             contractorDocType,
             contractorDocument,
@@ -138,7 +135,6 @@ const ContractForm = () => {
         });
     }, [
         activeId,
-        contractType,
         contractorName,
         contractorDocType,
         contractorDocument,
@@ -304,23 +300,12 @@ const ContractForm = () => {
                 {activeId === 2 && (
                     <>
                         <Field
-                            label="Tipo de contrato"
-                            value={contractType}
-                            onChange={(e) => setContractType(e.target.value)}
-                            name="contract-type"
-                            placeholder="ex: desenvolvimento de aplicativo"
-                            isLarge
-                            required
-                            maxLength={160}
-                        />
-                        <Field
                             label={t("projectProposalLink")}
                             value={projectProposalLink}
                             onChange={(e) => setProjectProposalLink(e.target.value)}
                             name="project-proposal-link"
                             placeholder={t("projectProposalLinkPlaceholder")}
                             isLarge
-                            className="mt-6"
                         />
                         <div className="mt-6">
                             <p className="mb-4 text-body text-t-secondary">{t("projectDescriptionHint")}</p>

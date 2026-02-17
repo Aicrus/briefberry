@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
+import Image from "@/components/Image";
 import Field from "@/components/Field";
 import Button from "@/components/Button";
 import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
@@ -8,37 +9,46 @@ import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 const MAX_IMAGES = 4;
 const MAX_LINKS = 2;
 
+function fileToDataUrl(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsDataURL(file);
+    });
+}
+
 const References = ({}) => {
     const t = useTranslations("quiz");
     const [referenceLink, setReferenceLink] = useState("");
     const [referenceLinks, setReferenceLinks] = useState<string[]>(
         () => loadDraft<string[]>(DRAFT_KEYS.proposalReferences) ?? []
     );
-    const [images, setImages] = useState<File[]>([]);
-    const [previews, setPreviews] = useState<string[]>([]);
+    const [images, setImages] = useState<string[]>(
+        () => loadDraft<string[]>(DRAFT_KEYS.proposalReferenceImages) ?? []
+    );
     const [isDragOver, setIsDragOver] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
-
-    useEffect(() => {
-        const nextPreviews = images.map((image) => URL.createObjectURL(image));
-        setPreviews(nextPreviews);
-
-        return () => {
-            nextPreviews.forEach((url) => URL.revokeObjectURL(url));
-        };
-    }, [images]);
 
     useEffect(() => {
         saveDraft(DRAFT_KEYS.proposalReferences, referenceLinks);
     }, [referenceLinks]);
 
-    const handleFiles = (fileList: FileList | null) => {
+    useEffect(() => {
+        saveDraft(DRAFT_KEYS.proposalReferenceImages, images);
+    }, [images]);
+
+    const handleFiles = async (fileList: FileList | null) => {
         if (!fileList) return;
         const selected = Array.from(fileList).filter((file) =>
             file.type.startsWith("image/")
         );
         if (selected.length === 0) return;
-        setImages((prev) => [...prev, ...selected].slice(0, MAX_IMAGES));
+        const remainingSlots = Math.max(0, MAX_IMAGES - images.length);
+        if (remainingSlots === 0) return;
+        const filesToUse = selected.slice(0, remainingSlots);
+        const nextDataUrls = await Promise.all(filesToUse.map(fileToDataUrl));
+        setImages((prev) => [...prev, ...nextDataUrls].slice(0, MAX_IMAGES));
         if (inputRef.current) inputRef.current.value = "";
     };
 
@@ -100,13 +110,15 @@ const References = ({}) => {
                     {images.length} / {MAX_IMAGES}
                 </div>
             </div>
-            {previews.length > 0 && (
+            {images.length > 0 && (
                 <ul className="grid grid-cols-4 gap-3 mb-5 max-md:grid-cols-2">
-                    {previews.map((src, index) => (
+                    {images.map((src, index) => (
                         <li key={src} className="relative h-24 rounded-xl overflow-hidden bg-b-subtle">
-                            <img
+                            <Image
                                 className="w-full h-full object-cover"
                                 src={src}
+                                width={240}
+                                height={96}
                                 alt={`reference-${index + 1}`}
                             />
                             <button

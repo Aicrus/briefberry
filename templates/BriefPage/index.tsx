@@ -12,6 +12,7 @@ import BriefCategory from "@/components/BriefCategory";
 import SignaturePadModal from "@/components/SignaturePadModal";
 import useEventsStore from "@/store/useEventsStore";
 import { DRAFT_KEYS, loadDraft } from "@/lib/draftStorage";
+import { digitsToNumber, type CurrencyId } from "@/lib/currency";
 import Actions from "./Actions";
 
 import { content } from "./content";
@@ -395,6 +396,259 @@ type SignatureParticipant = {
     fullName: string;
 };
 
+const PROPOSAL_TYPE_LABELS: Record<number, string> = {
+    0: "Desenvolvimento de Aplicativo Web",
+    1: "Desenvolvimento de Aplicativo Mobile",
+    2: "Design de Interface (UI/UX)",
+    3: "Desenvolvimento de Logomarca e Branding",
+    4: "Desenvolvimento de Landing Page",
+};
+
+type ProposalTypeDraft = { active: number | null; otherType: string };
+type ProposalWizardDraft = {
+    projectName: string;
+    projectGoals: string;
+    yourBudget: string;
+    date: string;
+    billingModel: number | null;
+    paymentMethod: number | null;
+    billingAndPaymentOther: string;
+    currency: number | null;
+};
+type ProposalBudgetItem = { id: number; scope: string; budget: string };
+type ProposalContentShape = {
+    introduction: React.ReactNode;
+    goals: React.ReactNode;
+    timeline: React.ReactNode;
+    budget: React.ReactNode;
+    references: React.ReactNode;
+    conclusion: React.ReactNode;
+    images: string[];
+};
+
+const CURRENCY_SYMBOL_BY_ID: Record<number, string> = {
+    0: "R$",
+    1: "US$",
+    2: "€",
+};
+
+const BILLING_MODEL_LABEL: Record<number, string> = {
+    0: "Preço fechado",
+    1: "Por funcionalidade",
+    2: "Por etapa",
+};
+
+const PAYMENT_METHOD_LABEL: Record<number, string> = {
+    0: "50% na entrada e 50% na entrega",
+    1: "Pagamento por etapa",
+};
+
+function resolveProposalTypeLabel(draft: ProposalTypeDraft | null): string {
+    if (!draft) return "Desenvolvimento Digital";
+    if (draft.active === 5 && draft.otherType?.trim()) {
+        return draft.otherType.trim();
+    }
+    if (draft.active != null && PROPOSAL_TYPE_LABELS[draft.active]) {
+        return PROPOSAL_TYPE_LABELS[draft.active];
+    }
+    return "Desenvolvimento Digital";
+}
+
+function formatProposalBudget(
+    digits: string | undefined,
+    currency: number | null | undefined
+): string {
+    if (!digits) return "A definir";
+    const currencyId = ((currency ?? 1) as CurrencyId) || 1;
+    const symbol = CURRENCY_SYMBOL_BY_ID[currencyId] ?? "US$";
+    const amount = digitsToNumber(digits);
+    const formatted = amount.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+    return `${symbol} ${formatted}`;
+}
+
+function buildProposalContentFromDrafts(
+    typeDraft: ProposalTypeDraft | null,
+    wizardDraft: ProposalWizardDraft | null,
+    budgetDraft: ProposalBudgetItem[] | null,
+    referenceLinks: string[] | null,
+    referenceImages: string[] | null
+): ProposalContentShape {
+    const projectName = wizardDraft?.projectName?.trim() || "Projeto";
+    const projectGoals =
+        wizardDraft?.projectGoals?.trim() ||
+        "Escopo e objetivos detalhados serão definidos com base no direcionamento do cliente.";
+    const deadline = wizardDraft?.date?.trim() || "A definir";
+    const totalBudget = formatProposalBudget(
+        wizardDraft?.yourBudget,
+        wizardDraft?.currency
+    );
+    const billingModel =
+        wizardDraft?.billingModel != null
+            ? BILLING_MODEL_LABEL[wizardDraft.billingModel] || "A definir"
+            : "A definir";
+    const paymentMethod =
+        wizardDraft?.paymentMethod != null
+            ? PAYMENT_METHOD_LABEL[wizardDraft.paymentMethod] || "A definir"
+            : "A definir";
+    const paymentNotes = wizardDraft?.billingAndPaymentOther?.trim() || "";
+    const scopes =
+        budgetDraft
+            ?.filter((item) => item.scope?.trim())
+            .map((item) => item.scope.trim()) ?? [];
+    const stageBudgetRows =
+        budgetDraft
+            ?.filter((item) => item.scope?.trim() || item.budget?.trim())
+            .map((item) => ({
+                scope: item.scope?.trim() || "Etapa",
+                budget: formatProposalBudget(item.budget, wizardDraft?.currency),
+            })) ?? [];
+    const links = (referenceLinks ?? []).filter((link) => link?.trim());
+
+    return {
+        introduction: (
+            <div className="space-y-3">
+                <p>
+                    Conforme alinhado em nossa conversa inicial, apresentamos esta
+                    proposta para o projeto{" "}
+                    <span className="text-[1.08rem] font-semibold">
+                        {projectName}
+                    </span>
+                    .
+                </p>
+                <p>
+                    O foco é entregar uma solução moderna, funcional e preparada
+                    para evolução contínua, com impacto de negócio e excelente
+                    experiência do usuário.
+                </p>
+            </div>
+        ),
+        goals: (
+            <div className="space-y-3">
+                <p>{projectGoals}</p>
+                <p>
+                    <strong>Resultado esperado:</strong> produto funcional,
+                    atraente e pronto para validação de mercado, com base nas
+                    prioridades definidas pelo cliente.
+                </p>
+            </div>
+        ),
+        timeline: (
+            <div className="space-y-3">
+                <p>
+                    <strong>Funcionalidades do MVP</strong>
+                </p>
+                {scopes.length > 0 ? (
+                    <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                        {scopes.map((scope, index) => (
+                            <li key={`${scope}-${index}`}>{scope}</li>
+                        ))}
+                    </ul>
+                ) : (
+                    <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                        <li>Planejamento funcional e arquitetura da solução.</li>
+                        <li>Implementação das funcionalidades prioritárias do MVP.</li>
+                        <li>Ajustes de usabilidade, testes e refinamentos finais.</li>
+                    </ul>
+                )}
+                <p>
+                    <strong>Prazo previsto:</strong> {deadline}.
+                </p>
+            </div>
+        ),
+        budget: (
+            <div className="space-y-3">
+                <p>
+                    <strong>Total estimado:</strong> {totalBudget}.
+                </p>
+                <p>
+                    <strong>Modelo de cobrança:</strong> {billingModel}.
+                </p>
+                <p>
+                    <strong>Forma de pagamento:</strong> {paymentMethod}.
+                </p>
+                {paymentNotes && (
+                    <p>
+                        <strong>Observações comerciais:</strong> {paymentNotes}
+                    </p>
+                )}
+                {stageBudgetRows.length > 0 && (
+                    <>
+                        <p>
+                            <strong>Composição por etapa</strong>
+                        </p>
+                        <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                            {stageBudgetRows.map((row, index) => (
+                                <li key={`${row.scope}-${index}`}>
+                                    {row.scope}: {row.budget}
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                )}
+            </div>
+        ),
+        references: (
+            <div className="space-y-3">
+                {links.length > 0 ? (
+                    <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                        {links.map((link, index) => (
+                            <li key={`${link}-${index}`}>
+                                <a
+                                    href={link}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="underline decoration-1 underline-offset-2"
+                                >
+                                    {link}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>
+                        Nenhum link de referência foi informado até o momento.
+                    </p>
+                )}
+                <p>
+                    As referências orientam decisões de design, posicionamento e
+                    experiência da solução proposta.
+                </p>
+            </div>
+        ),
+        conclusion: (
+            <div className="space-y-3">
+                <div className="rounded-2xl border border-primary2/20 bg-primary2/5 p-4">
+                    <ul className="list-disc pl-6 space-y-1 [&>li]:leading-7">
+                        <li>
+                            Confirmação em até 24 horas após envio da proposta:
+                            <strong> 10% de desconto</strong>. Valor final: US$
+                            10.665.
+                        </li>
+                        <li>
+                            Confirmação em até 48 horas:
+                            <strong> 5% de desconto</strong>. Valor final: US$
+                            11.257,50.
+                        </li>
+                        <li>
+                            Publicação em lojas (Google Play e App Store) é
+                            opcional, com valor único de US$ 700, incluindo capas
+                            e preparação técnica.
+                        </li>
+                    </ul>
+                </div>
+                <p>
+                    Ficamos à disposição para ajustar qualquer ponto e avançar da
+                    forma mais adequada ao seu contexto.
+                </p>
+            </div>
+        ),
+        images: (referenceImages ?? []).slice(0, 4),
+    };
+}
+
 const BriefPage = () => {
     const t = useTranslations("brief");
     const tQuiz = useTranslations("quiz");
@@ -420,13 +674,15 @@ const BriefPage = () => {
             ? "Contrato de Desenvolvimento de Aplicativo"
             : featureType === "prd"
             ? t("prdTitle")
-            : t("proposalTitle");
+            : "Proposta Comercial de Desenvolvimento Digital";
+    const [proposalContentState, setProposalContentState] =
+        useState<ProposalContentShape>(content);
     const displayedContent =
         featureType === "contract"
             ? contractContent
             : featureType === "prd"
             ? prdContent
-            : content;
+            : proposalContentState;
     const sectionTitles = useMemo(
         () =>
             featureType === "contract"
@@ -448,14 +704,14 @@ const BriefPage = () => {
                       conclusion: tQuiz("prdStep8"),
                   }
                 : {
-                      introduction: t("introduction"),
-                      goals: t("goals"),
-                      timeline: t("timeline"),
-                      budget: t("budget"),
-                      references: t("references"),
-                      conclusion: t("conclusion"),
+                      introduction: "Resumo da Proposta",
+                      goals: "Objetivos e Resultado Esperado",
+                      timeline: "Escopo e Funcionalidades",
+                      budget: "Investimento e Prazos",
+                      references: "Referências e Materiais",
+                      conclusion: "Condições e Próximos Passos",
                   },
-        [featureType, t, tQuiz]
+        [featureType, tQuiz]
     );
     const subtitleDefault =
         featureType === "contract"
@@ -463,7 +719,7 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "PRD"
             : "Proposta";
-    const storageKey = `briefberry:doc-edit:${featureType}:v7`;
+    const storageKey = `briefberry:doc-edit:${featureType}:v10`;
 
     const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
     const [editableSubtitle, setEditableSubtitle] = useState(subtitleDefault);
@@ -479,7 +735,7 @@ const BriefPage = () => {
         conclusion: null,
     });
     const [editableReferenceImages, setEditableReferenceImages] = useState<string[]>(
-        featureType === "proposal" ? content.images : []
+        featureType === "proposal" ? proposalContentState.images : []
     );
     const [isDraftHydrated, setIsDraftHydrated] = useState(false);
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
@@ -491,6 +747,9 @@ const BriefPage = () => {
 
     useEffect(() => {
         if (typeof window === "undefined") return;
+        let hasPersistedTitle = false;
+        let persistedTitleValue = "";
+        let hasPersistedReferenceImages = false;
         try {
             const raw = window.localStorage.getItem(storageKey);
             if (!raw) {
@@ -510,7 +769,11 @@ const BriefPage = () => {
                 setIsDraftHydrated(true);
                 return;
             }
-            if (parsed.documentTitle) setEditableDocumentTitle(parsed.documentTitle);
+            if (parsed.documentTitle) {
+                setEditableDocumentTitle(parsed.documentTitle);
+                hasPersistedTitle = true;
+                persistedTitleValue = parsed.documentTitle;
+            }
             if (parsed.subtitle) setEditableSubtitle(parsed.subtitle);
             if (parsed.sectionTitles) setEditableSectionTitles(parsed.sectionTitles);
             if (parsed.sectionContents) {
@@ -523,23 +786,43 @@ const BriefPage = () => {
                 setEditableSectionContents(nextContents);
             }
             if (parsed.referenceImages) setEditableReferenceImages(parsed.referenceImages);
+            if (parsed.referenceImages?.length) hasPersistedReferenceImages = true;
         } catch {
             // Ignore corrupted draft payloads
         } finally {
-            if (featureType === "contract") {
-                const contractWizardDraft = loadDraft<{
-                    contractType?: string;
-                    projectDescription?: string;
-                }>(DRAFT_KEYS.contractWizard);
-                const rawType =
-                    contractWizardDraft?.contractType?.trim() ??
-                    contractWizardDraft?.projectDescription?.trim() ??
-                    "";
-                if (rawType) {
-                    const normalized = rawType.toLowerCase().startsWith("contrato de")
-                        ? rawType
-                        : `Contrato de ${rawType}`;
-                    setEditableDocumentTitle(normalized);
+            if (featureType === "proposal") {
+                const proposalTypeDraft =
+                    loadDraft<ProposalTypeDraft>(DRAFT_KEYS.proposalTypeBrief);
+                const proposalWizardDraft =
+                    loadDraft<ProposalWizardDraft>(DRAFT_KEYS.proposalWizard);
+                const proposalBudgetDraft =
+                    loadDraft<ProposalBudgetItem[]>(DRAFT_KEYS.proposalBudget);
+                const proposalReferencesDraft =
+                    loadDraft<string[]>(DRAFT_KEYS.proposalReferences);
+                const proposalReferenceImagesDraft =
+                    loadDraft<string[]>(DRAFT_KEYS.proposalReferenceImages);
+
+                const dynamicProposalContent = buildProposalContentFromDrafts(
+                    proposalTypeDraft,
+                    proposalWizardDraft,
+                    proposalBudgetDraft,
+                    proposalReferencesDraft,
+                    proposalReferenceImagesDraft
+                );
+                setProposalContentState(dynamicProposalContent);
+                if (!hasPersistedReferenceImages) {
+                    setEditableReferenceImages(dynamicProposalContent.images);
+                }
+
+                const typeLabel = resolveProposalTypeLabel(proposalTypeDraft);
+                const dynamicTitle = `Proposta Comercial de ${typeLabel}`;
+                const shouldOverrideTitle =
+                    !hasPersistedTitle ||
+                    persistedTitleValue === "Proposta Modelo 2026" ||
+                    persistedTitleValue ===
+                        "Proposta Comercial de Desenvolvimento Digital";
+                if (shouldOverrideTitle) {
+                    setEditableDocumentTitle(dynamicTitle);
                 }
             }
             setIsDraftHydrated(true);

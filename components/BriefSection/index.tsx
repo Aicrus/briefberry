@@ -212,11 +212,13 @@ const BriefSection = ({
                             </div>
                         )}
                         {images && (
-                            <Images
-                                images={images}
-                                edit={edit}
-                                onImagesChange={onImagesChange}
-                            />
+                            <div className={edit ? "" : "mt-4"}>
+                                <Images
+                                    images={images}
+                                    edit={edit}
+                                    onImagesChange={onImagesChange}
+                                />
+                            </div>
                         )}
                     </div>
                     {!isOnlyView && !edit && (
