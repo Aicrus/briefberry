@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
@@ -12,9 +13,10 @@ import {
     FEATURE_ROUTES,
     type FeatureType,
 } from "@/lib/draftStorage";
-import Menu from "./Menu";
 import Plan from "./Plan";
 import LanguageSwitcher from "./LanguageSwitcher";
+
+const Menu = dynamic(() => import("./Menu"), { ssr: false });
 
 type HeaderProps = {
     isFixed?: boolean;

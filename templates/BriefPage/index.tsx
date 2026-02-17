@@ -17,196 +17,319 @@ import { content } from "./content";
 
 const contractContent = {
     introduction: (
-        <div className="whitespace-normal">
-            {`CONTRATO DE PRESTAÇÃO DE SERVIÇO E
-DESENVOLVIMENTO DE APLICATIVO
-Pelo presente instrumento particular de contrato, de um lado,
-doravante denominada simplesmente CONTRATANTE, pela pessoa
-jurídica BEST SOLUTIONS GROUP USA LLC com sede em
-WESTSIDE VLG LP, cidade de WINDERMERE/ estado FLÓRIDA Nº
-12803, ZIP CODE 34786, inscrita no EIN Nº 99-0779895, e seu
-representante legal ALEXANDRE LUIS CAMARGO SOLE, E-MAIL:
-alexlcamargo75@gmail.com
-Com o objetivo de agilizar o processo e aumentar a precisão, a empresa
-delega ao parceiro, Mario Marcio Albino Pavão, identificado pelo ID
-A415-553-78-442-0, as funções de gestão do projeto, incluindo a
-comunicação com a equipe de desenvolvimento. Todas as informações e
-reportagens serão conduzidas por ele, residente no endereço 1910
-Celebration Blvd, apt 205, CEP 34747, Celebration-FL, e acessível
-através do e-mail marcio@best4send.com. Mario Marcio Albino Pavão
-também se torna responsável oficial pelo projeto, conforme estabelecido
-neste contrato.
-E, de outro lado, doravante denominada CONTRATADA AICRUS com
-sede em São Paulo à rua MMDC, CEP 05510-000, inscrita no CPF/
-CNPJ N° 36.501.721/0001-22, e seu representante legal PAULO
-MORALES inscrito no CPF Nº 029.328.682-50 tem entre si, justo e
-contratado o que segue:`}
+        <div className="space-y-3">
+            <p>
+                <strong>
+                    CONTRATO DE PRESTAÇÃO DE SERVIÇO E DESENVOLVIMENTO DE
+                    APLICATIVO
+                </strong>
+            </p>
+            <p>
+                Pelo presente instrumento particular de contrato, de um lado,
+                doravante denominada simplesmente <strong>CONTRATANTE</strong>,
+                pela pessoa jurídica BEST SOLUTIONS GROUP USA LLC com sede em
+                WESTSIDE VLG LP, cidade de WINDERMERE/ estado FLÓRIDA Nº 12803,
+                ZIP CODE 34786, inscrita no EIN Nº 99-0779895, e seu
+                representante legal ALEXANDRE LUIS CAMARGO SOLE, E-MAIL:
+                alexlcamargo75@gmail.com
+            </p>
+            <p>
+                Com o objetivo de agilizar o processo e aumentar a precisão, a
+                empresa delega ao parceiro, Mario Marcio Albino Pavão,
+                identificado pelo ID A415-553-78-442-0, as funções de gestão do
+                projeto, incluindo a comunicação com a equipe de desenvolvimento.
+                Todas as informações e reportagens serão conduzidas por ele,
+                residente no endereço 1910 Celebration Blvd, apt 205, CEP 34747,
+                Celebration-FL, e acessível através do e-mail
+                marcio@best4send.com. Mario Marcio Albino Pavão também se torna
+                responsável oficial pelo projeto, conforme estabelecido neste
+                contrato.
+            </p>
+            <p>
+                E, de outro lado, doravante denominada <strong>CONTRATADA</strong>{" "}
+                AICRUS com sede em São Paulo à rua MMDC, CEP 05510-000, inscrita
+                no CPF/CNPJ N° 36.501.721/0001-22, e seu representante legal
+                PAULO MORALES inscrito no CPF Nº 029.328.682-50 tem entre si,
+                justo e contratado o que segue:
+            </p>
         </div>
     ),
     goals: (
-        <div className="whitespace-normal">
-            {`DO OBJETO DO CONTRATO
-CLÁUSULA 1ª - Constitui objeto deste contrato a prestação dos
-serviços pela CONTRATADA à CONTRATANTE o desenvolvimento de:
-Desenvolvimento de uma plataforma de meios de pagamentos, câmbio e
-remessa internacional "BEST 4SEND” completa com todas as funções e
-integrações necessárias para sua operação, entregues em aplicação WEB
-e Mobile para utilização em computadores e aplicativos Android e IOS
-hospedados e funcionais nas respectivas plataformas.
-Aplicativo funcional para (Android, iOS) com entrega de código- fonte
-d o p r o j e t o p a r a r e g i s t r o d e p a t e n t e n o s
-ó r g ã o s c o m p e t e n t e s (Código Dart) e transferência para a
-conta do CONTRATANTE.
-EXECUÇÃO DOS SERVIÇOS
-Os serviços objeto deste contrato serão executados pelo CONTRATADO,
-observando o disposto na proposta apresentada, conforme descrito a
-seguir sobre suas principais funcionalidades:
-I – Trata-se de uma abrangente plataforma de pagamentos internacionais
-que visa integrar serviços de geração de links de pagamento, gateways de
-pagamento, operações de câmbio e cartões pré-pagos com uma experiência
-segura e em conformidade com os regulamentos financeiros internacionais.
-Principais funcionalidades descritas abaixo:
-• Geração de Links de Pagamento e Checkout
-• Conta master plataforma com Dashboards e relatórios de gestão
-completa
-• Contas de cliente com Dashboards e Relatórios individuais
-• Cotas de cartão de débito/pré-pago com Dashboards e relatórios master
-e individuais (API)
-• Configurações Gerenciais, Permissionamentos e taxas.
-• Integrações Externas com Gateway de pagamento, corretora de cambio/
-remessa internacional e emissor de cartão pré-pago
-• Painel de gestão de afiliados com configuração de comissão e geração
-link de divulgação para abertura de contas
-• API documentada com manual intuitivo para integração de terceiros
-• Adoção de padrões de segurança global e conformidade com
-regulamentos financeiros dos EUA e Brasil (A segurança na aplicação e
-APIs foca no controle de acesso dos usuários, excluindo segurança em
-integrações com terceiros)
-• Monitoramento transacional ponta a ponta com reconciliação em tempo
-real e periódicas para prevenção de fraudes e erros nas transformações
-seguindo regras de segurança e compilasse.
-• Desempenho e Escalabilidade
-• Arquitetura Modular Micro Serviços
-• Tecnologia FlutterFlow e Supabase/PostgreSQL
-• PARÁGRAFO ÚNICO - Este projeto possui 60 (dias) de garantia para
-eventuais ajustes e correção de bugs.
-• Após o término do período de garantia de 60 dias, quaisquer correções ou
-ajustes necessários não incorrerão em custos adicionais, já que estão
-inclusos no plano anual de suporte, o qual tem um valor de R$ 3.600
-reais. Além disso, ao se tornar nosso cliente anual, você terá direito a um
-desconto de 30% em futuras funcionalidades, tanto no front-end quanto
-no back-end.`}
+        <div className="space-y-3">
+            <p>
+                <strong>DO OBJETO DO CONTRATO</strong>
+            </p>
+            <p>
+                <strong>CLÁUSULA 1ª</strong> - Constitui objeto deste contrato a prestação dos
+                serviços pela CONTRATADA à CONTRATANTE o desenvolvimento de:
+            </p>
+            <p>
+                Desenvolvimento de uma plataforma de meios de pagamentos, câmbio
+                e remessa internacional &quot;BEST 4SEND” completa com todas as
+                funções e integrações necessárias para sua operação, entregues em
+                aplicação WEB e Mobile para utilização em computadores e
+                aplicativos Android e IOS hospedados e funcionais nas respectivas
+                plataformas.
+            </p>
+            <p>
+                Aplicativo funcional para (Android, iOS) com entrega de
+                código-fonte do projeto para registro de patente nos órgãos
+                competentes (Código Dart) e transferência para a conta do
+                CONTRATANTE.
+            </p>
+            <p>
+                <strong>EXECUÇÃO DOS SERVIÇOS</strong>
+            </p>
+            <p>
+                Os serviços objeto deste contrato serão executados pelo
+                CONTRATADO, observando o disposto na proposta apresentada,
+                conforme descrito a seguir sobre suas principais funcionalidades:
+            </p>
+            <p>
+                I – Trata-se de uma abrangente plataforma de pagamentos
+                internacionais que visa integrar serviços de geração de links de
+                pagamento, gateways de pagamento, operações de câmbio e cartões
+                pré-pagos com uma experiência segura e em conformidade com os
+                regulamentos financeiros internacionais.
+            </p>
+            <p>
+                <strong>Principais funcionalidades descritas abaixo:</strong>
+            </p>
+            <ul className="list-disc pl-8 space-y-2 [&>li]:leading-7">
+                <li>Geração de Links de Pagamento e Checkout</li>
+                <li>
+                    Conta master plataforma com Dashboards e relatórios de gestão
+                    completa
+                </li>
+                <li>
+                    Contas de cliente com Dashboards e Relatórios individuais
+                </li>
+                <li>
+                    Cotas de cartão de débito/pré-pago com Dashboards e
+                    relatórios master e individuais (API)
+                </li>
+                <li>Configurações Gerenciais, Permissionamentos e taxas.</li>
+                <li>
+                    Integrações Externas com Gateway de pagamento, corretora de
+                    cambio/remessa internacional e emissor de cartão pré-pago
+                </li>
+                <li>
+                    Painel de gestão de afiliados com configuração de comissão e
+                    geração link de divulgação para abertura de contas
+                </li>
+                <li>
+                    API documentada com manual intuitivo para integração de
+                    terceiros
+                </li>
+                <li>
+                    Adoção de padrões de segurança global e conformidade com
+                    regulamentos financeiros dos EUA e Brasil (A segurança na
+                    aplicação e APIs foca no controle de acesso dos usuários,
+                    excluindo segurança em integrações com terceiros)
+                </li>
+                <li>
+                    Monitoramento transacional ponta a ponta com reconciliação em
+                    tempo real e periódicas para prevenção de fraudes e erros nas
+                    transformações seguindo regras de segurança e compilasse.
+                </li>
+                <li>Desempenho e Escalabilidade</li>
+                <li>Arquitetura Modular Micro Serviços</li>
+                <li>Tecnologia FlutterFlow e Supabase/PostgreSQL</li>
+            </ul>
+            <p>
+                PARÁGRAFO ÚNICO - Este projeto possui 60 (dias) de garantia para
+                eventuais ajustes e correção de bugs.
+            </p>
+            <p>
+                Após o término do período de garantia de 60 dias, quaisquer
+                correções ou ajustes necessários não incorrerão em custos
+                adicionais, já que estão inclusos no plano anual de suporte, o
+                qual tem um valor de R$ 3.600 reais. Além disso, ao se tornar
+                nosso cliente anual, você terá direito a um desconto de 30% em
+                futuras funcionalidades, tanto no front-end quanto no back-end.
+            </p>
         </div>
     ),
     timeline: (
-        <div className="whitespace-normal">
-            {`DAS OBRIGAÇÕES DA CONTRATANTE
-PARÁGRAFO PRIMEIRO - Para que a CONTRATADA possa executar os
-trabalhos de criação e desenvolvimento do projeto referidos no caput
-desta cláusula, o CONTRATANTE deverá fornecer briefing, do projeto
-para ser desenvolvido, materiais fornecidos pela CONTRATANTE
-preferencialmente por escrito, dos produtos/serviços sobre os quais e
-para os quais os trabalhos serão realizados.
-PARÁGRAFO SEGUNDO – Desenvolvimento e hospedagem diretamente
-nos ambientes gerenciados serão custeados pela CONTRATANTE como:
-Conta FlutterFlow, conta Supabase, GitHub e outros utilizados no
-processo de desenvolvimento e entrega, com ambientes configurados e
-prontos para continuidade de ajustes, manutenção e implementação de
-novos módulos em a necessidade de configurar novos ambientes.
-PARÁGRAFO TERCEIRO — Os custos associados a servidores, serviços
-de e-mail, SMS, bem como outras ferramentas e softwares essenciais
-para a operacionalização do sistema ficarão sob a responsabilidade do
-CONTRATANTE.
-DAS OBRIGAÇÕES DA CONTRATADA
-CLÁUSULA 2ª - Dentro do prazo de 2 dias a contar da assinatura deste
-contrato, a CONTRATADA deverá proceder à criação de uma primeira
-ideia ou primeiro esboços ou conceito, apresentando- os à
-CONTRATANTE, que, a contar do seu recebimento, deverá aprová-los ou
-não, sempre por escrito, no prazo de 1 dia.
-CLÁUSULA 3ª - As PARTES comprometem-se a utilizar as informações
-confidenciais apenas no âmbito do desenvolvimento e da execução do
-projeto de colaboração, sendo vedada tanto a sua divulgação à terceiros,
-quanto qualquer outra utilização que não seja expressamente permitida
-pela PARTE REVELADORA.`}
+        <div className="space-y-3">
+            <p>
+                <strong>DAS OBRIGAÇÕES DA CONTRATANTE</strong>
+            </p>
+            <p>
+                <strong>PARÁGRAFO PRIMEIRO</strong> - Para que a CONTRATADA
+                possa executar os trabalhos de criação e desenvolvimento do
+                projeto referidos no caput desta cláusula, o CONTRATANTE deverá
+                fornecer briefing, do projeto para ser desenvolvido, materiais
+                fornecidos pela CONTRATANTE preferencialmente por escrito, dos
+                produtos/serviços sobre os quais e para os quais os trabalhos
+                serão realizados.
+            </p>
+            <p>
+                <strong>PARÁGRAFO SEGUNDO</strong> – Desenvolvimento e
+                hospedagem diretamente nos ambientes gerenciados serão custeados
+                pela CONTRATANTE como: Conta FlutterFlow, conta Supabase, GitHub
+                e outros utilizados no processo de desenvolvimento e entrega, com
+                ambientes configurados e prontos para continuidade de ajustes,
+                manutenção e implementação de novos módulos em a necessidade de
+                configurar novos ambientes.
+            </p>
+            <p>
+                <strong>PARÁGRAFO TERCEIRO</strong> — Os custos associados a
+                servidores, serviços de e-mail, SMS, bem como outras ferramentas
+                e softwares essenciais para a operacionalização do sistema ficarão
+                sob a responsabilidade do CONTRATANTE.
+            </p>
+            <p>
+                <strong>DAS OBRIGAÇÕES DA CONTRATADA</strong>
+            </p>
+            <p>
+                <strong>CLÁUSULA 2ª</strong> - Dentro do prazo de 2 dias a contar
+                da assinatura deste contrato, a CONTRATADA deverá proceder à
+                criação de uma primeira ideia ou primeiro esboços ou conceito,
+                apresentando-os à CONTRATANTE, que, a contar do seu recebimento,
+                deverá aprová-los ou não, sempre por escrito, no prazo de 1 dia.
+            </p>
+            <p>
+                <strong>CLÁUSULA 3ª</strong> - As PARTES comprometem-se a
+                utilizar as informações confidenciais apenas no âmbito do
+                desenvolvimento e da execução do projeto de colaboração, sendo
+                vedada tanto a sua divulgação à terceiros, quanto qualquer outra
+                utilização que não seja expressamente permitida pela PARTE
+                REVELADORA.
+            </p>
         </div>
     ),
     budget: (
-        <div className="whitespace-normal">
-            {`DO CUSTO E DA FORMA DE PAGAMENTO
-CLÁUSULA 4ª - Pela prestação de serviços referidos na cláusula 1 supra,
-bem como pela concessão na sua utilização mencionada a
-CONTRATANTE pagará a CONTRATADA uma única vez um total de R$
-80.400 (Setenta e cinco mil reais) pagos da seguinte forma:
-O valor do contrato, inclui monitoramento e o bom funcionamento e a
-manutenção contínua anual, é de R$ 3.600 (três mil e seiscentos) reais,
-garantindo a operacionalidade do sistema atualizações regulares e suporte
-técnico especializado.
-Além disso, abrange R$ 1.800 (mil e oitocentos) reais para disponibilizar o
-aplicativo na App Store e Google Play Store, assegurando sua presença
-nas principais plataformas móveis.
-Duas parcelas iguais no valor de R$ 40.200 (quarenta mil e duzentos)
-reais. A ser pago pelo CONTRATANTE à CONTRATADA primeira parcela
-no dia 27 de Fevereiro de 2024 e segunda parcela de 50% à ser paga
-após a finalização e entrega do App.
-O código-fonte permanecerá fora do servidor do Contratante até que o
-pagamento integral seja efetuado.
-O valor deverá ser repassado ao Contratado através de transferência
-PIX ou transferência bancária brasileira, conta americana ou Europeia
-fornecida pela CONTRATADA.
-DO PRAZO
-PARÁGRAFO TERCEIRO: o presente contrato possui prazo de até 60
-(DIAS) ÚTEIS a partir da assinatura deste contrato, iniciando-se em 27 de
-Janeiro de 2024 e finalizando-se em 20 de Maio de 2024 com
-possibilidade de entrega antes deste prazo.`}
+        <div className="space-y-3">
+            <p>
+                <strong>DO CUSTO E DA FORMA DE PAGAMENTO</strong>
+            </p>
+            <p>
+                <strong>CLÁUSULA 4ª</strong> - Pela prestação de serviços
+                referidos na cláusula 1 supra, bem como pela concessão na sua
+                utilização mencionada a CONTRATANTE pagará a CONTRATADA uma única
+                vez um total de R$ 80.400 (Setenta e cinco mil reais) pagos da
+                seguinte forma:
+            </p>
+            <p>
+                O valor do contrato, inclui monitoramento e o bom funcionamento e
+                a manutenção contínua anual, é de R$ 3.600 (três mil e seiscentos)
+                reais, garantindo a operacionalidade do sistema atualizações
+                regulares e suporte técnico especializado.
+            </p>
+            <p>
+                Além disso, abrange R$ 1.800 (mil e oitocentos) reais para
+                disponibilizar o aplicativo na App Store e Google Play Store,
+                assegurando sua presença nas principais plataformas móveis.
+            </p>
+            <p>
+                Duas parcelas iguais no valor de R$ 40.200 (quarenta mil e
+                duzentos) reais. A ser pago pelo CONTRATANTE à CONTRATADA primeira
+                parcela no dia 27 de Fevereiro de 2024 e segunda parcela de 50% à
+                ser paga após a finalização e entrega do App.
+            </p>
+            <p>
+                O código-fonte permanecerá fora do servidor do Contratante até que
+                o pagamento integral seja efetuado.
+            </p>
+            <p>
+                O valor deverá ser repassado ao Contratado através de transferência
+                PIX ou transferência bancária brasileira, conta americana ou
+                Europeia fornecida pela CONTRATADA.
+            </p>
+            <p>
+                <strong>DO PRAZO</strong>
+            </p>
+            <p>
+                <strong>PARÁGRAFO TERCEIRO:</strong> o presente contrato possui
+                prazo de até 60 (DIAS) ÚTEIS a partir da assinatura deste
+                contrato, iniciando-se em 27 de Janeiro de 2024 e finalizando-se
+                em 20 de Maio de 2024 com possibilidade de entrega antes deste
+                prazo.
+            </p>
         </div>
     ),
     references: (
-        <div className="whitespace-normal">
-            {`DA RESCISÃO
-CLÁUSULA 5ª - A rescisão do presente instrumento não extinguirá os
-direitos e obrigações que as partes tenham entre si e para com terceiros,
-não havendo estorno do valor já pago, caso está já tenha iniciado o
-projeto.
-CLÁUSULA 6ª - A CONTRATADA agirá segundo as normas do Código de Ética da Associação dos Designes Gráficos, e também assume obrigação
-e o compromisso de manter em sigilo todas as informações que. lhe forem
-prestadas pela CONTRATANTE para que possa proceder ao
-desenvolvimento do projeto gráfico, assim também em relação ao trabalho
-em desenvolvimento.
-DOS DIREITOS À PROPRIEDADE INDUSTRIAL
-CLÁUSULA 7ª - Caso a consultoria resulte invenção, descobertas,
-aperfeiçoamentos ou inovações, os direitos de propriedade pertencerão à
-CONTRATANTE autor do trabalho que gerou desenvolvimento
-tecnológico, nos termos da Lei n° 9.279/96 (Código de Propriedade
-Industrial) ou legislação aplicável 1.
-CLAUSULA 8ª - A equipe envolvida neste projeto se compromete a manter
-sigilo sobre os dados e informações decorrentes da consecução do
-presente contrato, salvo o CONTRATANTE autorize em contrário.
-O App seguirá toda legislação brasileira, inclusive a lei de proteção de dados.
-PARÁGRAFO ÚNICO - Não se considera Recuperação
-Judicial, até mesmo a branca, Falência ou Liquidação/Encerramento
-de Sociedade Empresarial ou Civil como justo motivo para rescisão
-unilateral do contrato sem a implicação das penalizares ajustadas
-neste contrato DAS CONDIÇÕES GERAIS.
-CLÁUSULA 9ª - A CONTRATADA não possuirá horário fixo de entrada e
-saída na empresa, uma vez que não existirá vínculo empregatício.
-CLÁUSULA 10ª - É livre à CONTRATADA ter seus próprios clientes, fora do
-âmbito deste contrato.
-CLÁUSULA 11ª - A CONTRATADA tem total direito de não dar
-continuidade ao serviço oferecida ao CONTRATANTE caso não haja o
-cumprimento das obrigações referidas na 1a página deste contrato.`}
+        <div className="space-y-3">
+            <p>
+                <strong>DA RESCISÃO</strong>
+            </p>
+            <p>
+                <strong>CLÁUSULA 5ª</strong> - A rescisão do presente instrumento
+                não extinguirá os direitos e obrigações que as partes tenham entre
+                si e para com terceiros, não havendo estorno do valor já pago,
+                caso está já tenha iniciado o projeto.
+            </p>
+            <p>
+                <strong>CLÁUSULA 6ª</strong> - A CONTRATADA agirá segundo as normas
+                do Código de Ética da Associação dos Designes Gráficos, e também
+                assume obrigação e o compromisso de manter em sigilo todas as
+                informações que. lhe forem prestadas pela CONTRATANTE para que
+                possa proceder ao desenvolvimento do projeto gráfico, assim também
+                em relação ao trabalho em desenvolvimento.
+            </p>
+            <p>
+                <strong>DOS DIREITOS À PROPRIEDADE INDUSTRIAL</strong>
+            </p>
+            <p>
+                <strong>CLÁUSULA 7ª</strong> - Caso a consultoria resulte invenção,
+                descobertas, aperfeiçoamentos ou inovações, os direitos de
+                propriedade pertencerão à CONTRATANTE autor do trabalho que gerou
+                desenvolvimento tecnológico, nos termos da Lei n° 9.279/96
+                (Código de Propriedade Industrial) ou legislação aplicável 1.
+            </p>
+            <p>
+                <strong>CLAUSULA 8ª</strong> - A equipe envolvida neste projeto se
+                compromete a manter sigilo sobre os dados e informações decorrentes
+                da consecução do presente contrato, salvo o CONTRATANTE autorize
+                em contrário.
+            </p>
+            <p>
+                O App seguirá toda legislação brasileira, inclusive a lei de
+                proteção de dados.
+            </p>
+            <p>
+                <strong>PARÁGRAFO ÚNICO</strong> - Não se considera Recuperação
+                Judicial, até mesmo a branca, Falência ou Liquidação/Encerramento
+                de Sociedade Empresarial ou Civil como justo motivo para rescisão
+                unilateral do contrato sem a implicação das penalizares ajustadas
+                neste contrato.
+            </p>
+            <p>
+                <strong>DAS CONDIÇÕES GERAIS</strong>
+            </p>
+            <p>
+                <strong>CLÁUSULA 9ª</strong> - A CONTRATADA não possuirá horário
+                fixo de entrada e saída na empresa, uma vez que não existirá
+                vínculo empregatício.
+            </p>
+            <p>
+                <strong>CLÁUSULA 10ª</strong> - É livre à CONTRATADA ter seus
+                próprios clientes, fora do âmbito deste contrato.
+            </p>
+            <p>
+                <strong>CLÁUSULA 11ª</strong> - A CONTRATADA tem total direito de
+                não dar continuidade ao serviço oferecida ao CONTRATANTE caso não
+                haja o cumprimento das obrigações referidas na 1a página deste
+                contrato.
+            </p>
         </div>
     ),
     conclusion: (
-        <div className="whitespace-normal">
-            {`DO FORO
-CLÁUSULA 12ª
--
-Para dirimir quaisquer controvérsias
-oriundas do contrato, as partes elegem o foro da comarca de SÃO
-PAULO/SP.
-As partes acima já qualificadas ora contratadas, resolvem na melhor
-forma de direito firmar o presente contrato.
-São Paulo/SP 27/02/2024`}
+        <div className="space-y-3">
+            <p>
+                <strong>DO FORO</strong>
+            </p>
+            <p>
+                <strong>CLÁUSULA 12ª</strong> - Para dirimir quaisquer
+                controvérsias oriundas do contrato, as partes elegem o foro da
+                comarca de SÃO PAULO/SP.
+            </p>
+            <p>
+                As partes acima já qualificadas ora contratadas, resolvem na
+                melhor forma de direito firmar o presente contrato.
+            </p>
+            <p>São Paulo/SP 27/02/2024</p>
         </div>
     ),
 };
@@ -345,7 +468,7 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "PRD"
             : "Proposta";
-    const storageKey = `briefberry:doc-edit:${featureType}:v4`;
+    const storageKey = `briefberry:doc-edit:${featureType}:v7`;
 
     const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
     const [editableSubtitle, setEditableSubtitle] = useState(subtitleDefault);
@@ -395,14 +518,22 @@ const BriefPage = () => {
             if (parsed.documentTitle) setEditableDocumentTitle(parsed.documentTitle);
             if (parsed.subtitle) setEditableSubtitle(parsed.subtitle);
             if (parsed.sectionTitles) setEditableSectionTitles(parsed.sectionTitles);
-            if (parsed.sectionContents) setEditableSectionContents(parsed.sectionContents);
+            if (parsed.sectionContents) {
+                const nextContents = { ...parsed.sectionContents };
+                if (featureType === "contract") {
+                    // Keep legal template formatting in the first two contract sections.
+                    nextContents.introduction = null;
+                    nextContents.goals = null;
+                }
+                setEditableSectionContents(nextContents);
+            }
             if (parsed.referenceImages) setEditableReferenceImages(parsed.referenceImages);
         } catch {
             // Ignore corrupted draft payloads
         } finally {
             setIsDraftHydrated(true);
         }
-    }, [storageKey]);
+    }, [featureType, storageKey]);
 
     useEffect(() => {
         if (!isDraftHydrated) return;
@@ -412,7 +543,14 @@ const BriefPage = () => {
             documentTitle: editableDocumentTitle,
             subtitle: editableSubtitle,
             sectionTitles: editableSectionTitles,
-            sectionContents: editableSectionContents,
+            sectionContents:
+                featureType === "contract"
+                    ? {
+                          ...editableSectionContents,
+                          introduction: null,
+                          goals: null,
+                      }
+                    : editableSectionContents,
             referenceImages: editableReferenceImages,
         };
         window.localStorage.setItem(storageKey, JSON.stringify(payload));
@@ -423,6 +561,7 @@ const BriefPage = () => {
         editableSectionContents,
         editableReferenceImages,
         isDraftHydrated,
+        featureType,
         storageKey,
     ]);
     const categoryValue =

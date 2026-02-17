@@ -38,13 +38,14 @@ const BriefSection = ({
     const [editedContent, setEditedContent] = useState<string | null>(
         editedContentProp ?? null
     );
-    const [draftContent, setDraftContent] = useState("");
+    const draftContentHtmlRef = useRef("");
+    const [didEditContent, setDidEditContent] = useState(false);
     const [isEditingTitle, setIsEditingTitle] = useState(false);
     const [draftTitle, setDraftTitle] = useState(title);
 
     const ref = useRef<HTMLDivElement | null>(null);
     const contentRef = useRef<HTMLDivElement | null>(null);
-    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const editableDivRef = useRef<HTMLDivElement | null>(null);
     const titleInputRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
@@ -53,10 +54,15 @@ const BriefSection = ({
 
     useOnClickOutside(ref as RefObject<HTMLElement>, () => {
         if (!edit) return;
-        const next = draftContent.trim();
+        if (!didEditContent) {
+            setEdit(false);
+            return;
+        }
+        const next = draftContentHtmlRef.current.trim();
         setEditedContent(next || null);
         onContentChange?.(next);
         setEdit(false);
+        setDidEditContent(false);
     });
 
     const handleRegenerate = async () => {
@@ -80,10 +86,11 @@ const BriefSection = ({
 
     const handleStartEdit = () => {
         if (isOnlyView || edit) return;
-        const currentText = editedContent ?? contentRef.current?.innerText ?? "";
-        setDraftContent(currentText);
+        const currentHtml = editedContent ?? contentRef.current?.innerHTML ?? "";
+        draftContentHtmlRef.current = currentHtml;
+        setDidEditContent(false);
         setEdit(true);
-        setTimeout(() => textareaRef.current?.focus(), 0);
+        setTimeout(() => editableDivRef.current?.focus(), 0);
     };
 
     const handleStartEditTitle = () => {
@@ -136,17 +143,26 @@ const BriefSection = ({
                         ref={ref}
                     >
                         {edit ? (
-                            <textarea
-                                ref={textareaRef}
-                                className="w-full min-h-40 p-0 bg-transparent resize-none outline-0 text-body text-t-primary-body"
-                                value={draftContent}
-                                onChange={(e) => setDraftContent(e.target.value)}
+                            <div
+                                ref={editableDivRef}
+                                className="w-full min-h-40 p-0 bg-transparent outline-0 text-body text-t-primary-body [&_p]:not-last:mb-6"
+                                contentEditable
+                                suppressContentEditableWarning
+                                dangerouslySetInnerHTML={{
+                                    __html: draftContentHtmlRef.current,
+                                }}
+                                onInput={(e) => {
+                                    draftContentHtmlRef.current =
+                                        e.currentTarget.innerHTML;
+                                    setDidEditContent(true);
+                                }}
                                 onClick={(e) => e.stopPropagation()}
                             />
                         ) : editedContent !== null ? (
-                            <div className="whitespace-normal [text-align:justify]">
-                                {editedContent}
-                            </div>
+                            <div
+                                className="whitespace-normal [text-align:justify] [&_p]:not-last:mb-6"
+                                dangerouslySetInnerHTML={{ __html: editedContent }}
+                            />
                         ) : (
                             <div
                                 ref={contentRef}

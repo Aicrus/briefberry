@@ -14,10 +14,7 @@ const Actions = ({ featureType }: ActionsProps) => {
     const ref = useRef<HTMLDivElement | null>(null);
     useOnClickOutside(ref as RefObject<HTMLElement>, () => setVisible(false));
 
-    const briefLink =
-        typeof window !== "undefined"
-            ? `${window.location.origin}/brief?feature=${featureType}&view=1`
-            : `/brief?feature=${featureType}&view=1`;
+    const briefLink = `/brief?feature=${featureType}&view=1`;
     const documentName =
         featureType === "contract"
             ? t("contract")
