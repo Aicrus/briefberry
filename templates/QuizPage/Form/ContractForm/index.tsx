@@ -6,7 +6,7 @@ import Icon from "@/components/Icon";
 import { formatCPF, formatCNPJ, formatSSN, formatEIN } from "@/lib/masks";
 
 /** 0=CPF, 1=CNPJ, 2=SSN (EUA), 3=EIN (EUA), 4=VAT/NIF (Europa), 5=Outro */
-const DOC_TYPE_IDS = [0, 1, 2, 3, 4, 5] as const;
+const DOC_TYPE_IDS = [2, 3, 4, 1, 0, 5] as const;
 type DocTypeId = (typeof DOC_TYPE_IDS)[number];
 
 function getDocTypeLabelKey(id: DocTypeId): string {
@@ -54,17 +54,9 @@ function isDocTypeNumeric(docType: DocTypeId): boolean {
     return docType <= 3; // CPF, CNPJ, SSN, EIN
 }
 
-const CONTRACTOR_TYPE_OPTIONS = [
-    { id: 0, titleKey: "contractorPF" as const, icon: "profile" },
-    { id: 1, titleKey: "contractorPJ" as const, icon: "documents" },
-] as const;
-
 const STEP_KEYS = [
-    "contractStep0",
     "contractStep1",
     "contractStep2",
-    "contractStep3",
-    "contractStep4",
     "contractStep5",
     "contractStep6",
 ] as const;
@@ -78,22 +70,18 @@ const ContractForm = () => {
     const t = useTranslations("quiz");
     const [activeId, setActiveId] = useState(0);
 
-    const [contractorType, setContractorType] = useState<number | null>(null);
-
     // Step 1: Contractor data
     const [contractorName, setContractorName] = useState("");
-    const [contractorDocType, setContractorDocType] = useState<DocTypeId>(0);
+    const [contractorDocType, setContractorDocType] = useState<DocTypeId>(DOC_TYPE_IDS[0]);
     const [contractorDocument, setContractorDocument] = useState("");
     const [contractorEmail, setContractorEmail] = useState("");
 
     // Step 2: Client data
     const [clientName, setClientName] = useState("");
-    const [clientDocType, setClientDocType] = useState<DocTypeId>(0);
+    const [clientDocType, setClientDocType] = useState<DocTypeId>(DOC_TYPE_IDS[0]);
     const [clientDocument, setClientDocument] = useState("");
     const [clientEmail, setClientEmail] = useState("");
 
-    const [intellectualProperty, setIntellectualProperty] = useState<number | null>(null);
-    const [changePolicy, setChangePolicy] = useState<number | null>(null);
     const [termination, setTermination] = useState<number | null>(null);
     const [additionalTerms, setAdditionalTerms] = useState("");
 
@@ -121,23 +109,6 @@ const ContractForm = () => {
             </div>
             <div className="flex-1 min-h-0 flex flex-col">
                 {activeId === 0 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {CONTRACTOR_TYPE_OPTIONS.map((option) => (
-                            <div
-                                key={option.id}
-                                className={cardClass(contractorType === option.id)}
-                                onClick={() => setContractorType(option.id)}
-                            >
-                                <Icon
-                                    className="mb-8 fill-inherit max-3xl:mb-5"
-                                    name={option.icon}
-                                />
-                                <div className="">{t(option.titleKey)}</div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {activeId === 1 && (
                     <>
                         <Field
                             label={t("contractorName")}
@@ -200,7 +171,7 @@ const ContractForm = () => {
                         </div>
                     </>
                 )}
-                {activeId === 2 && (
+                {activeId === 1 && (
                     <>
                         <Field
                             label={t("clientName")}
@@ -263,41 +234,7 @@ const ContractForm = () => {
                         </div>
                     </>
                 )}
-                {activeId === 3 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {[0, 1].map((id) => (
-                            <div
-                                key={id}
-                                className={cardClass(intellectualProperty === id)}
-                                onClick={() => setIntellectualProperty(id)}
-                            >
-                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name="lock" />
-                                <div className="text-body-bold">{t(id === 0 ? "ipAfterPayment" : "ipUntilPayment")}</div>
-                                <div className="mt-2 text-body text-t-secondary leading-snug">
-                                    {t(id === 0 ? "ipAfterPaymentDesc" : "ipUntilPaymentDesc")}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {activeId === 4 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {[0, 1].map((id) => (
-                            <div
-                                key={id}
-                                className={cardClass(changePolicy === id)}
-                                onClick={() => setChangePolicy(id)}
-                            >
-                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name={id === 0 ? "check" : "edit"} />
-                                <div className="text-body-bold">{t(id === 0 ? "changesWithinScope" : "changesExtraCharged")}</div>
-                                <div className="mt-2 text-body text-t-secondary leading-snug">
-                                    {t(id === 0 ? "changesWithinScopeDesc" : "changesExtraChargedDesc")}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-                {activeId === 5 && (
+                {activeId === 2 && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                         {[0, 1].map((id) => (
                             <div
@@ -306,7 +243,7 @@ const ContractForm = () => {
                                 onClick={() => setTermination(id)}
                             >
                                 <Icon className="mb-5 fill-inherit max-3xl:mb-4" name={id === 0 ? "check" : "close-small"} />
-                                <div className="text-body-bold">{t(id === 0 ? "yes" : "no")}</div>
+                                <div className="text-body-bold">{t(id === 0 ? "terminationNoRefund" : "terminationProportionalRefund")}</div>
                                 <div className="mt-2 text-body text-t-secondary leading-snug">
                                     {t(id === 0 ? "terminationYesDesc" : "terminationNoDesc")}
                                 </div>
@@ -314,7 +251,7 @@ const ContractForm = () => {
                         ))}
                     </div>
                 )}
-                {activeId === 6 && (
+                {activeId === 3 && (
                     <>
                         <p className="mb-4 text-body text-t-secondary">{t("contractTermsHint")}</p>
                         <Field
