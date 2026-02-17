@@ -125,7 +125,7 @@ const BriefSection = ({
                 </div>
                 <div className="group relative">
                     <div
-                        className={`relative -mx-4 p-4 border-[1.5px] border-transparent rounded-2xl text-body text-t-primary-body [&_p]:not-last:mb-6 transition-colors ${
+                        className={`relative -mx-4 p-4 border-[1.5px] border-transparent rounded-2xl text-[15.5px] leading-7 text-t-primary [&_p]:not-last:mb-6 [text-align:justify] transition-colors ${
                             isOnlyView
                                 ? ""
                                 : "group-hover:border-stroke2 overflow-hidden"
@@ -144,9 +144,16 @@ const BriefSection = ({
                                 onClick={(e) => e.stopPropagation()}
                             />
                         ) : editedContent !== null ? (
-                            <div className="whitespace-pre-wrap">{editedContent}</div>
+                            <div className="whitespace-normal [text-align:justify]">
+                                {editedContent}
+                            </div>
                         ) : (
-                            <div ref={contentRef}>{content}</div>
+                            <div
+                                ref={contentRef}
+                                className="whitespace-normal [text-align:justify]"
+                            >
+                                {content}
+                            </div>
                         )}
                         {images && (
                             <Images

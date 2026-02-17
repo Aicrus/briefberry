@@ -17,7 +17,7 @@ import { content } from "./content";
 
 const contractContent = {
     introduction: (
-        <div className="whitespace-pre-wrap">
+        <div className="whitespace-normal">
             {`CONTRATO DE PRESTAÇÃO DE SERVIÇO E
 DESENVOLVIMENTO DE APLICATIVO
 Pelo presente instrumento particular de contrato, de um lado,
@@ -44,7 +44,7 @@ contratado o que segue:`}
         </div>
     ),
     goals: (
-        <div className="whitespace-pre-wrap">
+        <div className="whitespace-normal">
             {`DO OBJETO DO CONTRATO
 CLÁUSULA 1ª - Constitui objeto deste contrato a prestação dos
 serviços pela CONTRATADA à CONTRATANTE o desenvolvimento de:
@@ -99,7 +99,7 @@ no back-end.`}
         </div>
     ),
     timeline: (
-        <div className="whitespace-pre-wrap">
+        <div className="whitespace-normal">
             {`DAS OBRIGAÇÕES DA CONTRATANTE
 PARÁGRAFO PRIMEIRO - Para que a CONTRATADA possa executar os
 trabalhos de criação e desenvolvimento do projeto referidos no caput
@@ -131,7 +131,7 @@ pela PARTE REVELADORA.`}
         </div>
     ),
     budget: (
-        <div className="whitespace-pre-wrap">
+        <div className="whitespace-normal">
             {`DO CUSTO E DA FORMA DE PAGAMENTO
 CLÁUSULA 4ª - Pela prestação de serviços referidos na cláusula 1 supra,
 bem como pela concessão na sua utilização mencionada a
@@ -161,7 +161,7 @@ possibilidade de entrega antes deste prazo.`}
         </div>
     ),
     references: (
-        <div className="whitespace-pre-wrap">
+        <div className="whitespace-normal">
             {`DA RESCISÃO
 CLÁUSULA 5ª - A rescisão do presente instrumento não extinguirá os
 direitos e obrigações que as partes tenham entre si e para com terceiros,
@@ -197,7 +197,7 @@ cumprimento das obrigações referidas na 1a página deste contrato.`}
         </div>
     ),
     conclusion: (
-        <div className="whitespace-pre-wrap">
+        <div className="whitespace-normal">
             {`DO FORO
 CLÁUSULA 12ª
 -
@@ -206,32 +206,7 @@ oriundas do contrato, as partes elegem o foro da comarca de SÃO
 PAULO/SP.
 As partes acima já qualificadas ora contratadas, resolvem na melhor
 forma de direito firmar o presente contrato.
-São Paulo/SP 27/02/2024
-ACORDANTE 1
-BEST SOLUTIONS GROUP USA LLC
-AC
-ALEXANDRE LUIS CAMARGO SOLE
-TESTEMUNHA
-MARIO MARCIO ALBINO PAVÃO
-ACORDANTE 2
-AICRUS
-Aicrus T
-PAULO MORALES DIAZ DA COSTA
-TESTEMUNHA
-Taina S
-TAINÁ EVANGELISTA DA SILVA
-Autenticação eletrônica 6/7
-Data e horários em GMT -3:00 Sao Paulo
-Última atualização em 27 fev 2024 às 18:49
-Identificador: 6c0e1f1b42ab2a8b57eabfac7abfdb3b3668ce67972be1f1c
-Página de assinaturas
-Aicrus T Taina S
-Aicrus Tech Taina Silva
-Aicrus
-Signatário Signatário
-Alexandre C
-Mario Pavao Alexandre Camargo
-Signatário Signatário`}
+São Paulo/SP 27/02/2024`}
         </div>
     ),
 };
@@ -287,7 +262,6 @@ const prdContent = {
 };
 
 const DOC_DRAFT_TTL_MS = 1000 * 60 * 60 * 24;
-const LOAD_TIME_MS = Date.now();
 type SectionKey =
     | "introduction"
     | "goals"
@@ -295,6 +269,13 @@ type SectionKey =
     | "budget"
     | "references"
     | "conclusion";
+type SignatureParticipant = {
+    id: string;
+    role: string;
+    organization?: string;
+    shortLabel?: string;
+    fullName: string;
+};
 
 const BriefPage = () => {
     const t = useTranslations("brief");
@@ -302,6 +283,7 @@ const BriefPage = () => {
     const isPremiumPlan = useEventsStore((state) => state.isPremiumPlan);
     const searchParams = useSearchParams();
     const feature = searchParams.get("feature");
+    const isReadOnlyView = searchParams.get("view") === "1";
     const featureType: "proposal" | "contract" | "prd" =
         feature === "contract"
             ? "contract"
@@ -363,57 +345,25 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "PRD"
             : "Proposta";
-    const storageKey = `briefberry:doc-edit:${featureType}:v2`;
-    const persistedDraft = useMemo(() => {
-        if (typeof window === "undefined") return null;
-        try {
-            const raw = window.localStorage.getItem(storageKey);
-            if (!raw) return null;
-            const parsed = JSON.parse(raw) as {
-                expiresAt: number;
-                documentTitle?: string;
-                subtitle?: string;
-                sectionTitles?: Record<SectionKey, string>;
-                sectionContents?: Record<SectionKey, string | null>;
-                referenceImages?: string[];
-            };
-            if (!parsed.expiresAt || parsed.expiresAt < LOAD_TIME_MS) {
-                window.localStorage.removeItem(storageKey);
-                return null;
-            }
-            return parsed;
-        } catch {
-            return null;
-        }
-    }, [storageKey]);
+    const storageKey = `briefberry:doc-edit:${featureType}:v4`;
 
-    const [editableDocumentTitle, setEditableDocumentTitle] = useState(
-        () => persistedDraft?.documentTitle ?? documentTitle
-    );
-    const [editableSubtitle, setEditableSubtitle] = useState(
-        () => persistedDraft?.subtitle ?? subtitleDefault
-    );
-    const [editableSectionTitles, setEditableSectionTitles] = useState(
-        () => persistedDraft?.sectionTitles ?? sectionTitles
-    );
+    const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
+    const [editableSubtitle, setEditableSubtitle] = useState(subtitleDefault);
+    const [editableSectionTitles, setEditableSectionTitles] = useState(sectionTitles);
     const [editableSectionContents, setEditableSectionContents] = useState<
         Record<SectionKey, string | null>
-    >(
-        () =>
-            persistedDraft?.sectionContents ?? {
-                introduction: null,
-                goals: null,
-                timeline: null,
-                budget: null,
-                references: null,
-                conclusion: null,
-            }
-    );
+    >({
+        introduction: null,
+        goals: null,
+        timeline: null,
+        budget: null,
+        references: null,
+        conclusion: null,
+    });
     const [editableReferenceImages, setEditableReferenceImages] = useState<string[]>(
-        () =>
-            persistedDraft?.referenceImages ??
-            (featureType === "proposal" ? content.images : [])
+        featureType === "proposal" ? content.images : []
     );
+    const [isDraftHydrated, setIsDraftHydrated] = useState(false);
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
     const [signatureModalVersion, setSignatureModalVersion] = useState(0);
     const [activeSigner, setActiveSigner] = useState("");
@@ -422,6 +372,40 @@ const BriefPage = () => {
     const [isEditingSubtitle, setIsEditingSubtitle] = useState(false);
 
     useEffect(() => {
+        if (typeof window === "undefined") return;
+        try {
+            const raw = window.localStorage.getItem(storageKey);
+            if (!raw) {
+                setIsDraftHydrated(true);
+                return;
+            }
+            const parsed = JSON.parse(raw) as {
+                expiresAt: number;
+                documentTitle?: string;
+                subtitle?: string;
+                sectionTitles?: Record<SectionKey, string>;
+                sectionContents?: Record<SectionKey, string | null>;
+                referenceImages?: string[];
+            };
+            if (!parsed.expiresAt || parsed.expiresAt < Date.now()) {
+                window.localStorage.removeItem(storageKey);
+                setIsDraftHydrated(true);
+                return;
+            }
+            if (parsed.documentTitle) setEditableDocumentTitle(parsed.documentTitle);
+            if (parsed.subtitle) setEditableSubtitle(parsed.subtitle);
+            if (parsed.sectionTitles) setEditableSectionTitles(parsed.sectionTitles);
+            if (parsed.sectionContents) setEditableSectionContents(parsed.sectionContents);
+            if (parsed.referenceImages) setEditableReferenceImages(parsed.referenceImages);
+        } catch {
+            // Ignore corrupted draft payloads
+        } finally {
+            setIsDraftHydrated(true);
+        }
+    }, [storageKey]);
+
+    useEffect(() => {
+        if (!isDraftHydrated) return;
         if (typeof window === "undefined") return;
         const payload = {
             expiresAt: Date.now() + DOC_DRAFT_TTL_MS,
@@ -438,6 +422,7 @@ const BriefPage = () => {
         editableSectionTitles,
         editableSectionContents,
         editableReferenceImages,
+        isDraftHydrated,
         storageKey,
     ]);
     const categoryValue =
@@ -446,12 +431,60 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "prd"
             : "proposal";
-    const signerList =
+    const signatureParticipants: SignatureParticipant[] =
         featureType === "contract"
-            ? ["ACORDANTE 1", "ACORDANTE 2", "TESTEMUNHA 1", "TESTEMUNHA 2"]
+            ? [
+                  {
+                      id: "ACORDANTE_1",
+                      role: "ACORDANTE 1",
+                      organization: "BEST SOLUTIONS GROUP USA LLC",
+                      shortLabel: "AC",
+                      fullName: "ALEXANDRE LUIS CAMARGO SOLE",
+                  },
+                  {
+                      id: "TESTEMUNHA_1",
+                      role: "TESTEMUNHA",
+                      fullName: "MARIO MARCIO ALBINO PAVÃO",
+                  },
+                  {
+                      id: "ACORDANTE_2",
+                      role: "ACORDANTE 2",
+                      organization: "AICRUS",
+                      shortLabel: "Aicrus T",
+                      fullName: "PAULO MORALES DIAZ DA COSTA",
+                  },
+                  {
+                      id: "TESTEMUNHA_2",
+                      role: "TESTEMUNHA",
+                      shortLabel: "Taina S",
+                      fullName: "TAINÁ EVANGELISTA DA SILVA",
+                  },
+              ]
             : featureType === "prd"
-            ? ["RESPONSÁVEL PELO PRODUTO", "RESPONSÁVEL TÉCNICO"]
-            : ["CONTRATANTE", "CONTRATADA"];
+            ? [
+                  {
+                      id: "RESPONSAVEL_PRODUTO",
+                      role: "RESPONSÁVEL PELO PRODUTO",
+                      fullName: "Assinante 1",
+                  },
+                  {
+                      id: "RESPONSAVEL_TECNICO",
+                      role: "RESPONSÁVEL TÉCNICO",
+                      fullName: "Assinante 2",
+                  },
+              ]
+            : [
+                  {
+                      id: "CONTRATANTE",
+                      role: "CONTRATANTE",
+                      fullName: "Assinante 1",
+                  },
+                  {
+                      id: "CONTRATADA",
+                      role: "CONTRATADA",
+                      fullName: "Assinante 2",
+                  },
+              ];
 
     return (
         <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>
@@ -460,15 +493,17 @@ const BriefPage = () => {
                     key={featureType}
                     className="relative max-w-220 mx-auto p-12 shadow-hover bg-b-surface4 rounded-4xl before:absolute before:top-full before:left-6 before:right-6 before:-z-1 before:h-3.75 before:rounded-b-4xl before:bg-b-surface2 max-md:px-8 max-md:pb-4 max-md:before:hidden"
                 >
-                    <Button
-                        className="absolute! top-2 right-2 shadow-hover"
-                        isCircle
-                        isPrimary
-                        as="link"
-                        href={editHref}
-                    >
-                        <Icon name="edit" />
-                    </Button>
+                    {!isReadOnlyView && (
+                        <Button
+                            className="absolute! top-2 right-2 shadow-hover"
+                            isCircle
+                            isPrimary
+                            as="link"
+                            href={editHref}
+                        >
+                            <Icon name="edit" />
+                        </Button>
+                    )}
                     <div className="mb-10 max-md:mb-6">
                         <div className="mb-2 text-h2 max-md:text-h5">
                             <Icon
@@ -499,7 +534,10 @@ const BriefPage = () => {
                                 <button
                                     type="button"
                                     className="text-left"
-                                    onClick={() => setIsEditingDocumentTitle(true)}
+                                    onClick={() =>
+                                        !isReadOnlyView &&
+                                        setIsEditingDocumentTitle(true)
+                                    }
                                 >
                                     {editableDocumentTitle}
                                 </button>
@@ -523,7 +561,9 @@ const BriefPage = () => {
                             <button
                                 type="button"
                                 className="text-left"
-                                onClick={() => setIsEditingSubtitle(true)}
+                                onClick={() =>
+                                    !isReadOnlyView && setIsEditingSubtitle(true)
+                                }
                             >
                                 <BriefCategory
                                     value={categoryValue}
@@ -553,6 +593,7 @@ const BriefPage = () => {
                                 introduction: nextContent || null,
                             }))
                         }
+                        isOnlyView={isReadOnlyView}
                     />
                     <BriefSection
                         title={editableSectionTitles.goals}
@@ -570,6 +611,7 @@ const BriefPage = () => {
                                 goals: nextContent || null,
                             }))
                         }
+                        isOnlyView={isReadOnlyView}
                     />
                     <BriefSection
                         title={editableSectionTitles.timeline}
@@ -590,6 +632,7 @@ const BriefPage = () => {
                                 timeline: nextContent || null,
                             }))
                         }
+                        isOnlyView={isReadOnlyView}
                     />
                     <BriefSection
                         title={editableSectionTitles.budget}
@@ -607,6 +650,7 @@ const BriefPage = () => {
                                 budget: nextContent || null,
                             }))
                         }
+                        isOnlyView={isReadOnlyView}
                     />
                     <BriefSection
                         title={editableSectionTitles.references}
@@ -633,6 +677,7 @@ const BriefPage = () => {
                                 : undefined
                         }
                         onImagesChange={setEditableReferenceImages}
+                        isOnlyView={isReadOnlyView}
                     />
                     <BriefSection
                         title={editableSectionTitles.conclusion}
@@ -653,22 +698,37 @@ const BriefPage = () => {
                                 conclusion: nextContent || null,
                             }))
                         }
+                        isOnlyView={isReadOnlyView}
                     />
-                    <div className="mt-10 border-t border-stroke2 pt-8">
+                    {featureType === "contract" && (
+                        <div className="mt-10 border-t border-stroke2 pt-8">
                         <div className="mb-4 text-h5">Assinaturas</div>
                         <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
-                            {signerList.map((signer) => (
+                            {signatureParticipants.map((participant) => (
                                 <div
-                                    key={signer}
+                                    key={participant.id}
                                     className="rounded-2xl border border-stroke2 bg-b-surface1 p-4"
                                 >
                                     <div className="mb-3 text-small text-t-secondary">
-                                        {signer}
+                                        {participant.role}
                                     </div>
-                                    {signatures[signer] ? (
+                                    {participant.organization && (
+                                        <div className="mb-1 text-caption text-t-primary">
+                                            {participant.organization}
+                                        </div>
+                                    )}
+                                    {participant.shortLabel && (
+                                        <div className="mb-1 text-caption text-t-secondary">
+                                            {participant.shortLabel}
+                                        </div>
+                                    )}
+                                    <div className="mb-3 text-small text-t-primary">
+                                        {participant.fullName}
+                                    </div>
+                                    {signatures[participant.id] ? (
                                         <Image
-                                            src={signatures[signer]}
-                                            alt={`Assinatura ${signer}`}
+                                            src={signatures[participant.id]}
+                                            alt={`Assinatura ${participant.role}`}
                                             width={280}
                                             height={56}
                                             className="mb-3 h-14 w-auto object-contain"
@@ -676,38 +736,43 @@ const BriefPage = () => {
                                     ) : (
                                         <div className="mb-3 h-14 w-full rounded-lg border border-dashed border-stroke2" />
                                     )}
-                                    <Button
-                                        isPrimary
-                                        onClick={() => {
-                                            setActiveSigner(signer);
-                                            setSignatureModalVersion((prev) => prev + 1);
-                                            setSignatureModalOpen(true);
-                                        }}
-                                    >
-                                        {signatures[signer]
-                                            ? "Assinar novamente"
-                                            : "Clique para assinar"}
-                                    </Button>
+                                    {!isReadOnlyView && (
+                                        <Button
+                                            isPrimary
+                                            onClick={() => {
+                                                setActiveSigner(participant.id);
+                                                setSignatureModalVersion((prev) => prev + 1);
+                                                setSignatureModalOpen(true);
+                                            }}
+                                        >
+                                            {signatures[participant.id]
+                                                ? "Assinar novamente"
+                                                : "Clique para assinar"}
+                                        </Button>
+                                    )}
                                 </div>
                             ))}
                         </div>
-                    </div>
+                        </div>
+                    )}
                 </div>
             </div>
-            <Actions featureType={featureType} />
-            <SignaturePadModal
-                key={signatureModalVersion}
-                open={signatureModalOpen}
-                onClose={() => setSignatureModalOpen(false)}
-                title="Assinatura eletrônica"
-                signerName={activeSigner}
-                onSave={(dataUrl) =>
-                    setSignatures((prev) => ({
-                        ...prev,
-                        [activeSigner]: dataUrl,
-                    }))
-                }
-            />
+            {!isReadOnlyView && <Actions featureType={featureType} />}
+            {featureType === "contract" && (
+                <SignaturePadModal
+                    key={signatureModalVersion}
+                    open={signatureModalOpen}
+                    onClose={() => setSignatureModalOpen(false)}
+                    title="Assinatura eletrônica"
+                    signerName={activeSigner}
+                    onSave={(dataUrl) =>
+                        setSignatures((prev) => ({
+                            ...prev,
+                            [activeSigner]: dataUrl,
+                        }))
+                    }
+                />
+            )}
         </Layout>
     );
 };

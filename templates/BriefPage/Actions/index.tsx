@@ -14,7 +14,10 @@ const Actions = ({ featureType }: ActionsProps) => {
     const ref = useRef<HTMLDivElement | null>(null);
     useOnClickOutside(ref as RefObject<HTMLElement>, () => setVisible(false));
 
-    const briefLink = "https://briefberry.vercel.app/brief/wr386e28sn";
+    const briefLink =
+        typeof window !== "undefined"
+            ? `${window.location.origin}/brief?feature=${featureType}&view=1`
+            : `/brief?feature=${featureType}&view=1`;
     const documentName =
         featureType === "contract"
             ? t("contract")
@@ -92,7 +95,7 @@ const Actions = ({ featureType }: ActionsProps) => {
                                 </div>
                                 <Link
                                     className="group flex"
-                                    href="/brief-linked"
+                                    href={briefLink}
                                     target="_blank"
                                 >
                                     <Icon
