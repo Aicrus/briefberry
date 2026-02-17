@@ -4,13 +4,23 @@ import { useOnClickOutside } from "usehooks-ts";
 import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 
-const Actions = ({}) => {
+type ActionsProps = {
+    featureType: "proposal" | "contract" | "prd";
+};
+
+const Actions = ({ featureType }: ActionsProps) => {
     const t = useTranslations("brief");
     const [visible, setVisible] = useState(false);
     const ref = useRef<HTMLDivElement | null>(null);
     useOnClickOutside(ref as RefObject<HTMLElement>, () => setVisible(false));
 
     const briefLink = "https://briefberry.vercel.app/brief/wr386e28sn";
+    const documentName =
+        featureType === "contract"
+            ? t("contract")
+            : featureType === "prd"
+            ? t("prd")
+            : t("proposal");
 
     const actions = [
         {
@@ -30,12 +40,12 @@ const Actions = ({}) => {
             titleKey: "sendEmail" as const,
             icon: "envelope",
             onClick: () => {
-                const subject = "Brief from Briefberry";
-                const body = `Hello!\nRead the brief: ${briefLink}`;
+                const subject = `${documentName} from Briefberry`;
+                const body = `Hello!\nRead the ${documentName.toLowerCase()}: ${briefLink}`;
                 const mailto = `mailto:?subject=${encodeURIComponent(
                     subject
                 )}&body=${encodeURIComponent(body)}`;
-                window.location.href = mailto;
+                window.location.assign(mailto);
             },
         },
         {

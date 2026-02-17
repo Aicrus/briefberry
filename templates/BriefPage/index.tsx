@@ -17,13 +17,25 @@ const BriefPage = () => {
     const isPremiumPlan = useEventsStore((state) => state.isPremiumPlan);
     const searchParams = useSearchParams();
     const feature = searchParams.get("feature");
+    const featureType: "proposal" | "contract" | "prd" =
+        feature === "contract"
+            ? "contract"
+            : feature === "prd"
+            ? "prd"
+            : "proposal";
 
     const editHref =
-        feature === "contract"
+        featureType === "contract"
             ? "/quiz/contract?edit=1"
-            : feature === "prd"
+            : featureType === "prd"
             ? "/quiz/prd?edit=1"
             : "/quiz?edit=1";
+    const documentTitle =
+        featureType === "contract"
+            ? t("contractTitle")
+            : featureType === "prd"
+            ? t("prdTitle")
+            : t("proposalTitle");
 
     return (
         <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>
@@ -48,7 +60,7 @@ const BriefPage = () => {
                                 }`}
                                 name={isPremiumPlan ? "verification" : "lock"}
                             />
-                            Studio Modelo 2024
+                            {documentTitle}
                         </div>
                         <BriefCategory value="ux-ui-design" />
                     </div>
@@ -70,7 +82,7 @@ const BriefPage = () => {
                     />
                 </div>
             </div>
-            <Actions />
+            <Actions featureType={featureType} />
         </Layout>
     );
 };

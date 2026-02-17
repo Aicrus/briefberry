@@ -247,7 +247,10 @@
         "minCharsToContinue": "Escribe al menos 100 caracteres para continuar."
     },
     "quizGenerating": {
-        "countdownMessage": "Tu brief se entregará en {seconds} segundos.",
+        "countdownMessage": "Tu documento se entregará en {seconds} segundos.",
+        "countdownProposal": "Tu propuesta se entregará en {seconds} segundos.",
+        "countdownContract": "Tu contrato se entregará en {seconds} segundos.",
+        "countdownPrd": "Tu PRD se entregará en {seconds} segundos.",
         "generating": "Generando"
     },
     "myBriefs": {
@@ -293,6 +296,12 @@
         "download": "Descargar",
         "sendEmail": "Enviar por correo",
         "regenerate": "Regenerar",
+        "proposal": "Propuesta",
+        "contract": "Contrato",
+        "prd": "PRD",
+        "proposalTitle": "Propuesta Modelo 2024",
+        "contractTitle": "Contrato Modelo 2024",
+        "prdTitle": "PRD Modelo 2024",
         "yourCustomLink": "Tu enlace personalizado",
         "regenerating": "Regenerando...",
         "regenerateModalTitle": "¿Cómo quieres reescribir esta sección?",
