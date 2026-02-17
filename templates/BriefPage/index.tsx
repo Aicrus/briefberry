@@ -11,6 +11,7 @@ import BriefSection from "@/components/BriefSection";
 import BriefCategory from "@/components/BriefCategory";
 import SignaturePadModal from "@/components/SignaturePadModal";
 import useEventsStore from "@/store/useEventsStore";
+import { DRAFT_KEYS, loadDraft } from "@/lib/draftStorage";
 import Actions from "./Actions";
 
 import { content } from "./content";
@@ -18,12 +19,6 @@ import { content } from "./content";
 const contractContent = {
     introduction: (
         <div className="space-y-3">
-            <p>
-                <strong>
-                    CONTRATO DE PRESTAÇÃO DE SERVIÇO E DESENVOLVIMENTO DE
-                    APLICATIVO
-                </strong>
-            </p>
             <p>
                 Pelo presente instrumento particular de contrato, de um lado,
                 doravante denominada simplesmente <strong>CONTRATANTE</strong>,
@@ -422,7 +417,7 @@ const BriefPage = () => {
             : "/quiz?edit=1";
     const documentTitle =
         featureType === "contract"
-            ? t("contractTitle")
+            ? "Contrato de Desenvolvimento de Aplicativo"
             : featureType === "prd"
             ? t("prdTitle")
             : t("proposalTitle");
@@ -531,6 +526,22 @@ const BriefPage = () => {
         } catch {
             // Ignore corrupted draft payloads
         } finally {
+            if (featureType === "contract") {
+                const contractWizardDraft = loadDraft<{
+                    contractType?: string;
+                    projectDescription?: string;
+                }>(DRAFT_KEYS.contractWizard);
+                const rawType =
+                    contractWizardDraft?.contractType?.trim() ??
+                    contractWizardDraft?.projectDescription?.trim() ??
+                    "";
+                if (rawType) {
+                    const normalized = rawType.toLowerCase().startsWith("contrato de")
+                        ? rawType
+                        : `Contrato de ${rawType}`;
+                    setEditableDocumentTitle(normalized);
+                }
+            }
             setIsDraftHydrated(true);
         }
     }, [featureType, storageKey]);

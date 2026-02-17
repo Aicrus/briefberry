@@ -28,6 +28,8 @@ const FEATURE_DRAFTS: Record<FeatureType, string[]> = {
     prd: [DRAFT_KEYS.prdWizard],
 };
 
+const DOC_EDIT_PREFIX = "briefberry:doc-edit:";
+
 export function loadDraft<T>(key: string): T | null {
     if (typeof window === "undefined") return null;
     try {
@@ -51,4 +53,23 @@ export function saveDraft<T>(key: string, value: T) {
 export function clearFeatureDrafts(feature: FeatureType) {
     if (typeof window === "undefined") return;
     FEATURE_DRAFTS[feature].forEach((key) => window.localStorage.removeItem(key));
+    const featureDocPrefix = `${DOC_EDIT_PREFIX}${feature}:`;
+    for (let i = window.localStorage.length - 1; i >= 0; i--) {
+        const key = window.localStorage.key(i);
+        if (key && key.startsWith(featureDocPrefix)) {
+            window.localStorage.removeItem(key);
+        }
+    }
+}
+
+export function clearAllDrafts() {
+    if (typeof window === "undefined") return;
+    const draftKeys = Object.values(DRAFT_KEYS);
+    draftKeys.forEach((key) => window.localStorage.removeItem(key));
+    for (let i = window.localStorage.length - 1; i >= 0; i--) {
+        const key = window.localStorage.key(i);
+        if (key && key.startsWith(DOC_EDIT_PREFIX)) {
+            window.localStorage.removeItem(key);
+        }
+    }
 }
