@@ -2,9 +2,10 @@ import Icon from "@/components/Icon";
 
 type Props = {
     value: string;
+    label?: string;
 };
 
-const BriefCategory = ({ value }: Props) => (
+const BriefCategory = ({ value, label }: Props) => (
     <div className="flex items-center gap-2 text-heading text-t-secondary">
         <Icon
             className="fill-t-secondary"
@@ -29,7 +30,8 @@ const BriefCategory = ({ value }: Props) => (
                     : "align-right"
             }
         />
-        {value === "proposal"
+        {label ||
+            (value === "proposal"
             ? "Proposta"
             : value === "contract"
             ? "Contrato"
@@ -45,7 +47,7 @@ const BriefCategory = ({ value }: Props) => (
             ? "Illustration"
             : value === "3d-design"
             ? "3D Design"
-            : "Web app"}
+            : "Web app")}
     </div>
 );
 

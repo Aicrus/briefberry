@@ -5,50 +5,48 @@ import Icon from "@/components/Icon";
 type Props = {
     images: string[];
     edit: boolean;
+    onImagesChange?: (nextImages: string[]) => void;
 };
 
 const MAX_IMAGES = 4;
 
-const Images = ({ images, edit }: Props) => {
+const Images = ({ images, edit, onImagesChange }: Props) => {
     const [localImages, setLocalImages] = useState<string[]>(images);
     const [isDragOver, setIsDragOver] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const createdObjectUrlsRef = useRef<Set<string>>(new Set());
 
     useEffect(() => {
         setLocalImages(images);
     }, [images]);
 
-    useEffect(() => {
-        const createdUrls = createdObjectUrlsRef.current;
-        return () => {
-            createdUrls.forEach((url) => URL.revokeObjectURL(url));
-            createdUrls.clear();
-        };
-    }, []);
+    const fileToDataUrl = (file: File) =>
+        new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result || ""));
+            reader.onerror = () => reject(new Error("file-read-error"));
+            reader.readAsDataURL(file);
+        });
 
-    const handleFiles = (fileList: FileList | null) => {
+    const handleFiles = async (fileList: FileList | null) => {
         if (!fileList) return;
         const selected = Array.from(fileList).filter((file) =>
             file.type.startsWith("image/")
         );
         if (selected.length === 0) return;
-
-        const nextUrls = selected.map((file) => URL.createObjectURL(file));
-        nextUrls.forEach((url) => createdObjectUrlsRef.current.add(url));
-
-        setLocalImages((prev) => [...prev, ...nextUrls].slice(0, MAX_IMAGES));
+        const nextImages = await Promise.all(selected.map(fileToDataUrl));
+        setLocalImages((prev) => {
+            const merged = [...prev, ...nextImages].slice(0, MAX_IMAGES);
+            onImagesChange?.(merged);
+            return merged;
+        });
         if (inputRef.current) inputRef.current.value = "";
     };
 
     const handleRemoveImage = (index: number) => {
         setLocalImages((prev) => {
-            const target = prev[index];
-            if (target && createdObjectUrlsRef.current.has(target)) {
-                URL.revokeObjectURL(target);
-                createdObjectUrlsRef.current.delete(target);
-            }
-            return prev.filter((_, i) => i !== index);
+            const next = prev.filter((_, i) => i !== index);
+            onImagesChange?.(next);
+            return next;
         });
     };
 

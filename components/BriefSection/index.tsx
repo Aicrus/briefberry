@@ -1,4 +1,4 @@
-import { RefObject, useRef, useState } from "react";
+import { RefObject, useEffect, useRef, useState } from "react";
 import { useOnClickOutside } from "usehooks-ts";
 import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
@@ -13,6 +13,10 @@ type SectionProps = {
     images?: string[];
     isOnlyView?: boolean;
     onRegenerate?: (instruction: string) => Promise<void> | void;
+    onTitleChange?: (nextTitle: string) => void;
+    editedContent?: string;
+    onContentChange?: (nextContent: string) => void;
+    onImagesChange?: (nextImages: string[]) => void;
 };
 
 const BriefSection = ({
@@ -21,21 +25,37 @@ const BriefSection = ({
     images,
     isOnlyView,
     onRegenerate,
+    onTitleChange,
+    editedContent: editedContentProp,
+    onContentChange,
+    onImagesChange,
 }: SectionProps) => {
     const t = useTranslations("brief");
     const [isRegenerate, setIsRegenerate] = useState(false);
     const [isRegenerateModalOpen, setIsRegenerateModalOpen] = useState(false);
     const [regenerateInstruction, setRegenerateInstruction] = useState("");
     const [edit, setEdit] = useState(false);
-    const [editedContent, setEditedContent] = useState<string | null>(null);
+    const [editedContent, setEditedContent] = useState<string | null>(
+        editedContentProp ?? null
+    );
     const [draftContent, setDraftContent] = useState("");
+    const [isEditingTitle, setIsEditingTitle] = useState(false);
+    const [draftTitle, setDraftTitle] = useState(title);
 
     const ref = useRef<HTMLDivElement | null>(null);
     const contentRef = useRef<HTMLDivElement | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const titleInputRef = useRef<HTMLInputElement | null>(null);
+
+    useEffect(() => {
+        setEditedContent(editedContentProp ?? null);
+    }, [editedContentProp]);
+
     useOnClickOutside(ref as RefObject<HTMLElement>, () => {
         if (!edit) return;
-        setEditedContent(draftContent);
+        const next = draftContent.trim();
+        setEditedContent(next || null);
+        onContentChange?.(next);
         setEdit(false);
     });
 
@@ -66,10 +86,43 @@ const BriefSection = ({
         setTimeout(() => textareaRef.current?.focus(), 0);
     };
 
+    const handleStartEditTitle = () => {
+        if (isOnlyView || isEditingTitle) return;
+        setDraftTitle(title);
+        setIsEditingTitle(true);
+        setTimeout(() => titleInputRef.current?.focus(), 0);
+    };
+
+    const handleCommitTitle = () => {
+        const nextTitle = draftTitle.trim();
+        if (nextTitle && onTitleChange) {
+            onTitleChange(nextTitle);
+        }
+        setIsEditingTitle(false);
+    };
+
     return (
         <>
             <div className="not-last:mb-6">
-                <div className="py-2 text-h5">{title}</div>
+                <div className="py-2 text-h5" onClick={handleStartEditTitle}>
+                    {isEditingTitle ? (
+                        <input
+                            ref={titleInputRef}
+                            className="w-full bg-transparent border-0 outline-0 text-h5"
+                            value={draftTitle}
+                            onChange={(e) => setDraftTitle(e.target.value)}
+                            onBlur={handleCommitTitle}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    handleCommitTitle();
+                                }
+                            }}
+                        />
+                    ) : (
+                        title
+                    )}
+                </div>
                 <div className="group relative">
                     <div
                         className={`relative -mx-4 p-4 border-[1.5px] border-transparent rounded-2xl text-body text-t-primary-body [&_p]:not-last:mb-6 transition-colors ${
@@ -95,7 +148,13 @@ const BriefSection = ({
                         ) : (
                             <div ref={contentRef}>{content}</div>
                         )}
-                        {images && <Images images={images} edit={edit} />}
+                        {images && (
+                            <Images
+                                images={images}
+                                edit={edit}
+                                onImagesChange={onImagesChange}
+                            />
+                        )}
                     </div>
                     {!isOnlyView && !edit && (
                         <button

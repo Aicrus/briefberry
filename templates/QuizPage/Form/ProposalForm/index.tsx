@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
-import Icon from "@/components/Icon";
 import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 const STEP_KEYS = ["proposalStep0", "proposalStep1", "proposalStep2", "proposalStep3"] as const;
@@ -38,8 +36,6 @@ const REVISIONS_OPTIONS = [
 
 const ProposalForm = () => {
     const t = useTranslations("quiz");
-    const searchParams = useSearchParams();
-    const isEditMode = searchParams.get("edit") === "1";
     const initialDraft = useMemo(
         () =>
             loadDraft<{
@@ -51,9 +47,7 @@ const ProposalForm = () => {
             }>(DRAFT_KEYS.proposalSimple),
         []
     );
-    const [activeId, setActiveId] = useState(
-        isEditMode ? 0 : (initialDraft?.activeId ?? 0)
-    );
+    const [activeId, setActiveId] = useState(0);
 
     const [billingModel, setBillingModel] = useState<number | null>(
         initialDraft?.billingModel ?? null

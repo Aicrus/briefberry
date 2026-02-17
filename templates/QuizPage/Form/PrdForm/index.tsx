@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
@@ -36,8 +35,6 @@ const INTEGRATION_KEYS = ["payments", "ai", "external_api", "whatsapp"] as const
 
 const PrdForm = () => {
     const t = useTranslations("quiz");
-    const searchParams = useSearchParams();
-    const isEditMode = searchParams.get("edit") === "1";
     const initialDraft = useMemo(
         () =>
             loadDraft<{
@@ -63,9 +60,7 @@ const PrdForm = () => {
             }>(DRAFT_KEYS.prdWizard),
         []
     );
-    const [activeId, setActiveId] = useState(
-        isEditMode ? 0 : (initialDraft?.activeId ?? 0)
-    );
+    const [activeId, setActiveId] = useState(0);
 
     const [language, setLanguage] = useState<number | null>(
         initialDraft?.language ?? null

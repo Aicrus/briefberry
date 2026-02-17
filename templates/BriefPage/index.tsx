@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Layout from "@/components/Layout";
@@ -114,8 +115,19 @@ const prdContent = {
     ),
 };
 
+const DOC_DRAFT_TTL_MS = 1000 * 60 * 60 * 24;
+const LOAD_TIME_MS = Date.now();
+type SectionKey =
+    | "introduction"
+    | "goals"
+    | "timeline"
+    | "budget"
+    | "references"
+    | "conclusion";
+
 const BriefPage = () => {
     const t = useTranslations("brief");
+    const tQuiz = useTranslations("quiz");
     const isPremiumPlan = useEventsStore((state) => state.isPremiumPlan);
     const searchParams = useSearchParams();
     const feature = searchParams.get("feature");
@@ -144,6 +156,113 @@ const BriefPage = () => {
             : featureType === "prd"
             ? prdContent
             : content;
+    const sectionTitles = useMemo(
+        () =>
+            featureType === "contract"
+                ? {
+                      introduction: tQuiz("contractStep1"),
+                      goals: tQuiz("contractStep2"),
+                      timeline: tQuiz("contractStep3"),
+                      budget: tQuiz("contractTerms"),
+                      references: tQuiz("contractStepClauses"),
+                      conclusion: tQuiz("contractStep5"),
+                  }
+                : featureType === "prd"
+                ? {
+                      introduction: tQuiz("prdStep0"),
+                      goals: tQuiz("prdStepLangAndDeadline"),
+                      timeline: tQuiz("prdStepBackendAndAuth"),
+                      budget: tQuiz("prdStepFeaturesAndIntegrations"),
+                      references: tQuiz("prdStep7"),
+                      conclusion: tQuiz("prdStep8"),
+                  }
+                : {
+                      introduction: t("introduction"),
+                      goals: t("goals"),
+                      timeline: t("timeline"),
+                      budget: t("budget"),
+                      references: t("references"),
+                      conclusion: t("conclusion"),
+                  },
+        [featureType, t, tQuiz]
+    );
+    const subtitleDefault =
+        featureType === "contract"
+            ? "Contrato"
+            : featureType === "prd"
+            ? "PRD"
+            : "Proposta";
+    const storageKey = `briefberry:doc-edit:${featureType}`;
+    const persistedDraft = useMemo(() => {
+        if (typeof window === "undefined") return null;
+        try {
+            const raw = window.localStorage.getItem(storageKey);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw) as {
+                expiresAt: number;
+                documentTitle?: string;
+                subtitle?: string;
+                sectionTitles?: Record<SectionKey, string>;
+                sectionContents?: Record<SectionKey, string | null>;
+                referenceImages?: string[];
+            };
+            if (!parsed.expiresAt || parsed.expiresAt < LOAD_TIME_MS) {
+                window.localStorage.removeItem(storageKey);
+                return null;
+            }
+            return parsed;
+        } catch {
+            return null;
+        }
+    }, [storageKey]);
+
+    const [editableDocumentTitle, setEditableDocumentTitle] = useState(
+        () => persistedDraft?.documentTitle ?? documentTitle
+    );
+    const [editableSubtitle, setEditableSubtitle] = useState(
+        () => persistedDraft?.subtitle ?? subtitleDefault
+    );
+    const [editableSectionTitles, setEditableSectionTitles] = useState(
+        () => persistedDraft?.sectionTitles ?? sectionTitles
+    );
+    const [editableSectionContents, setEditableSectionContents] = useState<
+        Record<SectionKey, string | null>
+    >(
+        () =>
+            persistedDraft?.sectionContents ?? {
+                introduction: null,
+                goals: null,
+                timeline: null,
+                budget: null,
+                references: null,
+                conclusion: null,
+            }
+    );
+    const [editableReferenceImages, setEditableReferenceImages] = useState<string[]>(
+        () => persistedDraft?.referenceImages ?? content.images
+    );
+    const [isEditingDocumentTitle, setIsEditingDocumentTitle] = useState(false);
+    const [isEditingSubtitle, setIsEditingSubtitle] = useState(false);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        const payload = {
+            expiresAt: Date.now() + DOC_DRAFT_TTL_MS,
+            documentTitle: editableDocumentTitle,
+            subtitle: editableSubtitle,
+            sectionTitles: editableSectionTitles,
+            sectionContents: editableSectionContents,
+            referenceImages: editableReferenceImages,
+        };
+        window.localStorage.setItem(storageKey, JSON.stringify(payload));
+    }, [
+        editableDocumentTitle,
+        editableSubtitle,
+        editableSectionTitles,
+        editableSectionContents,
+        editableReferenceImages,
+        storageKey,
+    ]);
     const categoryValue =
         featureType === "contract"
             ? "contract"
@@ -154,7 +273,10 @@ const BriefPage = () => {
     return (
         <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>
             <div className="pt-34 px-6 pb-38 max-2xl:pt-32 max-2xl:px-11 max-2xl:pb-33 max-xl:pt-30 max-lg:pt-28 max-md:pt-22 max-md:px-4 max-md:pb-24">
-                <div className="relative max-w-170 mx-auto p-12 shadow-hover bg-b-surface4 rounded-4xl before:absolute before:top-full before:left-6 before:right-6 before:-z-1 before:h-3.75 before:rounded-b-4xl before:bg-b-surface2 max-md:px-8 max-md:pb-4 max-md:before:hidden">
+                <div
+                    key={featureType}
+                    className="relative max-w-170 mx-auto p-12 shadow-hover bg-b-surface4 rounded-4xl before:absolute before:top-full before:left-6 before:right-6 before:-z-1 before:h-3.75 before:rounded-b-4xl before:bg-b-surface2 max-md:px-8 max-md:pb-4 max-md:before:hidden"
+                >
                     <Button
                         className="absolute! top-2 right-2 shadow-hover"
                         isCircle
@@ -174,25 +296,176 @@ const BriefPage = () => {
                                 }`}
                                 name={isPremiumPlan ? "verification" : "lock"}
                             />
-                            {documentTitle}
+                            {isEditingDocumentTitle ? (
+                                <input
+                                    className="w-full bg-transparent border-0 outline-0 text-h2 max-md:text-h5"
+                                    value={editableDocumentTitle}
+                                    onChange={(e) =>
+                                        setEditableDocumentTitle(e.target.value)
+                                    }
+                                    onBlur={() => setIsEditingDocumentTitle(false)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            setIsEditingDocumentTitle(false);
+                                        }
+                                    }}
+                                    autoFocus
+                                />
+                            ) : (
+                                <button
+                                    type="button"
+                                    className="text-left"
+                                    onClick={() => setIsEditingDocumentTitle(true)}
+                                >
+                                    {editableDocumentTitle}
+                                </button>
+                            )}
                         </div>
-                        <BriefCategory value={categoryValue} />
+                        {isEditingSubtitle ? (
+                            <input
+                                className="w-full bg-transparent border-0 outline-0 text-heading text-t-secondary"
+                                value={editableSubtitle}
+                                onChange={(e) => setEditableSubtitle(e.target.value)}
+                                onBlur={() => setIsEditingSubtitle(false)}
+                                onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        setIsEditingSubtitle(false);
+                                    }
+                                }}
+                                autoFocus
+                            />
+                        ) : (
+                            <button
+                                type="button"
+                                className="text-left"
+                                onClick={() => setIsEditingSubtitle(true)}
+                            >
+                                <BriefCategory
+                                    value={categoryValue}
+                                    label={editableSubtitle}
+                                />
+                            </button>
+                        )}
                     </div>
                     <BriefSection
-                        title={t("introduction")}
-                        content={displayedContent.introduction}
+                        title={editableSectionTitles.introduction}
+                        onTitleChange={(nextTitle) =>
+                            setEditableSectionTitles((prev) => ({
+                                ...prev,
+                                introduction: nextTitle,
+                            }))
+                        }
+                        content={
+                            editableSectionContents.introduction ??
+                            displayedContent.introduction
+                        }
+                        editedContent={
+                            editableSectionContents.introduction ?? undefined
+                        }
+                        onContentChange={(nextContent) =>
+                            setEditableSectionContents((prev) => ({
+                                ...prev,
+                                introduction: nextContent || null,
+                            }))
+                        }
                     />
-                    <BriefSection title={t("goals")} content={displayedContent.goals} />
-                    <BriefSection title={t("timeline")} content={displayedContent.timeline} />
-                    <BriefSection title={t("budget")} content={displayedContent.budget} />
                     <BriefSection
-                        title={t("references")}
-                        content={displayedContent.references}
-                        images={content.images}
+                        title={editableSectionTitles.goals}
+                        onTitleChange={(nextTitle) =>
+                            setEditableSectionTitles((prev) => ({
+                                ...prev,
+                                goals: nextTitle,
+                            }))
+                        }
+                        content={editableSectionContents.goals ?? displayedContent.goals}
+                        editedContent={editableSectionContents.goals ?? undefined}
+                        onContentChange={(nextContent) =>
+                            setEditableSectionContents((prev) => ({
+                                ...prev,
+                                goals: nextContent || null,
+                            }))
+                        }
                     />
                     <BriefSection
-                        title={t("conclusion")}
-                        content={displayedContent.conclusion}
+                        title={editableSectionTitles.timeline}
+                        onTitleChange={(nextTitle) =>
+                            setEditableSectionTitles((prev) => ({
+                                ...prev,
+                                timeline: nextTitle,
+                            }))
+                        }
+                        content={
+                            editableSectionContents.timeline ??
+                            displayedContent.timeline
+                        }
+                        editedContent={editableSectionContents.timeline ?? undefined}
+                        onContentChange={(nextContent) =>
+                            setEditableSectionContents((prev) => ({
+                                ...prev,
+                                timeline: nextContent || null,
+                            }))
+                        }
+                    />
+                    <BriefSection
+                        title={editableSectionTitles.budget}
+                        onTitleChange={(nextTitle) =>
+                            setEditableSectionTitles((prev) => ({
+                                ...prev,
+                                budget: nextTitle,
+                            }))
+                        }
+                        content={editableSectionContents.budget ?? displayedContent.budget}
+                        editedContent={editableSectionContents.budget ?? undefined}
+                        onContentChange={(nextContent) =>
+                            setEditableSectionContents((prev) => ({
+                                ...prev,
+                                budget: nextContent || null,
+                            }))
+                        }
+                    />
+                    <BriefSection
+                        title={editableSectionTitles.references}
+                        onTitleChange={(nextTitle) =>
+                            setEditableSectionTitles((prev) => ({
+                                ...prev,
+                                references: nextTitle,
+                            }))
+                        }
+                        content={
+                            editableSectionContents.references ??
+                            displayedContent.references
+                        }
+                        editedContent={editableSectionContents.references ?? undefined}
+                        onContentChange={(nextContent) =>
+                            setEditableSectionContents((prev) => ({
+                                ...prev,
+                                references: nextContent || null,
+                            }))
+                        }
+                        images={editableReferenceImages}
+                        onImagesChange={setEditableReferenceImages}
+                    />
+                    <BriefSection
+                        title={editableSectionTitles.conclusion}
+                        onTitleChange={(nextTitle) =>
+                            setEditableSectionTitles((prev) => ({
+                                ...prev,
+                                conclusion: nextTitle,
+                            }))
+                        }
+                        content={
+                            editableSectionContents.conclusion ??
+                            displayedContent.conclusion
+                        }
+                        editedContent={editableSectionContents.conclusion ?? undefined}
+                        onContentChange={(nextContent) =>
+                            setEditableSectionContents((prev) => ({
+                                ...prev,
+                                conclusion: nextContent || null,
+                            }))
+                        }
                     />
                 </div>
             </div>

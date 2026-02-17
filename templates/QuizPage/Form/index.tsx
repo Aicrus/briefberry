@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
@@ -32,8 +31,6 @@ const cardClass = (active: boolean) =>
 
 const Form = ({}) => {
     const t = useTranslations("quiz");
-    const searchParams = useSearchParams();
-    const isEditMode = searchParams.get("edit") === "1";
     const initialDraft = useMemo(
         () =>
             loadDraft<{
@@ -49,9 +46,7 @@ const Form = ({}) => {
             }>(DRAFT_KEYS.proposalWizard),
         []
     );
-    const [activeId, setActiveId] = useState(
-        isEditMode ? 0 : (initialDraft?.activeId ?? 0)
-    );
+    const [activeId, setActiveId] = useState(0);
     const [projectName, setProjectName] = useState(initialDraft?.projectName ?? "");
     const [projectGoals, setProjectGoals] = useState(initialDraft?.projectGoals ?? "");
     const [yourBudget, setYourBudget] = useState(initialDraft?.yourBudget ?? "");

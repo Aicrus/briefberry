@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
@@ -70,8 +69,6 @@ const cardClass = (active: boolean) =>
 
 const ContractForm = () => {
     const t = useTranslations("quiz");
-    const searchParams = useSearchParams();
-    const isEditMode = searchParams.get("edit") === "1";
     const initialDraft = useMemo(
         () =>
             loadDraft<{
@@ -90,9 +87,7 @@ const ContractForm = () => {
             }>(DRAFT_KEYS.contractWizard),
         []
     );
-    const [activeId, setActiveId] = useState(
-        isEditMode ? 0 : (initialDraft?.activeId ?? 0)
-    );
+    const [activeId, setActiveId] = useState(0);
 
     // Step 1: Contractor data
     const [contractorName, setContractorName] = useState(initialDraft?.contractorName ?? "");
