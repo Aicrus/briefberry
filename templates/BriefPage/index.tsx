@@ -588,10 +588,6 @@ function buildProposalContentFromDrafts(
         goals: (
             <div className="space-y-3">
                 <p>{projectGoals}</p>
-                <p>
-                    <strong>{tBrief("proposalExpectedResultLabel")}</strong>{" "}
-                    {tBrief("proposalExpectedResultText")}
-                </p>
             </div>
         ),
         timeline: (
@@ -612,16 +608,16 @@ function buildProposalContentFromDrafts(
                         <li>{tBrief("proposalDefaultScopeLine3")}</li>
                     </ul>
                 )}
-                <p>
-                    <strong>{tBrief("proposalDeadlineLabel")}</strong> {deadline}.
-                </p>
             </div>
         ),
         budget: (
-            <div className="space-y-3">
+            <div className="space-y-2">
                 <p>
                     <strong>{tBrief("proposalTotalEstimatedLabel")}</strong>{" "}
                     {totalBudget}.
+                </p>
+                <p>
+                    <strong>{tBrief("proposalDeadlineLabel")}</strong> {deadline}.
                 </p>
                 <p>
                     <strong>{tBrief("proposalBillingModelLabel")}</strong>{" "}
