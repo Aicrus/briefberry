@@ -49,6 +49,194 @@ function getContractDocTypeLabel(docType: ContractDocTypeId | null | undefined):
     return "Documento";
 }
 
+type DocLocale = "pt" | "en" | "es";
+
+function resolveDocLocale(locale: string): DocLocale {
+    if (locale.startsWith("es")) return "es";
+    if (locale.startsWith("en")) return "en";
+    return "pt";
+}
+
+const CONTRACT_UI_COPY = {
+    pt: {
+        documentTitle: "Contrato de Desenvolvimento de Aplicativo",
+        sectionIntroduction: "Partes Contratantes",
+        sectionGoals: "Objeto do Contrato e Escopo",
+        sectionTimeline: "Execução e Obrigações",
+        sectionBudget: "Termos e Condições de Pagamento",
+        sectionReferences: "Rescisão, Sigilo e Direitos",
+        sectionConclusion: "Foro e Assinaturas",
+        toDefine: "A definir",
+        notInformed: "não informado",
+        addressNotInformed: "endereço não informado",
+        paymentTermsFallback: "Condições de pagamento a definir entre as partes.",
+        clientLabel: "CONTRATANTE",
+        contractorLabel: "CONTRATADA",
+        introClientPrefix:
+            "Pelo presente instrumento particular de contrato, de um lado, doravante denominada simplesmente",
+        introClientSuffix: "inscrita no",
+        introClientAddress: "com sede em",
+        introClientEmail: "e e-mail",
+        introContractorPrefix: "E, de outro lado, doravante denominada",
+        introContractorSuffix: "inscrita no",
+        introEnding: "têm entre si, justo e contratado o que segue:",
+        objectTitle: "DO OBJETO DO CONTRATO",
+        clause1:
+            "CLÁUSULA 1ª - Constitui objeto deste contrato a prestação dos serviços pela CONTRATADA à CONTRATANTE, conforme escopo abaixo:",
+        proposalReferenceLabel: "Referência da proposta do projeto:",
+        paymentTitle: "DO CUSTO E DA FORMA DE PAGAMENTO",
+        clause4:
+            "CLÁUSULA 4ª - Pela prestação de serviços referidos na cláusula 1 supra, a CONTRATANTE pagará à CONTRATADA o valor total de",
+        paymentClauseSuffix: "conforme condições abaixo:",
+        timelineTitle: "DO PRAZO",
+        timelineTextStart: "O presente contrato inicia em",
+        timelineTextEnd: "e possui entrega acordada para",
+        warrantyLabel: "GARANTIA",
+        warrantyText: "O projeto possui",
+        warrantyTextSuffix:
+            "dias de garantia para eventuais ajustes e correção de bugs.",
+        rescissionTitle: "DA RESCISÃO",
+        clause5Prefix: "CLÁUSULA 5ª -",
+        noRefundClause:
+            "A rescisão do presente instrumento não extinguirá os direitos e obrigações que as partes tenham entre si e para com terceiros, não havendo estorno do valor já pago, caso o projeto já tenha sido iniciado.",
+        forumTitle: "DO FORO",
+        clause12:
+            "CLÁUSULA 12ª - Para dirimir quaisquer controvérsias oriundas do contrato, as partes elegem o foro da comarca de",
+        closingLine:
+            "As partes acima já qualificadas ora contratadas, resolvem na melhor forma de direito firmar o presente contrato.",
+        signaturesTitle: "Assinaturas",
+        signerNamePlaceholder: "Nome do assinante",
+        signAgain: "Assinar novamente",
+        clickToSign: "Clique para assinar",
+        signatureModalTitle: "Assinatura eletrônica",
+        signer1Role: "ACORDANTE 1",
+        signer2Role: "ACORDANTE 2",
+        witnessRole: "TESTEMUNHA",
+        signer2Short: "Acordante 2",
+        witness2Short: "Testemunha 2",
+        witness1Default: "TESTEMUNHA 1",
+        witness2Default: "TESTEMUNHA 2",
+    },
+    en: {
+        documentTitle: "Application Development Contract",
+        sectionIntroduction: "Contracting Parties",
+        sectionGoals: "Contract Scope and Object",
+        sectionTimeline: "Execution and Obligations",
+        sectionBudget: "Payment Terms and Conditions",
+        sectionReferences: "Termination, Confidentiality and Rights",
+        sectionConclusion: "Jurisdiction and Signatures",
+        toDefine: "To be defined",
+        notInformed: "not informed",
+        addressNotInformed: "address not informed",
+        paymentTermsFallback: "Payment terms to be defined between the parties.",
+        clientLabel: "CLIENT",
+        contractorLabel: "CONTRACTOR",
+        introClientPrefix:
+            "By this private agreement, on one side, hereinafter referred to as",
+        introClientSuffix: "registered under",
+        introClientAddress: "with registered office at",
+        introClientEmail: "and email",
+        introContractorPrefix: "And, on the other side, hereinafter referred to as",
+        introContractorSuffix: "registered under",
+        introEnding: "agree to the following terms:",
+        objectTitle: "OBJECT OF THE CONTRACT",
+        clause1:
+            "CLAUSE 1 - The object of this contract is the provision of services by the CONTRACTOR to the CLIENT, according to the scope below:",
+        proposalReferenceLabel: "Project proposal reference:",
+        paymentTitle: "COST AND PAYMENT TERMS",
+        clause4:
+            "CLAUSE 4 - For the services described in Clause 1, the CLIENT shall pay the CONTRACTOR the total amount of",
+        paymentClauseSuffix: "according to the conditions below:",
+        timelineTitle: "TIMELINE",
+        timelineTextStart: "This contract starts on",
+        timelineTextEnd: "and has an agreed delivery date of",
+        warrantyLabel: "WARRANTY",
+        warrantyText: "The project includes",
+        warrantyTextSuffix:
+            "days of warranty for bug fixes and adjustment corrections.",
+        rescissionTitle: "TERMINATION",
+        clause5Prefix: "CLAUSE 5 -",
+        noRefundClause:
+            "Termination of this agreement does not extinguish rights and obligations between the parties and third parties, and there will be no refund for amounts already paid once the project has started.",
+        forumTitle: "JURISDICTION",
+        clause12:
+            "CLAUSE 12 - To settle any disputes arising from this contract, the parties elect the jurisdiction of",
+        closingLine:
+            "The parties identified above execute this agreement in the best form of law.",
+        signaturesTitle: "Signatures",
+        signerNamePlaceholder: "Signer name",
+        signAgain: "Sign again",
+        clickToSign: "Click to sign",
+        signatureModalTitle: "Electronic signature",
+        signer1Role: "SIGNATORY 1",
+        signer2Role: "SIGNATORY 2",
+        witnessRole: "WITNESS",
+        signer2Short: "Signatory 2",
+        witness2Short: "Witness 2",
+        witness1Default: "WITNESS 1",
+        witness2Default: "WITNESS 2",
+    },
+    es: {
+        documentTitle: "Contrato de Desarrollo de Aplicaciones",
+        sectionIntroduction: "Partes Contratantes",
+        sectionGoals: "Objeto y Alcance del Contrato",
+        sectionTimeline: "Ejecución y Obligaciones",
+        sectionBudget: "Términos y Condiciones de Pago",
+        sectionReferences: "Rescisión, Confidencialidad y Derechos",
+        sectionConclusion: "Foro y Firmas",
+        toDefine: "Por definir",
+        notInformed: "no informado",
+        addressNotInformed: "dirección no informada",
+        paymentTermsFallback: "Condiciones de pago por definir entre las partes.",
+        clientLabel: "CLIENTE",
+        contractorLabel: "CONTRATISTA",
+        introClientPrefix:
+            "Por el presente instrumento particular de contrato, de una parte, en adelante denominada",
+        introClientSuffix: "inscrita en",
+        introClientAddress: "con sede en",
+        introClientEmail: "y correo electrónico",
+        introContractorPrefix: "Y, de otra parte, en adelante denominada",
+        introContractorSuffix: "inscrita en",
+        introEnding: "acuerdan lo siguiente:",
+        objectTitle: "OBJETO DEL CONTRATO",
+        clause1:
+            "CLÁUSULA 1 - Constituye objeto de este contrato la prestación de servicios por la CONTRATISTA al CLIENTE, según el alcance abajo:",
+        proposalReferenceLabel: "Referencia de la propuesta del proyecto:",
+        paymentTitle: "COSTO Y FORMA DE PAGO",
+        clause4:
+            "CLÁUSULA 4 - Por los servicios descritos en la cláusula 1, el CLIENTE pagará a la CONTRATISTA el valor total de",
+        paymentClauseSuffix: "según las condiciones siguientes:",
+        timelineTitle: "PLAZO",
+        timelineTextStart: "El presente contrato inicia en",
+        timelineTextEnd: "y tiene entrega acordada para",
+        warrantyLabel: "GARANTÍA",
+        warrantyText: "El proyecto tiene",
+        warrantyTextSuffix:
+            "días de garantía para ajustes eventuales y corrección de errores.",
+        rescissionTitle: "RESCISIÓN",
+        clause5Prefix: "CLÁUSULA 5 -",
+        noRefundClause:
+            "La rescisión del presente instrumento no extinguirá los derechos y obligaciones entre las partes y frente a terceros, sin reembolso de los valores ya pagados una vez iniciado el proyecto.",
+        forumTitle: "FORO",
+        clause12:
+            "CLÁUSULA 12 - Para dirimir cualquier controversia derivada del contrato, las partes eligen el foro de",
+        closingLine:
+            "Las partes ya calificadas firman el presente contrato en la mejor forma de derecho.",
+        signaturesTitle: "Firmas",
+        signerNamePlaceholder: "Nombre del firmante",
+        signAgain: "Firmar nuevamente",
+        clickToSign: "Haz clic para firmar",
+        signatureModalTitle: "Firma electrónica",
+        signer1Role: "FIRMANTE 1",
+        signer2Role: "FIRMANTE 2",
+        witnessRole: "TESTIGO",
+        signer2Short: "Firmante 2",
+        witness2Short: "Testigo 2",
+        witness1Default: "TESTIGO 1",
+        witness2Default: "TESTIGO 2",
+    },
+} as const;
+
 const contractContent = {
     introduction: (
         <div className="space-y-3">
@@ -363,74 +551,77 @@ const contractContent = {
 };
 
 function buildContractContentFromDraft(
-    draft: ContractWizardDraft | null
+    draft: ContractWizardDraft | null,
+    docLocale: DocLocale
 ): Omit<ProposalContentShape, "images"> {
-    if (!draft) return contractContent;
+    const copy = CONTRACT_UI_COPY[docLocale];
+    const isPt = docLocale === "pt";
 
-    const contractorName = draft.contractorName?.trim() || "CONTRATADA";
-    const contractorEmail = draft.contractorEmail?.trim() || "não informado";
-    const contractorAddress = draft.contractorAddress?.trim() || "endereço não informado";
-    const contractorDocument = draft.contractorDocument?.trim() || "não informado";
-    const contractorDocLabel = getContractDocTypeLabel(draft.contractorDocType);
+    const contractorName = draft?.contractorName?.trim() || copy.contractorLabel;
+    const contractorEmail = draft?.contractorEmail?.trim() || copy.notInformed;
+    const contractorAddress =
+        draft?.contractorAddress?.trim() || copy.addressNotInformed;
+    const contractorDocument = draft?.contractorDocument?.trim() || copy.notInformed;
+    const contractorDocLabel = getContractDocTypeLabel(draft?.contractorDocType);
 
-    const clientName = draft.clientName?.trim() || "CONTRATANTE";
-    const clientEmail = draft.clientEmail?.trim() || "não informado";
-    const clientAddress = draft.clientAddress?.trim() || "endereço não informado";
-    const clientDocument = draft.clientDocument?.trim() || "não informado";
-    const clientDocLabel = getContractDocTypeLabel(draft.clientDocType);
+    const clientName = draft?.clientName?.trim() || copy.clientLabel;
+    const clientEmail = draft?.clientEmail?.trim() || copy.notInformed;
+    const clientAddress = draft?.clientAddress?.trim() || copy.addressNotInformed;
+    const clientDocument = draft?.clientDocument?.trim() || copy.notInformed;
+    const clientDocLabel = getContractDocTypeLabel(draft?.clientDocType);
 
     const projectDescription =
-        draft.projectDescription?.trim() ||
-        "Escopo do projeto a ser desenvolvido conforme briefing e proposta comercial.";
-    const projectProposalLink = draft.projectProposalLink?.trim();
+        draft?.projectDescription?.trim() ||
+        (isPt
+            ? "Escopo do projeto a ser desenvolvido conforme briefing e proposta comercial."
+            : docLocale === "en"
+              ? "Project scope to be developed according to the brief and commercial proposal."
+              : "Alcance del proyecto a desarrollar según el briefing y la propuesta comercial.");
+    const projectProposalLink = draft?.projectProposalLink?.trim();
     const contractValue = formatProposalBudget(
-        draft.contractValue,
-        draft.currency,
-        "A definir"
+        draft?.contractValue,
+        draft?.currency,
+        copy.toDefine
     );
     const paymentTerms =
-        draft.paymentTerms?.trim().replace(/\s*['"]+\s*$/, "") ||
-        "Condições de pagamento a definir entre as partes.";
-    const projectStartDate = draft.projectStartDate?.trim() || "A definir";
-    const projectDeliveryDate = draft.projectDeliveryDate?.trim() || "A definir";
-    const warrantyDays = draft.warrantyDays?.trim() || "";
-    const forumCity = draft.forumCity?.trim() || "A definir";
-    const signatureCity = draft.signatureCity?.trim() || forumCity;
-    const signatureDate = draft.signatureDate?.trim() || "A definir";
-    const terminationClause =
-        "A rescisão do presente instrumento não extinguirá os direitos e obrigações que as partes tenham entre si e para com terceiros, não havendo estorno do valor já pago, caso o projeto já tenha sido iniciado.";
+        draft?.paymentTerms?.trim().replace(/\s*['"]+\s*$/, "") ||
+        copy.paymentTermsFallback;
+    const projectStartDate = draft?.projectStartDate?.trim() || copy.toDefine;
+    const projectDeliveryDate = draft?.projectDeliveryDate?.trim() || copy.toDefine;
+    const warrantyDays = draft?.warrantyDays?.trim() || "";
+    const forumCity = draft?.forumCity?.trim() || copy.toDefine;
+    const signatureCity = draft?.signatureCity?.trim() || forumCity;
+    const signatureDate = draft?.signatureDate?.trim() || copy.toDefine;
 
     return {
         introduction: (
             <div className="space-y-3">
                 <p>
-                    Pelo presente instrumento particular de contrato, de um lado,
-                    doravante denominada simplesmente <strong>CONTRATANTE</strong>,{" "}
-                    {clientName}, inscrita no {clientDocLabel} Nº {clientDocument}, com
-                    sede em {clientAddress}, e e-mail {clientEmail}.
+                    {copy.introClientPrefix} <strong>{copy.clientLabel}</strong>,{" "}
+                    {clientName}, {copy.introClientSuffix} {clientDocLabel} Nº{" "}
+                    {clientDocument}, {copy.introClientAddress} {clientAddress},{" "}
+                    {copy.introClientEmail} {clientEmail}.
                 </p>
                 <p>
-                    E, de outro lado, doravante denominada <strong>CONTRATADA</strong>,{" "}
-                    {contractorName}, inscrita no {contractorDocLabel} Nº{" "}
-                    {contractorDocument}, com sede em {contractorAddress}, e e-mail{" "}
-                    {contractorEmail}, têm entre si, justo e contratado o que segue:
+                    {copy.introContractorPrefix} <strong>{copy.contractorLabel}</strong>,{" "}
+                    {contractorName}, {copy.introContractorSuffix} {contractorDocLabel} Nº{" "}
+                    {contractorDocument}, {copy.introClientAddress} {contractorAddress},{" "}
+                    {copy.introClientEmail} {contractorEmail}, {copy.introEnding}
                 </p>
             </div>
         ),
         goals: (
             <div className="space-y-3">
                 <p>
-                    <strong>DO OBJETO DO CONTRATO</strong>
+                    <strong>{copy.objectTitle}</strong>
                 </p>
                 <p>
-                    <strong>CLÁUSULA 1ª</strong> - Constitui objeto deste contrato a
-                    prestação dos serviços pela CONTRATADA à CONTRATANTE, conforme
-                    escopo abaixo:
+                    <strong>{copy.clause1}</strong>
                 </p>
                 <p>{projectDescription}</p>
                 {projectProposalLink && (
                     <p>
-                        Referência da proposta do projeto:{" "}
+                        {copy.proposalReferenceLabel}{" "}
                         <a
                             href={projectProposalLink}
                             target="_blank"
@@ -444,43 +635,61 @@ function buildContractContentFromDraft(
                 )}
             </div>
         ),
-        timeline: contractContent.timeline,
+        timeline: isPt ? (
+            contractContent.timeline
+        ) : (
+            <div className="space-y-3">
+                <p>
+                    <strong>
+                        {docLocale === "en"
+                            ? "EXECUTION AND OBLIGATIONS"
+                            : "EJECUCIÓN Y OBLIGACIONES"}
+                    </strong>
+                </p>
+                <p>
+                    {docLocale === "en"
+                        ? "The parties agree to provide all information, access, and materials needed for proper project execution."
+                        : "Las partes se comprometen a proporcionar toda la información, acceso y materiales necesarios para la correcta ejecución del proyecto."}
+                </p>
+                <p>
+                    {docLocale === "en"
+                        ? "The contractor will execute the project according to the approved scope, keeping confidentiality over all data and documents shared during the engagement."
+                        : "La contratista ejecutará el proyecto de acuerdo con el alcance aprobado, manteniendo confidencialidad sobre todos los datos y documentos compartidos durante el servicio."}
+                </p>
+            </div>
+        ),
         budget: (
             <div className="space-y-3">
                 <p>
-                    <strong>DO CUSTO E DA FORMA DE PAGAMENTO</strong>
+                    <strong>{copy.paymentTitle}</strong>
                 </p>
                 <p>
-                    <strong>CLÁUSULA 4ª</strong> - Pela prestação de serviços
-                    referidos na cláusula 1 supra, a CONTRATANTE pagará à
-                    CONTRATADA o valor total de <strong>{contractValue}</strong>,
-                    conforme condições abaixo:
+                    <strong>{copy.clause4}</strong> <strong>{contractValue}</strong>,{" "}
+                    {copy.paymentClauseSuffix}
                 </p>
                 <p>{paymentTerms}</p>
                 <p>
-                    <strong>DO PRAZO</strong>
+                    <strong>{copy.timelineTitle}</strong>
                 </p>
                 <p>
-                    O presente contrato inicia em <strong>{projectStartDate}</strong>{" "}
-                    e possui entrega prevista para{" "}
-                    <strong>{projectDeliveryDate}</strong>.
+                    {copy.timelineTextStart} <strong>{projectStartDate}</strong>{" "}
+                    {copy.timelineTextEnd} <strong>{projectDeliveryDate}</strong>.
                 </p>
                 {warrantyDays && (
                     <p>
-                        <strong>GARANTIA</strong> - O projeto possui{" "}
-                        <strong>{warrantyDays} dias</strong> de garantia para
-                        eventuais ajustes e correção de bugs.
+                        <strong>{copy.warrantyLabel}</strong> - {copy.warrantyText}{" "}
+                        <strong>{warrantyDays}</strong> {copy.warrantyTextSuffix}
                     </p>
                 )}
             </div>
         ),
-        references: (
+        references: isPt ? (
             <div className="space-y-3">
                 <p>
-                    <strong>DA RESCISÃO</strong>
+                    <strong>{copy.rescissionTitle}</strong>
                 </p>
                 <p>
-                    <strong>CLÁUSULA 5ª</strong> - {terminationClause}
+                    <strong>{copy.clause5Prefix}</strong> {copy.noRefundClause}
                 </p>
                 <p>
                     <strong>CLÁUSULA 6ª</strong> - A CONTRATADA agirá segundo as normas
@@ -507,21 +716,35 @@ function buildContractContentFromDraft(
                     em contrário.
                 </p>
             </div>
+        ) : (
+            <div className="space-y-3">
+                <p>
+                    <strong>{copy.rescissionTitle}</strong>
+                </p>
+                <p>
+                    <strong>{copy.clause5Prefix}</strong> {copy.noRefundClause}
+                </p>
+                <p>
+                    {docLocale === "en"
+                        ? "Both parties agree to confidentiality over all technical, operational, and strategic information shared under this agreement."
+                        : "Ambas partes se comprometen a la confidencialidad sobre toda la información técnica, operativa y estratégica compartida en este contrato."}
+                </p>
+                <p>
+                    {docLocale === "en"
+                        ? "All intellectual property rights resulting from the contracted work shall belong to the client after full payment."
+                        : "Todos los derechos de propiedad intelectual resultantes del trabajo contratado pertenecerán al cliente tras el pago total."}
+                </p>
+            </div>
         ),
         conclusion: (
             <div className="space-y-3">
                 <p>
-                    <strong>DO FORO</strong>
+                    <strong>{copy.forumTitle}</strong>
                 </p>
                 <p>
-                    <strong>CLÁUSULA 12ª</strong> - Para dirimir quaisquer
-                    controvérsias oriundas do contrato, as partes elegem o foro da
-                    comarca de <strong>{forumCity}</strong>.
+                    <strong>{copy.clause12}</strong> <strong>{forumCity}</strong>.
                 </p>
-                <p>
-                    As partes acima já qualificadas ora contratadas, resolvem na
-                    melhor forma de direito firmar o presente contrato.
-                </p>
+                <p>{copy.closingLine}</p>
                 <p>
                     <strong>
                         {signatureCity} {signatureDate}
@@ -903,6 +1126,8 @@ const BriefPage = () => {
     const t = useTranslations("brief");
     const tQuiz = useTranslations("quiz");
     const locale = useLocale();
+    const docLocale = resolveDocLocale(locale);
+    const contractCopy = CONTRACT_UI_COPY[docLocale];
     const tBrief = useMemo<TranslateFn>(
         () =>
             ((key: string, values?: Record<string, string | number>) =>
@@ -950,7 +1175,7 @@ const BriefPage = () => {
     );
     const documentTitle =
         featureType === "contract"
-            ? "Contrato de Desenvolvimento de Aplicativo"
+            ? contractCopy.documentTitle
             : featureType === "prd"
             ? t("prdTitle")
             : defaultProposalTitle;
@@ -961,7 +1186,7 @@ const BriefPage = () => {
         useState<ContractWizardDraft | null>(null);
     const [contractContentState, setContractContentState] = useState<
         Omit<ProposalContentShape, "images">
-    >(contractContent);
+    >(buildContractContentFromDraft(null, docLocale));
     const displayedContent =
         featureType === "contract"
             ? contractContentState
@@ -972,12 +1197,12 @@ const BriefPage = () => {
         () =>
             featureType === "contract"
                 ? {
-                      introduction: "Partes Contratantes",
-                      goals: "Objeto do Contrato e Escopo",
-                      timeline: "Execução e Obrigações",
-                      budget: "Termos e Condições de Pagamento",
-                      references: "Rescisão, Sigilo e Direitos",
-                      conclusion: "Foro e Assinaturas",
+                      introduction: contractCopy.sectionIntroduction,
+                      goals: contractCopy.sectionGoals,
+                      timeline: contractCopy.sectionTimeline,
+                      budget: contractCopy.sectionBudget,
+                      references: contractCopy.sectionReferences,
+                      conclusion: contractCopy.sectionConclusion,
                   }
                 : featureType === "prd"
                 ? {
@@ -996,15 +1221,15 @@ const BriefPage = () => {
                       references: t("proposalSectionReferences"),
                       conclusion: t("proposalSectionConditions"),
                   },
-        [featureType, t, tQuiz]
+        [contractCopy, featureType, t, tQuiz]
     );
     const subtitleDefault =
         featureType === "contract"
-            ? "Contrato"
+            ? t("contract")
             : featureType === "prd"
-            ? "PRD"
+            ? t("prd")
             : t("proposal");
-    const storageKey = `briefberry:doc-edit:${featureType}:v12`;
+    const storageKey = `briefberry:doc-edit:${featureType}:${docLocale}:v13`;
 
     const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
     const [editableSubtitle, setEditableSubtitle] = useState(subtitleDefault);
@@ -1130,11 +1355,13 @@ const BriefPage = () => {
                     DRAFT_KEYS.contractWizard
                 );
                 setContractDraftState(contractDraft);
-                setContractContentState(buildContractContentFromDraft(contractDraft));
+                setContractContentState(
+                    buildContractContentFromDraft(contractDraft, docLocale)
+                );
             }
             setIsDraftHydrated(true);
         }
-    }, [featureType, storageKey, locale, tBrief, tQuizText]);
+    }, [docLocale, featureType, storageKey, locale, tBrief, tQuizText]);
 
     useEffect(() => {
         if (!isDraftHydrated) return;
@@ -1177,35 +1404,36 @@ const BriefPage = () => {
                 ? [
                       {
                           id: "ACORDANTE_1",
-                          role: "ACORDANTE 1",
+                          role: contractCopy.signer1Role,
                           organization:
-                              contractDraftState?.clientName?.trim() || "CONTRATANTE",
+                              contractDraftState?.clientName?.trim() ||
+                              contractCopy.clientLabel,
                           shortLabel: "AC",
                           fullName:
                               contractDraftState?.clientName?.trim() ||
-                              "CONTRATANTE",
+                              contractCopy.clientLabel,
                       },
                       {
                           id: "TESTEMUNHA_1",
-                          role: "TESTEMUNHA",
-                          fullName: "TESTEMUNHA 1",
+                          role: contractCopy.witnessRole,
+                          fullName: contractCopy.witness1Default,
                       },
                       {
                           id: "ACORDANTE_2",
-                          role: "ACORDANTE 2",
+                          role: contractCopy.signer2Role,
                           organization:
                               contractDraftState?.contractorName?.trim() ||
-                              "CONTRATADA",
-                          shortLabel: "Acordante 2",
+                              contractCopy.contractorLabel,
+                          shortLabel: contractCopy.signer2Short,
                           fullName:
                               contractDraftState?.contractorName?.trim() ||
-                              "CONTRATADA",
+                              contractCopy.contractorLabel,
                       },
                       {
                           id: "TESTEMUNHA_2",
-                          role: "TESTEMUNHA",
-                          shortLabel: "Testemunha 2",
-                          fullName: "TESTEMUNHA 2",
+                          role: contractCopy.witnessRole,
+                          shortLabel: contractCopy.witness2Short,
+                          fullName: contractCopy.witness2Default,
                       },
                   ]
                 : featureType === "prd"
@@ -1233,7 +1461,7 @@ const BriefPage = () => {
                           fullName: "Assinante 2",
                       },
                   ],
-        [featureType, contractDraftState?.clientName, contractDraftState?.contractorName]
+        [contractCopy, featureType, contractDraftState?.clientName, contractDraftState?.contractorName]
     );
 
     useEffect(() => {
@@ -1467,7 +1695,7 @@ const BriefPage = () => {
                     />
                     {featureType === "contract" && (
                         <div className="mt-10 border-t border-stroke2 pt-8">
-                        <div className="mb-4 text-h5">Assinaturas</div>
+                        <div className="mb-4 text-h5">{contractCopy.signaturesTitle}</div>
                         <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                             {signatureParticipants.map((participant) => (
                                 <div
@@ -1500,7 +1728,7 @@ const BriefPage = () => {
                                                     [participant.id]: e.target.value,
                                                 }))
                                             }
-                                            placeholder="Nome do assinante"
+                                            placeholder={contractCopy.signerNamePlaceholder}
                                         />
                                     ) : (
                                         <div className="mb-3 text-small text-t-primary">
@@ -1509,7 +1737,7 @@ const BriefPage = () => {
                                         </div>
                                     )}
                                     {signatures[participant.id] ? (
-                                        <div className="mb-3 inline-flex max-w-full rounded-lg bg-[#D1D5DB] p-1.5 dark:bg-[#4B5563]">
+                                        <div className="mb-3 inline-flex max-w-full rounded-lg bg-b-surface2 p-1.5">
                                             <Image
                                                 src={signatures[participant.id]}
                                                 alt={`Assinatura ${participant.role}`}
@@ -1519,7 +1747,7 @@ const BriefPage = () => {
                                             />
                                         </div>
                                     ) : (
-                                        <div className="mb-3 h-14 w-full rounded-lg border border-dashed border-stroke2" />
+                                        <div className="mb-3 h-14 w-full rounded-lg border border-dashed border-stroke2 bg-b-surface2" />
                                     )}
                                     {!isReadOnlyView && (
                                         <Button
@@ -1531,8 +1759,8 @@ const BriefPage = () => {
                                             }}
                                         >
                                             {signatures[participant.id]
-                                                ? "Assinar novamente"
-                                                : "Clique para assinar"}
+                                                ? contractCopy.signAgain
+                                                : contractCopy.clickToSign}
                                         </Button>
                                     )}
                                 </div>
@@ -1548,7 +1776,7 @@ const BriefPage = () => {
                     key={signatureModalVersion}
                     open={signatureModalOpen}
                     onClose={() => setSignatureModalOpen(false)}
-                    title="Assinatura eletrônica"
+                    title={contractCopy.signatureModalTitle}
                     signerName={signatureNames[activeSigner] || activeSigner}
                     onSave={(dataUrl) =>
                         setSignatures((prev) => ({

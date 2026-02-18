@@ -1,4 +1,5 @@
 import { type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 import Modal from "@/components/Modal";
 import Button from "@/components/Button";
 
@@ -17,6 +18,26 @@ const SignaturePadModal = ({
     onClose,
     onSave,
 }: SignaturePadModalProps) => {
+    const locale = useLocale();
+    const lang = locale.startsWith("es") ? "es" : locale.startsWith("en") ? "en" : "pt";
+    const textByLang = {
+        pt: {
+            signerPrefix: "Assinante",
+            clear: "Limpar",
+            confirm: "Confirmar assinatura",
+        },
+        en: {
+            signerPrefix: "Signer",
+            clear: "Clear",
+            confirm: "Confirm signature",
+        },
+        es: {
+            signerPrefix: "Firmante",
+            clear: "Limpiar",
+            confirm: "Confirmar firma",
+        },
+    } as const;
+    const copy = textByLang[lang];
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const isDrawingRef = useRef(false);
     const lastPointRef = useRef<{ x: number; y: number } | null>(null);
@@ -27,7 +48,8 @@ const SignaturePadModal = ({
         const canvas = canvasRef.current;
         const isDarkMode =
             typeof document !== "undefined" &&
-            document.documentElement.classList.contains("dark");
+            (document.documentElement.getAttribute("data-theme") === "dark" ||
+                document.documentElement.classList.contains("dark"));
         const ratio = window.devicePixelRatio || 1;
         const width = canvas.clientWidth;
         const height = canvas.clientHeight;
@@ -108,13 +130,13 @@ const SignaturePadModal = ({
             <div className="mb-6">
                 <div className="text-h5">{title}</div>
                 <div className="mt-1 text-body text-t-secondary">
-                    Assinante: {signerName}
+                    {copy.signerPrefix}: {signerName}
                 </div>
             </div>
-            <div className="rounded-2xl border border-stroke2 bg-b-surface1 p-3">
+            <div className="rounded-2xl border border-stroke2 bg-b-surface2 p-3">
                 <canvas
                     ref={canvasRef}
-                    className="h-52 w-full touch-none rounded-xl bg-white dark:bg-[#1A1A1A]"
+                    className="h-52 w-full touch-none rounded-xl bg-b-surface2"
                     onPointerDown={handlePointerDown}
                     onPointerMove={handlePointerMove}
                     onPointerUp={handlePointerUp}
@@ -122,9 +144,9 @@ const SignaturePadModal = ({
                 />
             </div>
             <div className="mt-6 flex items-center justify-end gap-3">
-                <Button onClick={handleClear}>Limpar</Button>
+                <Button onClick={handleClear}>{copy.clear}</Button>
                 <Button isPrimary disabled={!hasStroke} onClick={handleSave}>
-                    Confirmar assinatura
+                    {copy.confirm}
                 </Button>
             </div>
         </Modal>
