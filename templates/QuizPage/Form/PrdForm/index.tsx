@@ -6,23 +6,40 @@ import Icon from "@/components/Icon";
 import MyDatePicker from "@/components/MyDatePicker";
 import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
-const STEP_KEYS = [
-    "prdStep0",
-    "prdStepLang",
-    "prdStepDeadline",
-    "prdStep1",
-    "prdStep2",
-    "prdStepBackendAndAuth",
-    "prdStep5",
-    "prdStep6",
-    "prdStep7",
-    "prdStep8",
-] as const;
+type StepId =
+    | "platform"
+    | "language"
+    | "deadline"
+    | "webFramework"
+    | "webDesignLibrary"
+    | "mobileFramework"
+    | "mobileDesignLibrary"
+    | "backendAndAuth"
+    | "features"
+    | "integrations"
+    | "design"
+    | "projectDetails";
+
+const STEP_TITLE_KEYS: Record<StepId, string> = {
+    platform: "prdStep0",
+    language: "prdStepLang",
+    deadline: "prdStepDeadline",
+    webFramework: "prdStep1",
+    webDesignLibrary: "prdStepWebDesignLibrary",
+    mobileFramework: "prdStep2",
+    mobileDesignLibrary: "prdStepMobileDesignLibrary",
+    backendAndAuth: "prdStepBackendAndAuth",
+    features: "prdStep5",
+    integrations: "prdStep6",
+    design: "prdStep7",
+    projectDetails: "prdStep8",
+};
 
 const PLATFORM_OPTIONS = [
-    { id: 0, titleKey: "platformWeb" as const, descKey: "platformWebDesc" as const, icon: "align-right" as const },
-    { id: 1, titleKey: "platformMobile" as const, descKey: "platformMobileDesc" as const, icon: "mobile" as const },
-    { id: 2, titleKey: "platformWebAndMobile" as const, descKey: "platformWebAndMobileDesc" as const, icon: "post" as const },
+    { id: 0, titleKey: "platformWeb" as const, icon: "align-right" as const },
+    { id: 1, titleKey: "platformMobile" as const, icon: "mobile" as const },
+    { id: 2, titleKey: "platformWebAndMobile" as const, icon: "post" as const },
+    { id: 3, titleKey: "other" as const, icon: "edit" as const },
 ] as const;
 
 const cardClass = (active: boolean) =>
@@ -32,9 +49,108 @@ const cardClass = (active: boolean) =>
 
 const FEATURE_KEYS = ["featAuth", "featPayments", "featUpload", "featRealtime", "featOffline", "featExternalApis"] as const;
 const INTEGRATION_KEYS = ["payments", "ai", "external_api", "whatsapp"] as const;
+
+const WEB_FRAMEWORK_OPTIONS = [
+    { name: "Next.js", descKey: "webFrameworkNextDesc" as const },
+    { name: "Nuxt.js", descKey: "webFrameworkNuxtDesc" as const },
+    { name: "Remix", descKey: "webFrameworkRemixDesc" as const },
+    { name: "Astro", descKey: "webFrameworkAstroDesc" as const },
+    { name: "SvelteKit", descKey: "webFrameworkSveltekitDesc" as const },
+] as const;
+
+const MOBILE_FRAMEWORK_OPTIONS = [
+    { name: "Flutter", descKey: "mobileFrameworkFlutterDesc" as const },
+    { name: "React Native", descKey: "mobileFrameworkReactNativeDesc" as const },
+    { name: "Expo (React Native)", descKey: "mobileFrameworkExpoDesc" as const },
+    { name: "Ionic", descKey: "mobileFrameworkIonicDesc" as const },
+    { name: "Nativo (Swift/Kotlin)", descKey: "mobileFrameworkNativeDesc" as const },
+] as const;
+
+const WEB_DESIGN_LIBRARY_OPTIONS = [
+    { value: "tailwind", titleKey: "webDesignLibTailwind" as const, descKey: "webDesignLibTailwindDesc" as const },
+    { value: "mui", titleKey: "webDesignLibMui" as const, descKey: "webDesignLibMuiDesc" as const },
+    { value: "chakra", titleKey: "webDesignLibChakra" as const, descKey: "webDesignLibChakraDesc" as const },
+    { value: "shadcn", titleKey: "webDesignLibShadcn" as const, descKey: "webDesignLibShadcnDesc" as const },
+    { value: "other", titleKey: "other" as const, descKey: "webDesignLibOtherDesc" as const },
+] as const;
+
+const FLUTTER_DESIGN_LIBRARY_OPTIONS = [
+    { value: "material", titleKey: "mobileDesignLibMaterial" as const, descKey: "mobileDesignLibMaterialDesc" as const },
+    { value: "cupertino", titleKey: "mobileDesignLibCupertino" as const, descKey: "mobileDesignLibCupertinoDesc" as const },
+    { value: "other", titleKey: "other" as const, descKey: "mobileDesignLibOtherDesc" as const },
+] as const;
+
+const REACT_NATIVE_DESIGN_LIBRARY_OPTIONS = [
+    { value: "paper", titleKey: "mobileDesignLibPaper" as const, descKey: "mobileDesignLibPaperDesc" as const },
+    { value: "nativebase", titleKey: "mobileDesignLibNativebase" as const, descKey: "mobileDesignLibNativebaseDesc" as const },
+    { value: "tamagui", titleKey: "mobileDesignLibTamagui" as const, descKey: "mobileDesignLibTamaguiDesc" as const },
+    { value: "other", titleKey: "other" as const, descKey: "mobileDesignLibOtherDesc" as const },
+] as const;
+
+const IONIC_DESIGN_LIBRARY_OPTIONS = [
+    { value: "ionic", titleKey: "mobileDesignLibIonic" as const, descKey: "mobileDesignLibIonicDesc" as const },
+    { value: "material", titleKey: "mobileDesignLibMaterial" as const, descKey: "mobileDesignLibMaterialDesc" as const },
+    { value: "other", titleKey: "other" as const, descKey: "mobileDesignLibOtherDesc" as const },
+] as const;
+
+const NATIVE_DESIGN_LIBRARY_OPTIONS = [
+    { value: "material", titleKey: "mobileDesignLibMaterial" as const, descKey: "mobileDesignLibMaterialDesc" as const },
+    { value: "cupertino", titleKey: "mobileDesignLibCupertino" as const, descKey: "mobileDesignLibCupertinoDesc" as const },
+    { value: "other", titleKey: "other" as const, descKey: "mobileDesignLibOtherDesc" as const },
+] as const;
 type AuthSelection = {
     emailPassword: boolean;
     socialLogin: boolean;
+};
+type PrdDraft = {
+    activeId: number;
+    language: number | null;
+    languageOther: string;
+    platform: number | null;
+    platformOther: string;
+    webFramework: number | null;
+    webFrameworkOther: string;
+    webDesignLibrary: string | null;
+    webDesignLibraryOther: string;
+    mobileFramework: number | null;
+    mobileFrameworkOther: string;
+    mobileDesignLibrary: string | null;
+    mobileDesignLibraryOther: string;
+    backendTech: number | null;
+    authentication:
+        | number
+        | null
+        | {
+              emailPassword: boolean;
+              socialLogin: boolean;
+          };
+    features: Record<string, boolean>;
+    otherFeaturesTags: string[];
+    otherFeaturesInput: string;
+    integrations: Record<string, boolean>;
+    otherIntegrationsTags: string[];
+    otherIntegrationsInput: string;
+    projectDeadline: string;
+    designSystem: number | null;
+    theme: number | null;
+    icons: number | null;
+    customRules: string;
+};
+
+const DEFAULT_FEATURES: Record<string, boolean> = {
+    featAuth: false,
+    featPayments: false,
+    featUpload: false,
+    featRealtime: false,
+    featOffline: false,
+    featExternalApis: false,
+};
+
+const DEFAULT_INTEGRATIONS: Record<string, boolean> = {
+    payments: false,
+    ai: false,
+    external_api: false,
+    whatsapp: false,
 };
 
 const normalizeAuthentication = (value: unknown): AuthSelection => {
@@ -57,117 +173,116 @@ const normalizeAuthentication = (value: unknown): AuthSelection => {
 
 const PrdForm = () => {
     const t = useTranslations("quiz");
-    const initialDraft = useMemo(
-        () =>
-            loadDraft<{
-                activeId: number;
-                language: number | null;
-                languageOther: string;
-                platform: number | null;
-                webFramework: number | null;
-                webFrameworkOther: string;
-                mobileFramework: number | null;
-                mobileFrameworkOther: string;
-                backendTech: number | null;
-                authentication:
-                    | number
-                    | null
-                    | {
-                          emailPassword: boolean;
-                          socialLogin: boolean;
-                      };
-                features: Record<string, boolean>;
-                otherFeaturesTags: string[];
-                otherFeaturesInput: string;
-                integrations: Record<string, boolean>;
-                otherIntegrationsTags: string[];
-                otherIntegrationsInput: string;
-                projectDeadline: string;
-                designSystem: number | null;
-                theme: number | null;
-                icons: number | null;
-                customRules: string;
-            }>(DRAFT_KEYS.prdWizard),
-        []
-    );
     const [activeId, setActiveId] = useState(0);
+    const [isDraftHydrated, setIsDraftHydrated] = useState(false);
 
-    const [language, setLanguage] = useState<number | null>(
-        initialDraft?.language ?? null
-    );
-    const [languageOther, setLanguageOther] = useState(initialDraft?.languageOther ?? "");
-    const [platform, setPlatform] = useState<number | null>(initialDraft?.platform ?? null);
-    const [webFramework, setWebFramework] = useState<number | null>(
-        initialDraft?.webFramework ?? null
-    );
-    const [webFrameworkOther, setWebFrameworkOther] = useState(
-        initialDraft?.webFrameworkOther ?? ""
-    );
-    const [mobileFramework, setMobileFramework] = useState<number | null>(
-        initialDraft?.mobileFramework ?? null
-    );
-    const [mobileFrameworkOther, setMobileFrameworkOther] = useState(
-        initialDraft?.mobileFrameworkOther ?? ""
-    );
-    const [backendTech, setBackendTech] = useState<number | null>(
-        initialDraft?.backendTech ?? null
-    );
-    const [authentication, setAuthentication] = useState<AuthSelection>(
-        normalizeAuthentication(initialDraft?.authentication)
-    );
+    const [language, setLanguage] = useState<number | null>(null);
+    const [languageOther, setLanguageOther] = useState("");
+    const [platform, setPlatform] = useState<number | null>(null);
+    const [platformOther, setPlatformOther] = useState("");
+    const [webFramework, setWebFramework] = useState<number | null>(null);
+    const [webFrameworkOther, setWebFrameworkOther] = useState("");
+    const [webDesignLibrary, setWebDesignLibrary] = useState<string | null>(null);
+    const [webDesignLibraryOther, setWebDesignLibraryOther] = useState("");
+    const [mobileFramework, setMobileFramework] = useState<number | null>(null);
+    const [mobileFrameworkOther, setMobileFrameworkOther] = useState("");
+    const [mobileDesignLibrary, setMobileDesignLibrary] = useState<string | null>(null);
+    const [mobileDesignLibraryOther, setMobileDesignLibraryOther] = useState("");
+    const [backendTech, setBackendTech] = useState<number | null>(null);
+    const [authentication, setAuthentication] = useState<AuthSelection>({ emailPassword: false, socialLogin: false });
 
-    const [features, setFeatures] = useState<Record<string, boolean>>(
-        initialDraft?.features ?? {
-            featAuth: false,
-            featPayments: false,
-            featUpload: false,
-            featRealtime: false,
-            featOffline: false,
-            featExternalApis: false,
+    const [features, setFeatures] = useState<Record<string, boolean>>(DEFAULT_FEATURES);
+    const [otherFeaturesTags, setOtherFeaturesTags] = useState<string[]>([]);
+    const [otherFeaturesInput, setOtherFeaturesInput] = useState("");
+
+    const [integrations, setIntegrations] = useState<Record<string, boolean>>(DEFAULT_INTEGRATIONS);
+    const [otherIntegrationsTags, setOtherIntegrationsTags] = useState<string[]>([]);
+    const [otherIntegrationsInput, setOtherIntegrationsInput] = useState("");
+
+    const [projectDeadline, setProjectDeadline] = useState("");
+    const [designSystem, setDesignSystem] = useState<number | null>(null);
+    const [theme, setTheme] = useState<number | null>(null);
+    const [icons, setIcons] = useState<number | null>(null);
+    const [customRules, setCustomRules] = useState("");
+
+    const hasWeb = platform === 0 || platform === 2;
+    const hasMobile = platform === 1 || platform === 2;
+    const stepIds = useMemo<StepId[]>(() => {
+        const ids: StepId[] = ["platform", "language", "deadline"];
+        if (hasWeb) {
+            ids.push("webFramework", "webDesignLibrary");
         }
-    );
-    const [otherFeaturesTags, setOtherFeaturesTags] = useState<string[]>(
-        initialDraft?.otherFeaturesTags ?? []
-    );
-    const [otherFeaturesInput, setOtherFeaturesInput] = useState(
-        initialDraft?.otherFeaturesInput ?? ""
-    );
-
-    const [integrations, setIntegrations] = useState<Record<string, boolean>>(
-        initialDraft?.integrations ?? {
-            payments: false,
-            ai: false,
-            external_api: false,
-            whatsapp: false,
+        if (hasMobile) {
+            ids.push("mobileFramework", "mobileDesignLibrary");
         }
-    );
-    const [otherIntegrationsTags, setOtherIntegrationsTags] = useState<string[]>(
-        initialDraft?.otherIntegrationsTags ?? []
-    );
-    const [otherIntegrationsInput, setOtherIntegrationsInput] = useState(
-        initialDraft?.otherIntegrationsInput ?? ""
-    );
+        ids.push("backendAndAuth", "features", "integrations", "design", "projectDetails");
+        return ids;
+    }, [hasWeb, hasMobile]);
+    const totalSteps = stepIds.length;
+    const currentStepIndex = Math.max(0, Math.min(activeId, totalSteps - 1));
+    const currentStep = stepIds[currentStepIndex];
 
-    const [projectDeadline, setProjectDeadline] = useState(
-        initialDraft?.projectDeadline ?? ""
-    );
-    const [designSystem, setDesignSystem] = useState<number | null>(
-        initialDraft?.designSystem ?? null
-    );
-    const [theme, setTheme] = useState<number | null>(initialDraft?.theme ?? null);
-    const [icons, setIcons] = useState<number | null>(initialDraft?.icons ?? null);
-    const [customRules, setCustomRules] = useState(initialDraft?.customRules ?? "");
+    const mobileDesignLibraryOptions = useMemo(() => {
+        if (mobileFramework === 0) return FLUTTER_DESIGN_LIBRARY_OPTIONS;
+        if (mobileFramework === 1 || mobileFramework === 2) return REACT_NATIVE_DESIGN_LIBRARY_OPTIONS;
+        if (mobileFramework === 3) return IONIC_DESIGN_LIBRARY_OPTIONS;
+        if (mobileFramework === MOBILE_FRAMEWORK_OPTIONS.length) {
+            return [{ value: "other", titleKey: "other" as const, descKey: "mobileDesignLibOtherDesc" as const }];
+        }
+        return NATIVE_DESIGN_LIBRARY_OPTIONS;
+    }, [mobileFramework]);
 
     useEffect(() => {
+        const draft = loadDraft<PrdDraft>(DRAFT_KEYS.prdWizard);
+        queueMicrotask(() => {
+            if (draft) {
+                setActiveId(draft.activeId ?? 0);
+                setLanguage(draft.language ?? null);
+                setLanguageOther(draft.languageOther ?? "");
+                setPlatform(draft.platform ?? null);
+                setPlatformOther(draft.platformOther ?? "");
+                setWebFramework(draft.webFramework ?? null);
+                setWebFrameworkOther(draft.webFrameworkOther ?? "");
+                setWebDesignLibrary(draft.webDesignLibrary ?? null);
+                setWebDesignLibraryOther(draft.webDesignLibraryOther ?? "");
+                setMobileFramework(draft.mobileFramework ?? null);
+                setMobileFrameworkOther(draft.mobileFrameworkOther ?? "");
+                setMobileDesignLibrary(draft.mobileDesignLibrary ?? null);
+                setMobileDesignLibraryOther(draft.mobileDesignLibraryOther ?? "");
+                setBackendTech(draft.backendTech ?? null);
+                setAuthentication(normalizeAuthentication(draft.authentication));
+                setFeatures({ ...DEFAULT_FEATURES, ...(draft.features ?? {}) });
+                setOtherFeaturesTags(draft.otherFeaturesTags ?? []);
+                setOtherFeaturesInput(draft.otherFeaturesInput ?? "");
+                setIntegrations({ ...DEFAULT_INTEGRATIONS, ...(draft.integrations ?? {}) });
+                setOtherIntegrationsTags(draft.otherIntegrationsTags ?? []);
+                setOtherIntegrationsInput(draft.otherIntegrationsInput ?? "");
+                setProjectDeadline(draft.projectDeadline ?? "");
+                setDesignSystem(draft.designSystem ?? null);
+                setTheme(draft.theme ?? null);
+                setIcons(draft.icons ?? null);
+                setCustomRules(draft.customRules ?? "");
+            }
+            setIsDraftHydrated(true);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!isDraftHydrated) return;
         saveDraft(DRAFT_KEYS.prdWizard, {
-            activeId,
+            activeId: currentStepIndex,
             language,
             languageOther,
             platform,
+            platformOther,
             webFramework,
             webFrameworkOther,
+            webDesignLibrary,
+            webDesignLibraryOther,
             mobileFramework,
             mobileFrameworkOther,
+            mobileDesignLibrary,
+            mobileDesignLibraryOther,
             backendTech,
             authentication,
             features,
@@ -183,14 +298,20 @@ const PrdForm = () => {
             customRules,
         });
     }, [
-        activeId,
+        isDraftHydrated,
+        currentStepIndex,
         language,
         languageOther,
         platform,
+        platformOther,
         webFramework,
         webFrameworkOther,
+        webDesignLibrary,
+        webDesignLibraryOther,
         mobileFramework,
         mobileFrameworkOther,
+        mobileDesignLibrary,
+        mobileDesignLibraryOther,
         backendTech,
         authentication,
         features,
@@ -206,14 +327,12 @@ const PrdForm = () => {
         customRules,
     ]);
 
-    const totalSteps = STEP_KEYS.length;
-
     const handleNext = () => {
-        if (activeId < totalSteps - 1) setActiveId(activeId + 1);
+        if (currentStepIndex < totalSteps - 1) setActiveId(currentStepIndex + 1);
     };
 
     const handlePrevious = () => {
-        if (activeId > 0) setActiveId(activeId - 1);
+        if (currentStepIndex > 0) setActiveId(currentStepIndex - 1);
     };
 
     const toggleFeature = (key: string) => {
@@ -246,9 +365,6 @@ const PrdForm = () => {
         { id: 4, key: "langOther" as const },
     ];
 
-    const webFrameworks = ["Next.js", "Nuxt.js", "Remix", "Astro", "SvelteKit"];
-    const mobileFrameworks = ["Flutter", "React Native", "Expo", "Ionic", "Nativo (Swift/Kotlin)"];
-
     const integrationLabelKey: Record<string, string> = {
         payments: "integrationPayments",
         ai: "integrationAi",
@@ -260,15 +376,15 @@ const PrdForm = () => {
         <div className="flex flex-col w-full max-w-152 max-h-200 h-full max-3xl:max-w-127 max-3xl:max-h-169 max-xl:max-w-136 max-md:max-h-full">
             <div className="flex mb-20 max-3xl:mb-12 max-2xl:mb-10 max-md:flex-col-reverse max-md:mb-8">
                 <div className="grow text-h2 max-md:text-h3">
-                    {t(STEP_KEYS[activeId])}
+                    {t(STEP_TITLE_KEYS[currentStep])}
                 </div>
                 <div className="flex justify-center items-center shrink-0 w-16 h-7 mt-3 ml-8 border-[1.5px] border-primary2/15 bg-primary2/5 rounded-full text-button text-primary2 max-md:m-0 max-md:mb-4">
-                    {activeId + 1} / {totalSteps}
+                    {currentStepIndex + 1} / {totalSteps}
                 </div>
             </div>
             <div className="flex-1 min-h-0 flex flex-col">
-                {/* 0. Plataforma */}
-                {activeId === 0 && (
+                {/* Plataforma */}
+                {currentStep === "platform" && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                         {PLATFORM_OPTIONS.map((opt) => (
                             <div
@@ -276,16 +392,27 @@ const PrdForm = () => {
                                 className={cardClass(platform === opt.id)}
                                 onClick={() => setPlatform(opt.id)}
                             >
-                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name={opt.icon} />
-                                <div className="text-body-bold">{t(opt.titleKey)}</div>
-                                <div className="mt-2 text-body text-t-secondary leading-snug">{t(opt.descKey)}</div>
+                                <Icon className="mb-8 fill-inherit max-3xl:mb-5" name={opt.icon} />
+                                <div className="">{t(opt.titleKey)}</div>
                             </div>
                         ))}
                     </div>
                 )}
+                {currentStep === "platform" && platform === 3 && (
+                    <div className="mt-6">
+                        <Field
+                            label=""
+                            value={platformOther}
+                            onChange={(e) => setPlatformOther(e.target.value)}
+                            name="platform-other"
+                            placeholder={t("platformOtherPlaceholder")}
+                            maxLength={200}
+                        />
+                    </div>
+                )}
 
-                {/* 1. Idioma */}
-                {activeId === 1 && (
+                {/* Idioma */}
+                {currentStep === "language" && (
                     <>
                         <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
                             {langOptions.map((opt) => (
@@ -313,8 +440,8 @@ const PrdForm = () => {
                     </>
                 )}
 
-                {/* 2. Quando quer que o projeto esteja pronto */}
-                {activeId === 2 && (
+                {/* Prazo */}
+                {currentStep === "deadline" && (
                     <>
                         <MyDatePicker
                             value={projectDeadline}
@@ -326,27 +453,27 @@ const PrdForm = () => {
                     </>
                 )}
 
-                {/* 3. Framework web */}
-                {activeId === 3 && (
+                {/* Framework web */}
+                {currentStep === "webFramework" && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {webFrameworks.map((name, id) => (
+                        {WEB_FRAMEWORK_OPTIONS.map((option, id) => (
                             <div
                                 key={id}
                                 className={cardClass(webFramework === id)}
                                 onClick={() => setWebFramework(id)}
                             >
-                                <div className="">{name}</div>
+                                <div className="">{option.name}</div>
                             </div>
                         ))}
                         <div
-                            className={cardClass(webFramework === webFrameworks.length)}
-                            onClick={() => setWebFramework(webFrameworks.length)}
+                            className={cardClass(webFramework === WEB_FRAMEWORK_OPTIONS.length)}
+                            onClick={() => setWebFramework(WEB_FRAMEWORK_OPTIONS.length)}
                         >
                             <div className="">{t("other")}</div>
                         </div>
                     </div>
                 )}
-                {activeId === 3 && webFramework === webFrameworks.length && (
+                {currentStep === "webFramework" && webFramework === WEB_FRAMEWORK_OPTIONS.length && (
                     <div className="mt-6">
                         <Field
                             label=""
@@ -359,27 +486,57 @@ const PrdForm = () => {
                     </div>
                 )}
 
-                {/* 4. Framework mobile */}
-                {activeId === 4 && (
+                {/* Biblioteca web */}
+                {currentStep === "webDesignLibrary" && (
+                    <>
+                        <div className="mb-5 text-body text-t-secondary max-md:mb-4">{t("webDesignLibraryHint")}</div>
+                        <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                            {WEB_DESIGN_LIBRARY_OPTIONS.map((option) => (
+                                <div
+                                    key={option.value}
+                                    className={cardClass(webDesignLibrary === option.value)}
+                                    onClick={() => setWebDesignLibrary(option.value)}
+                                >
+                                    <div className="">{t(option.titleKey)}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+                {currentStep === "webDesignLibrary" && webDesignLibrary === "other" && (
+                    <div className="mt-6">
+                        <Field
+                            label=""
+                            value={webDesignLibraryOther}
+                            onChange={(e) => setWebDesignLibraryOther(e.target.value)}
+                            name="web-design-library-other"
+                            placeholder={t("webDesignLibraryOtherPlaceholder")}
+                            maxLength={200}
+                        />
+                    </div>
+                )}
+
+                {/* Framework mobile */}
+                {currentStep === "mobileFramework" && (
                     <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {mobileFrameworks.map((name, id) => (
+                        {MOBILE_FRAMEWORK_OPTIONS.map((option, id) => (
                             <div
                                 key={id}
                                 className={cardClass(mobileFramework === id)}
                                 onClick={() => setMobileFramework(id)}
                             >
-                                <div className="">{name}</div>
+                                <div className="">{option.name}</div>
                             </div>
                         ))}
                         <div
-                            className={cardClass(mobileFramework === mobileFrameworks.length)}
-                            onClick={() => setMobileFramework(mobileFrameworks.length)}
+                            className={cardClass(mobileFramework === MOBILE_FRAMEWORK_OPTIONS.length)}
+                            onClick={() => setMobileFramework(MOBILE_FRAMEWORK_OPTIONS.length)}
                         >
                             <div className="">{t("other")}</div>
                         </div>
                     </div>
                 )}
-                {activeId === 4 && mobileFramework === mobileFrameworks.length && (
+                {currentStep === "mobileFramework" && mobileFramework === MOBILE_FRAMEWORK_OPTIONS.length && (
                     <div className="mt-6">
                         <Field
                             label=""
@@ -392,8 +549,38 @@ const PrdForm = () => {
                     </div>
                 )}
 
-                {/* 5. Backend e autenticação */}
-                {activeId === 5 && (
+                {/* Biblioteca mobile */}
+                {currentStep === "mobileDesignLibrary" && (
+                    <>
+                        <div className="mb-5 text-body text-t-secondary max-md:mb-4">{t("mobileDesignLibraryHint")}</div>
+                        <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                            {mobileDesignLibraryOptions.map((option) => (
+                                <div
+                                    key={option.value}
+                                    className={cardClass(mobileDesignLibrary === option.value)}
+                                    onClick={() => setMobileDesignLibrary(option.value)}
+                                >
+                                    <div className="">{t(option.titleKey)}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
+                {currentStep === "mobileDesignLibrary" && mobileDesignLibrary === "other" && (
+                    <div className="mt-6">
+                        <Field
+                            label=""
+                            value={mobileDesignLibraryOther}
+                            onChange={(e) => setMobileDesignLibraryOther(e.target.value)}
+                            name="mobile-design-library-other"
+                            placeholder={t("mobileDesignLibraryOtherPlaceholder")}
+                            maxLength={200}
+                        />
+                    </div>
+                )}
+
+                {/* Backend e autenticação */}
+                {currentStep === "backendAndAuth" && (
                     <div className="space-y-8">
                         <div>
                             <div className="mb-3 text-body-bold text-t-primary">{t("prdSectionBackend")}</div>
@@ -432,8 +619,8 @@ const PrdForm = () => {
                     </div>
                 )}
 
-                {/* 6. Funcionalidades principais */}
-                {activeId === 6 && (
+                {/* Funcionalidades principais */}
+                {currentStep === "features" && (
                     <>
                         <div className="mb-5 text-body text-t-secondary max-md:mb-4">{t("featuresHint")}</div>
                         <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
@@ -496,8 +683,8 @@ const PrdForm = () => {
                     </>
                 )}
 
-                {/* 7. Integrações */}
-                {activeId === 7 && (
+                {/* Integrações */}
+                {currentStep === "integrations" && (
                     <>
                         <div className="mb-5 text-body text-t-secondary max-md:mb-4">{t("integrationsHint")}</div>
                         <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
@@ -560,8 +747,8 @@ const PrdForm = () => {
                     </>
                 )}
 
-                {/* 8. Design e tema */}
-                {activeId === 8 && (
+                {/* Design e tema */}
+                {currentStep === "design" && (
                     <div className="space-y-8">
                         <div>
                             <div className="mb-3 text-body-bold text-t-primary">{t("designSectionDesign")}</div>
@@ -608,8 +795,8 @@ const PrdForm = () => {
                     </div>
                 )}
 
-                {/* 9. Regras */}
-                {activeId === 9 && (
+                {/* Projeto */}
+                {currentStep === "projectDetails" && (
                     <>
                         <p className="mb-4 text-body text-t-secondary">
                             {t("customRulesHint")}
@@ -633,7 +820,7 @@ const PrdForm = () => {
                 )}
             </div>
             <div className="flex mt-auto pt-10 max-md:-mx-1 max-md:pt-6">
-                {activeId > 0 && (
+                {currentStepIndex > 0 && (
                     <Button
                         className="min-w-40 max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
                         isStroke
@@ -642,7 +829,7 @@ const PrdForm = () => {
                         {t("previous")}
                     </Button>
                 )}
-                {activeId === 9 ? (
+                {currentStep === "projectDetails" ? (
                     customRules.length >= 100 ? (
                         <Button
                             className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
