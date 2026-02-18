@@ -249,6 +249,7 @@
         "featOffline": "Offline mode",
         "featExternalApis": "External API integrations",
         "otherFeaturesPlaceholder": "Type each feature and separate by comma",
+        "otherIntegrationsPlaceholder": "Type each integration and separate by comma",
         "webFrameworkOtherPlaceholder": "e.g. Angular, Vue.js, other framework",
         "mobileFrameworkOtherPlaceholder": "e.g. Xamarin, other framework or technology",
         "designSystemYes": "Yes, generate design system",

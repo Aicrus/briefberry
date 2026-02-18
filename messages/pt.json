@@ -249,6 +249,7 @@
         "featOffline": "Modo offline",
         "featExternalApis": "Integrações com APIs externas",
         "otherFeaturesPlaceholder": "Digite cada funcionalidade e separe por vírgula",
+        "otherIntegrationsPlaceholder": "Digite cada integração e separe por vírgula",
         "webFrameworkOtherPlaceholder": "ex: Angular, Vue.js, outro framework",
         "mobileFrameworkOtherPlaceholder": "ex: Xamarin, outro framework ou tecnologia",
         "designSystemYes": "Sim, gerar design system",
@@ -267,7 +268,7 @@
         "designSectionIcons": "Ícones",
         "customRules": "Regras de negócio e observações técnicas",
         "customRulesPlaceholder": "ex: Permissões de usuário, fluxos de trabalho, requisitos técnicos...",
-        "customRulesHint": "Detalhe ao máximo o seu projeto aqui. Quanto mais informações, melhor o PRD gerado.",
+        "customRulesHint": "Descreva seu projeto com o máximo de detalhes possível. Essas informações são essenciais para gerar um PRD mais completo e preciso. Detalhe ao máximo o seu projeto aqui. Quanto mais informações, melhor o PRD gerado.",
         "charCountMinMax": "mín. {min} e máx. {max} caracteres",
         "charCount": "{current} / {max} caracteres",
         "minCharsToContinue": "Digite pelo menos 100 caracteres para continuar."

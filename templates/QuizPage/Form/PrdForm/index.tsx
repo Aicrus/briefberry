@@ -32,6 +32,28 @@ const cardClass = (active: boolean) =>
 
 const FEATURE_KEYS = ["featAuth", "featPayments", "featUpload", "featRealtime", "featOffline", "featExternalApis"] as const;
 const INTEGRATION_KEYS = ["payments", "ai", "external_api", "whatsapp"] as const;
+type AuthSelection = {
+    emailPassword: boolean;
+    socialLogin: boolean;
+};
+
+const normalizeAuthentication = (value: unknown): AuthSelection => {
+    if (typeof value === "number") {
+        if (value === 1) return { emailPassword: true, socialLogin: false };
+        if (value === 2) return { emailPassword: false, socialLogin: true };
+        return { emailPassword: false, socialLogin: false };
+    }
+
+    if (value && typeof value === "object") {
+        const auth = value as Partial<AuthSelection>;
+        return {
+            emailPassword: Boolean(auth.emailPassword),
+            socialLogin: Boolean(auth.socialLogin),
+        };
+    }
+
+    return { emailPassword: false, socialLogin: false };
+};
 
 const PrdForm = () => {
     const t = useTranslations("quiz");
@@ -47,11 +69,19 @@ const PrdForm = () => {
                 mobileFramework: number | null;
                 mobileFrameworkOther: string;
                 backendTech: number | null;
-                authentication: number | null;
+                authentication:
+                    | number
+                    | null
+                    | {
+                          emailPassword: boolean;
+                          socialLogin: boolean;
+                      };
                 features: Record<string, boolean>;
                 otherFeaturesTags: string[];
                 otherFeaturesInput: string;
                 integrations: Record<string, boolean>;
+                otherIntegrationsTags: string[];
+                otherIntegrationsInput: string;
                 projectDeadline: string;
                 designSystem: number | null;
                 theme: number | null;
@@ -82,8 +112,8 @@ const PrdForm = () => {
     const [backendTech, setBackendTech] = useState<number | null>(
         initialDraft?.backendTech ?? null
     );
-    const [authentication, setAuthentication] = useState<number | null>(
-        initialDraft?.authentication ?? null
+    const [authentication, setAuthentication] = useState<AuthSelection>(
+        normalizeAuthentication(initialDraft?.authentication)
     );
 
     const [features, setFeatures] = useState<Record<string, boolean>>(
@@ -110,6 +140,12 @@ const PrdForm = () => {
             external_api: false,
             whatsapp: false,
         }
+    );
+    const [otherIntegrationsTags, setOtherIntegrationsTags] = useState<string[]>(
+        initialDraft?.otherIntegrationsTags ?? []
+    );
+    const [otherIntegrationsInput, setOtherIntegrationsInput] = useState(
+        initialDraft?.otherIntegrationsInput ?? ""
     );
 
     const [projectDeadline, setProjectDeadline] = useState(
@@ -138,6 +174,8 @@ const PrdForm = () => {
             otherFeaturesTags,
             otherFeaturesInput,
             integrations,
+            otherIntegrationsTags,
+            otherIntegrationsInput,
             projectDeadline,
             designSystem,
             theme,
@@ -159,6 +197,8 @@ const PrdForm = () => {
         otherFeaturesTags,
         otherFeaturesInput,
         integrations,
+        otherIntegrationsTags,
+        otherIntegrationsInput,
         projectDeadline,
         designSystem,
         theme,
@@ -182,6 +222,20 @@ const PrdForm = () => {
 
     const toggleIntegration = (key: string) => {
         setIntegrations((prev) => ({ ...prev, [key]: !prev[key] }));
+    };
+
+    const toggleAuthentication = (id: number) => {
+        if (id === 0) {
+            setAuthentication({ emailPassword: false, socialLogin: false });
+            return;
+        }
+
+        if (id === 1) {
+            setAuthentication((prev) => ({ ...prev, emailPassword: !prev.emailPassword }));
+            return;
+        }
+
+        setAuthentication((prev) => ({ ...prev, socialLogin: !prev.socialLogin }));
     };
 
     const langOptions = [
@@ -361,8 +415,14 @@ const PrdForm = () => {
                                 {[0, 1, 2].map((id) => (
                                     <div
                                         key={id}
-                                        className={cardClass(authentication === id)}
-                                        onClick={() => setAuthentication(id)}
+                                        className={cardClass(
+                                            id === 0
+                                                ? !authentication.emailPassword && !authentication.socialLogin
+                                                : id === 1
+                                                  ? authentication.emailPassword
+                                                  : authentication.socialLogin
+                                        )}
+                                        onClick={() => toggleAuthentication(id)}
                                     >
                                         <div className="">{t(id === 0 ? "authNone" : id === 1 ? "authEmailPassword" : "authSocialLogin")}</div>
                                     </div>
@@ -450,6 +510,52 @@ const PrdForm = () => {
                                     <div className="">{t(integrationLabelKey[key])}</div>
                                 </div>
                             ))}
+                        </div>
+                        <div className="mt-6">
+                            <div className="min-h-40 w-full rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1 px-4 py-4 focus-within:border-[#A8A8A8]/50">
+                                <div className="flex flex-wrap gap-2">
+                                    {otherIntegrationsTags.map((tag, index) => (
+                                        <span
+                                            key={`${tag}-${index}`}
+                                            className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-stroke1 bg-b-surface2 pl-3 pr-1.5 py-1.5 text-body text-t-primary"
+                                        >
+                                            {tag}
+                                            <button
+                                                type="button"
+                                                onClick={() => setOtherIntegrationsTags((prev) => prev.filter((_, i) => i !== index))}
+                                                className="flex size-6 items-center justify-center rounded-full fill-t-secondary transition-colors hover:bg-b-surface3 hover:fill-t-primary"
+                                                aria-label="Remover"
+                                            >
+                                                <Icon className="size-3.5 fill-inherit" name="close" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                    <input
+                                        type="text"
+                                        value={otherIntegrationsInput}
+                                        onChange={(e) => setOtherIntegrationsInput(e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" || e.key === ",") {
+                                                e.preventDefault();
+                                                const parts = otherIntegrationsInput.split(",").map((s) => s.trim()).filter(Boolean);
+                                                if (parts.length > 0) {
+                                                    setOtherIntegrationsTags((prev) => [...prev, ...parts]);
+                                                    setOtherIntegrationsInput("");
+                                                }
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            const parts = otherIntegrationsInput.split(",").map((s) => s.trim()).filter(Boolean);
+                                            if (parts.length > 0) {
+                                                setOtherIntegrationsTags((prev) => [...prev, ...parts]);
+                                                setOtherIntegrationsInput("");
+                                            }
+                                        }}
+                                        placeholder={otherIntegrationsTags.length === 0 ? t("otherIntegrationsPlaceholder") : ""}
+                                        className="min-w-48 flex-1 shrink-0 border-0 bg-transparent px-1 py-1 text-body font-medium text-t-primary outline-0 placeholder:text-t-tertiary"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </>
                 )}
