@@ -286,7 +286,7 @@ const ContractForm = () => {
                                         }}
                                         className={`rounded-full border-[1.5px] px-4 py-2 text-hairline font-medium text-t-secondary transition-all cursor-pointer hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary ${
                                             contractorDocType === id
-                                                ? "border-stroke-focus text-t-primary"
+                                                ? "border-stroke-focus! hover:border-stroke-focus! text-t-primary"
                                                 : "border-stroke1"
                                         }`}
                                     >
@@ -361,7 +361,7 @@ const ContractForm = () => {
                                         }}
                                         className={`rounded-full border-[1.5px] px-4 py-2 text-hairline font-medium text-t-secondary transition-all cursor-pointer hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary ${
                                             clientDocType === id
-                                                ? "border-stroke-focus text-t-primary"
+                                                ? "border-stroke-focus! hover:border-stroke-focus! text-t-primary"
                                                 : "border-stroke1"
                                         }`}
                                     >
