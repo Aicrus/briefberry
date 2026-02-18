@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import Layout from "@/components/Layout";
 import Button from "@/components/Button";
@@ -14,8 +14,6 @@ import useEventsStore from "@/store/useEventsStore";
 import { DRAFT_KEYS, loadDraft } from "@/lib/draftStorage";
 import { digitsToNumber, type CurrencyId } from "@/lib/currency";
 import Actions from "./Actions";
-
-import { content } from "./content";
 
 const contractContent = {
     introduction: (
@@ -396,12 +394,12 @@ type SignatureParticipant = {
     fullName: string;
 };
 
-const PROPOSAL_TYPE_LABELS: Record<number, string> = {
-    0: "Desenvolvimento de Aplicativo Web",
-    1: "Desenvolvimento de Aplicativo Mobile",
-    2: "Design de Interface (UI/UX)",
-    3: "Desenvolvimento de Logomarca e Branding",
-    4: "Desenvolvimento de Landing Page",
+const PROPOSAL_TYPE_KEYS: Record<number, string> = {
+    0: "typeWebApp",
+    1: "typeMobileApp",
+    2: "typeUiDesign",
+    3: "typeBranding",
+    4: "typeLandingPage",
 };
 
 type ProposalTypeDraft = { active: number | null; otherType: string };
@@ -432,36 +430,71 @@ const CURRENCY_SYMBOL_BY_ID: Record<number, string> = {
     2: "€",
 };
 
-const BILLING_MODEL_LABEL: Record<number, string> = {
-    0: "Preço fechado",
-    1: "Por funcionalidade",
-    2: "Por etapa",
-};
+type TranslateFn = (
+    key: string,
+    values?: Record<string, string | number>
+) => string;
 
-const PAYMENT_METHOD_LABEL: Record<number, string> = {
-    0: "50% na entrada e 50% na entrega",
-    1: "Pagamento por etapa",
-};
-
-function resolveProposalTypeLabel(draft: ProposalTypeDraft | null): string {
-    if (!draft) return "Desenvolvimento Digital";
+function resolveProposalTypeLabel(
+    draft: ProposalTypeDraft | null,
+    tQuiz: TranslateFn,
+    tBrief: TranslateFn
+): string {
+    if (!draft) return tBrief("proposalDefaultTypeLabel");
     if (draft.active === 5 && draft.otherType?.trim()) {
         return draft.otherType.trim();
     }
-    if (draft.active != null && PROPOSAL_TYPE_LABELS[draft.active]) {
-        return PROPOSAL_TYPE_LABELS[draft.active];
+    if (draft.active != null && PROPOSAL_TYPE_KEYS[draft.active]) {
+        return tQuiz(PROPOSAL_TYPE_KEYS[draft.active]);
     }
-    return "Desenvolvimento Digital";
+    return tBrief("proposalDefaultTypeLabel");
+}
+
+function resolveBillingModelLabel(
+    model: number | null | undefined,
+    tQuiz: TranslateFn,
+    tBrief: TranslateFn
+): string {
+    if (model === 0) return tQuiz("billingFixedPrice");
+    if (model === 1) return tQuiz("billingPerFeature");
+    if (model === 2) return tQuiz("billingPerStage");
+    return tBrief("proposalToDefine");
+}
+
+function resolvePaymentMethodLabel(
+    method: number | null | undefined,
+    tQuiz: TranslateFn,
+    tBrief: TranslateFn
+): string {
+    if (method === 0) return tQuiz("payment5050");
+    if (method === 1) return tQuiz("paymentPerStage");
+    if (method === 2) return tQuiz("paymentOnDelivery");
+    if (method === 3) return tQuiz("paymentDepositMilestones");
+    return tBrief("proposalToDefine");
 }
 
 function formatProposalBudget(
     digits: string | undefined,
-    currency: number | null | undefined
+    currency: number | null | undefined,
+    undefinedLabel: string
 ): string {
-    if (!digits) return "A definir";
+    if (!digits) return undefinedLabel;
     const currencyId = ((currency ?? 1) as CurrencyId) || 1;
     const symbol = CURRENCY_SYMBOL_BY_ID[currencyId] ?? "US$";
     const amount = digitsToNumber(digits);
+    const formatted = amount.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+    return `${symbol} ${formatted}`;
+}
+
+function formatProposalBudgetFromAmount(
+    amount: number,
+    currency: number | null | undefined
+): string {
+    const currencyId = ((currency ?? 1) as CurrencyId) || 1;
+    const symbol = CURRENCY_SYMBOL_BY_ID[currencyId] ?? "US$";
     const formatted = amount.toLocaleString("pt-BR", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
@@ -474,26 +507,50 @@ function buildProposalContentFromDrafts(
     wizardDraft: ProposalWizardDraft | null,
     budgetDraft: ProposalBudgetItem[] | null,
     referenceLinks: string[] | null,
-    referenceImages: string[] | null
+    referenceImages: string[] | null,
+    tBrief: TranslateFn,
+    tQuiz: TranslateFn
 ): ProposalContentShape {
-    const projectName = wizardDraft?.projectName?.trim() || "Projeto";
+    const projectName =
+        wizardDraft?.projectName?.trim() || tBrief("proposalProjectNameFallback");
+    const projectType = resolveProposalTypeLabel(typeDraft, tQuiz, tBrief);
     const projectGoals =
         wizardDraft?.projectGoals?.trim() ||
-        "Escopo e objetivos detalhados serão definidos com base no direcionamento do cliente.";
-    const deadline = wizardDraft?.date?.trim() || "A definir";
+        tBrief("proposalGoalsFallback");
+    const deadline = wizardDraft?.date?.trim() || tBrief("proposalToDefine");
     const totalBudget = formatProposalBudget(
         wizardDraft?.yourBudget,
-        wizardDraft?.currency
+        wizardDraft?.currency,
+        tBrief("proposalToDefine")
     );
-    const billingModel =
-        wizardDraft?.billingModel != null
-            ? BILLING_MODEL_LABEL[wizardDraft.billingModel] || "A definir"
-            : "A definir";
-    const paymentMethod =
-        wizardDraft?.paymentMethod != null
-            ? PAYMENT_METHOD_LABEL[wizardDraft.paymentMethod] || "A definir"
-            : "A definir";
+    const billingModel = resolveBillingModelLabel(
+        wizardDraft?.billingModel,
+        tQuiz,
+        tBrief
+    );
+    const paymentMethod = resolvePaymentMethodLabel(
+        wizardDraft?.paymentMethod,
+        tQuiz,
+        tBrief
+    );
     const paymentNotes = wizardDraft?.billingAndPaymentOther?.trim() || "";
+    const totalBudgetAmount = wizardDraft?.yourBudget
+        ? digitsToNumber(wizardDraft.yourBudget)
+        : null;
+    const discounted24h =
+        totalBudgetAmount !== null
+            ? formatProposalBudgetFromAmount(
+                  totalBudgetAmount * 0.9,
+                  wizardDraft?.currency
+              )
+            : tBrief("proposalToDefine");
+    const discounted48h =
+        totalBudgetAmount !== null
+            ? formatProposalBudgetFromAmount(
+                  totalBudgetAmount * 0.95,
+                  wizardDraft?.currency
+              )
+            : tBrief("proposalToDefine");
     const scopes =
         budgetDraft
             ?.filter((item) => item.scope?.trim())
@@ -502,8 +559,12 @@ function buildProposalContentFromDrafts(
         budgetDraft
             ?.filter((item) => item.scope?.trim() || item.budget?.trim())
             .map((item) => ({
-                scope: item.scope?.trim() || "Etapa",
-                budget: formatProposalBudget(item.budget, wizardDraft?.currency),
+                scope: item.scope?.trim() || tBrief("proposalStageFallback"),
+                budget: formatProposalBudget(
+                    item.budget,
+                    wizardDraft?.currency,
+                    tBrief("proposalToDefine")
+                ),
             })) ?? [];
     const links = (referenceLinks ?? []).filter((link) => link?.trim());
 
@@ -511,34 +572,32 @@ function buildProposalContentFromDrafts(
         introduction: (
             <div className="space-y-3">
                 <p>
-                    Conforme alinhado em nossa conversa inicial, apresentamos esta
-                    proposta para o projeto{" "}
+                    {tBrief("proposalIntroLine1")}{" "}
                     <span className="text-[1.08rem] font-semibold">
                         {projectName}
                     </span>
                     .
                 </p>
                 <p>
-                    O foco é entregar uma solução moderna, funcional e preparada
-                    para evolução contínua, com impacto de negócio e excelente
-                    experiência do usuário.
+                    <strong>{tBrief("proposalProjectTypeLabel")}</strong>{" "}
+                    {projectType}.
                 </p>
+                <p>{tBrief("proposalIntroLine2")}</p>
             </div>
         ),
         goals: (
             <div className="space-y-3">
                 <p>{projectGoals}</p>
                 <p>
-                    <strong>Resultado esperado:</strong> produto funcional,
-                    atraente e pronto para validação de mercado, com base nas
-                    prioridades definidas pelo cliente.
+                    <strong>{tBrief("proposalExpectedResultLabel")}</strong>{" "}
+                    {tBrief("proposalExpectedResultText")}
                 </p>
             </div>
         ),
         timeline: (
             <div className="space-y-3">
                 <p>
-                    <strong>Funcionalidades do MVP</strong>
+                    <strong>{tBrief("proposalMvpFeaturesLabel")}</strong>
                 </p>
                 {scopes.length > 0 ? (
                     <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
@@ -548,36 +607,40 @@ function buildProposalContentFromDrafts(
                     </ul>
                 ) : (
                     <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                        <li>Planejamento funcional e arquitetura da solução.</li>
-                        <li>Implementação das funcionalidades prioritárias do MVP.</li>
-                        <li>Ajustes de usabilidade, testes e refinamentos finais.</li>
+                        <li>{tBrief("proposalDefaultScopeLine1")}</li>
+                        <li>{tBrief("proposalDefaultScopeLine2")}</li>
+                        <li>{tBrief("proposalDefaultScopeLine3")}</li>
                     </ul>
                 )}
                 <p>
-                    <strong>Prazo previsto:</strong> {deadline}.
+                    <strong>{tBrief("proposalDeadlineLabel")}</strong> {deadline}.
                 </p>
             </div>
         ),
         budget: (
             <div className="space-y-3">
                 <p>
-                    <strong>Total estimado:</strong> {totalBudget}.
+                    <strong>{tBrief("proposalTotalEstimatedLabel")}</strong>{" "}
+                    {totalBudget}.
                 </p>
                 <p>
-                    <strong>Modelo de cobrança:</strong> {billingModel}.
+                    <strong>{tBrief("proposalBillingModelLabel")}</strong>{" "}
+                    {billingModel}.
                 </p>
                 <p>
-                    <strong>Forma de pagamento:</strong> {paymentMethod}.
+                    <strong>{tBrief("proposalPaymentMethodLabel")}</strong>{" "}
+                    {paymentMethod}.
                 </p>
                 {paymentNotes && (
                     <p>
-                        <strong>Observações comerciais:</strong> {paymentNotes}
+                        <strong>{tBrief("proposalCommercialNotesLabel")}</strong>{" "}
+                        {paymentNotes}
                     </p>
                 )}
                 {stageBudgetRows.length > 0 && (
                     <>
                         <p>
-                            <strong>Composição por etapa</strong>
+                            <strong>{tBrief("proposalStageCompositionLabel")}</strong>
                         </p>
                         <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
                             {stageBudgetRows.map((row, index) => (
@@ -608,14 +671,9 @@ function buildProposalContentFromDrafts(
                         ))}
                     </ul>
                 ) : (
-                    <p>
-                        Nenhum link de referência foi informado até o momento.
-                    </p>
+                    <p>{tBrief("proposalNoReferenceLinks")}</p>
                 )}
-                <p>
-                    As referências orientam decisões de design, posicionamento e
-                    experiência da solução proposta.
-                </p>
+                <p>{tBrief("proposalReferencesHelper")}</p>
             </div>
         ),
         conclusion: (
@@ -623,26 +681,18 @@ function buildProposalContentFromDrafts(
                 <div className="rounded-2xl border border-primary2/20 bg-primary2/5 p-4">
                     <ul className="list-disc pl-6 space-y-1 [&>li]:leading-7">
                         <li>
-                            Confirmação em até 24 horas após envio da proposta:
-                            <strong> 10% de desconto</strong>. Valor final: US$
-                            10.665.
+                            {tBrief("proposalSpecialCondition24h")}
+                            <strong> 10%</strong>. {tBrief("proposalFinalValueLabel")}{" "}
+                            {discounted24h}.
                         </li>
                         <li>
-                            Confirmação em até 48 horas:
-                            <strong> 5% de desconto</strong>. Valor final: US$
-                            11.257,50.
-                        </li>
-                        <li>
-                            Publicação em lojas (Google Play e App Store) é
-                            opcional, com valor único de US$ 700, incluindo capas
-                            e preparação técnica.
+                            {tBrief("proposalSpecialCondition48h")}
+                            <strong> 5%</strong>. {tBrief("proposalFinalValueLabel")}{" "}
+                            {discounted48h}.
                         </li>
                     </ul>
                 </div>
-                <p>
-                    Ficamos à disposição para ajustar qualquer ponto e avançar da
-                    forma mais adequada ao seu contexto.
-                </p>
+                <p>{tBrief("proposalClosingText")}</p>
             </div>
         ),
         images: (referenceImages ?? []).slice(0, 4),
@@ -652,6 +702,19 @@ function buildProposalContentFromDrafts(
 const BriefPage = () => {
     const t = useTranslations("brief");
     const tQuiz = useTranslations("quiz");
+    const locale = useLocale();
+    const tBrief = useMemo<TranslateFn>(
+        () =>
+            ((key: string, values?: Record<string, string | number>) =>
+                t(key as never, values as never)) as TranslateFn,
+        [t]
+    );
+    const tQuizText = useMemo<TranslateFn>(
+        () =>
+            ((key: string, values?: Record<string, string | number>) =>
+                tQuiz(key as never, values as never)) as TranslateFn,
+        [tQuiz]
+    );
     const isPremiumPlan = useEventsStore((state) => state.isPremiumPlan);
     const searchParams = useSearchParams();
     const feature = searchParams.get("feature");
@@ -669,14 +732,31 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "/quiz/prd?edit=1"
             : "/quiz?edit=1";
+    const defaultProposalTitle = t("proposalDocumentTitle", {
+        type: t("proposalDefaultTypeLabel"),
+    });
+    const defaultProposalContent = useMemo(
+        () =>
+            buildProposalContentFromDrafts(
+                null,
+                null,
+                null,
+                null,
+                null,
+                tBrief,
+                tQuizText
+            ),
+        [tBrief, tQuizText]
+    );
     const documentTitle =
         featureType === "contract"
             ? "Contrato de Desenvolvimento de Aplicativo"
             : featureType === "prd"
             ? t("prdTitle")
-            : "Proposta Comercial de Desenvolvimento Digital";
-    const [proposalContentState, setProposalContentState] =
-        useState<ProposalContentShape>(content);
+            : defaultProposalTitle;
+    const [proposalContentState, setProposalContentState] = useState<ProposalContentShape>(
+        defaultProposalContent
+    );
     const displayedContent =
         featureType === "contract"
             ? contractContent
@@ -704,22 +784,22 @@ const BriefPage = () => {
                       conclusion: tQuiz("prdStep8"),
                   }
                 : {
-                      introduction: "Resumo da Proposta",
-                      goals: "Objetivos e Resultado Esperado",
-                      timeline: "Escopo e Funcionalidades",
-                      budget: "Investimento e Prazos",
-                      references: "Referências e Materiais",
-                      conclusion: "Condições e Próximos Passos",
+                      introduction: t("proposalSectionSummary"),
+                      goals: t("proposalSectionGoals"),
+                      timeline: t("proposalSectionScope"),
+                      budget: t("proposalSectionInvestment"),
+                      references: t("proposalSectionReferences"),
+                      conclusion: t("proposalSectionConditions"),
                   },
-        [featureType, tQuiz]
+        [featureType, t, tQuiz]
     );
     const subtitleDefault =
         featureType === "contract"
             ? "Contrato"
             : featureType === "prd"
             ? "PRD"
-            : "Proposta";
-    const storageKey = `briefberry:doc-edit:${featureType}:v10`;
+            : t("proposal");
+    const storageKey = `briefberry:doc-edit:${featureType}:v12`;
 
     const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
     const [editableSubtitle, setEditableSubtitle] = useState(subtitleDefault);
@@ -807,27 +887,41 @@ const BriefPage = () => {
                     proposalWizardDraft,
                     proposalBudgetDraft,
                     proposalReferencesDraft,
-                    proposalReferenceImagesDraft
+                    proposalReferenceImagesDraft,
+                    tBrief,
+                    tQuizText
                 );
                 setProposalContentState(dynamicProposalContent);
                 if (!hasPersistedReferenceImages) {
                     setEditableReferenceImages(dynamicProposalContent.images);
                 }
 
-                const typeLabel = resolveProposalTypeLabel(proposalTypeDraft);
-                const dynamicTitle = `Proposta Comercial de ${typeLabel}`;
+                const typeLabel = resolveProposalTypeLabel(
+                    proposalTypeDraft,
+                    tQuizText,
+                    tBrief
+                );
+                const dynamicTitle = tBrief("proposalDocumentTitle", {
+                    type: typeLabel,
+                });
+                const isLegacyModelTitle =
+                    persistedTitleValue === "Proposta Modelo 2026" ||
+                    persistedTitleValue === "Proposal Model 2026" ||
+                    persistedTitleValue === "Propuesta Modelo 2026";
+                const isLegacyDynamicTitle = /^(Proposta Comercial de|Commercial Proposal for|Propuesta Comercial de)\s/i.test(
+                    persistedTitleValue
+                );
                 const shouldOverrideTitle =
                     !hasPersistedTitle ||
-                    persistedTitleValue === "Proposta Modelo 2026" ||
-                    persistedTitleValue ===
-                        "Proposta Comercial de Desenvolvimento Digital";
+                    isLegacyModelTitle ||
+                    isLegacyDynamicTitle;
                 if (shouldOverrideTitle) {
                     setEditableDocumentTitle(dynamicTitle);
                 }
             }
             setIsDraftHydrated(true);
         }
-    }, [featureType, storageKey]);
+    }, [featureType, storageKey, locale, tBrief, tQuizText]);
 
     useEffect(() => {
         if (!isDraftHydrated) return;

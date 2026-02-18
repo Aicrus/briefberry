@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 import Field from "@/components/Field";
@@ -14,19 +14,27 @@ const types = [
 
 const TypeBrief = ({}) => {
     const t = useTranslations("quiz");
-    const initialDraft = useMemo(
-        () =>
-            loadDraft<{ active: number | null; otherType: string }>(
-                DRAFT_KEYS.proposalTypeBrief
-            ),
-        []
-    );
-    const [active, setActive] = useState<number | null>(initialDraft?.active ?? null);
-    const [otherType, setOtherType] = useState(initialDraft?.otherType ?? "");
+    const [active, setActive] = useState<number | null>(null);
+    const [otherType, setOtherType] = useState("");
+    const [isDraftHydrated, setIsDraftHydrated] = useState(false);
 
     useEffect(() => {
+        const draft = loadDraft<{ active: number | null; otherType: string }>(
+            DRAFT_KEYS.proposalTypeBrief
+        );
+        queueMicrotask(() => {
+            if (draft) {
+                setActive(draft.active ?? null);
+                setOtherType(draft.otherType ?? "");
+            }
+            setIsDraftHydrated(true);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (!isDraftHydrated) return;
         saveDraft(DRAFT_KEYS.proposalTypeBrief, { active, otherType });
-    }, [active, otherType]);
+    }, [active, otherType, isDraftHydrated]);
 
     return (
         <>

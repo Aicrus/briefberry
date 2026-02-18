@@ -3,11 +3,9 @@ import { useTranslations } from "next-intl";
 import Icon from "@/components/Icon";
 import Image from "@/components/Image";
 import Field from "@/components/Field";
-import Button from "@/components/Button";
 import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 const MAX_IMAGES = 4;
-const MAX_LINKS = 2;
 
 function fileToDataUrl(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -21,9 +19,6 @@ function fileToDataUrl(file: File): Promise<string> {
 const References = ({}) => {
     const t = useTranslations("quiz");
     const [referenceLink, setReferenceLink] = useState("");
-    const [referenceLinks, setReferenceLinks] = useState<string[]>(
-        () => loadDraft<string[]>(DRAFT_KEYS.proposalReferences) ?? []
-    );
     const [images, setImages] = useState<string[]>(
         () => loadDraft<string[]>(DRAFT_KEYS.proposalReferenceImages) ?? []
     );
@@ -31,8 +26,18 @@ const References = ({}) => {
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        saveDraft(DRAFT_KEYS.proposalReferences, referenceLinks);
-    }, [referenceLinks]);
+        const saved = loadDraft<string[]>(DRAFT_KEYS.proposalReferences) ?? [];
+        queueMicrotask(() => {
+            if (saved.length > 0) {
+                setReferenceLink(saved[0]);
+            }
+        });
+    }, []);
+
+    useEffect(() => {
+        const value = referenceLink.trim();
+        saveDraft(DRAFT_KEYS.proposalReferences, value ? [value] : []);
+    }, [referenceLink]);
 
     useEffect(() => {
         saveDraft(DRAFT_KEYS.proposalReferenceImages, images);
@@ -54,17 +59,6 @@ const References = ({}) => {
 
     const handleRemoveImage = (index: number) => {
         setImages((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const handleAddLink = () => {
-        const value = referenceLink.trim();
-        if (!value || referenceLinks.length >= MAX_LINKS) return;
-        setReferenceLinks((prev) => [...prev, value].slice(0, MAX_LINKS));
-        setReferenceLink("");
-    };
-
-    const handleRemoveLink = (index: number) => {
-        setReferenceLinks((prev) => prev.filter((_, i) => i !== index));
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -132,57 +126,19 @@ const References = ({}) => {
                     ))}
                 </ul>
             )}
-            {referenceLinks.length < MAX_LINKS && (
-                <>
-                    <Field
-                        className="mb-4"
-                        label={t("referenceLink")}
-                        value={referenceLink}
-                        onChange={(e) => setReferenceLink(e.target.value)}
-                        name="reference-link"
-                        placeholder={t("referenceLinkPlaceholder")}
-                        isLarge
-                        required
-                        maxLength={500}
-                    />
-                    <Button
-                        className="px-5.5"
-                        isStroke
-                        onClick={handleAddLink}
-                    >
-                        <Icon className="mr-2" name="plus" />
-                        {t("addLink")}
-                    </Button>
-                </>
-            )}
-            {referenceLinks.length > 0 && (
-                <ul className="mt-4 space-y-2">
-                    {referenceLinks.map((link, index) => (
-                        <li
-                            key={`${link}-${index}`}
-                            className="flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-b-subtle"
-                        >
-                            <a
-                                className="truncate text-body text-t-primary underline"
-                                href={link}
-                                target="_blank"
-                                rel="noreferrer"
-                            >
-                                {link}
-                            </a>
-                            <button
-                                type="button"
-                                onClick={() => handleRemoveLink(index)}
-                                className="shrink-0"
-                            >
-                                <Icon className="size-4 fill-t-secondary" name="close-small" />
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
+            <Field
+                className="mb-4"
+                label={t("referenceLink")}
+                value={referenceLink}
+                onChange={(e) => setReferenceLink(e.target.value)}
+                name="reference-link"
+                placeholder={t("referenceLinkPlaceholder")}
+                isLarge
+                required
+                maxLength={500}
+            />
             <div className="mt-2 text-hairline text-t-tertiary">
-                {referenceLinks.length} / {MAX_LINKS} links
+                1 / 1 link
             </div>
         </div>
     );

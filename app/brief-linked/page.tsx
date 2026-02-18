@@ -1,5 +1,5 @@
-import BriefLinkedPage from "@/templates/BriefLinkedPage";
+import { redirect } from "next/navigation";
 
 export default function Page() {
-    return <BriefLinkedPage />;
+    redirect("/brief?feature=proposal&view=1");
 }
