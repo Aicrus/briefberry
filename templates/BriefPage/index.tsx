@@ -109,11 +109,7 @@ const CONTRACT_UI_COPY = {
         signAgain: "Assinar novamente",
         clickToSign: "Clique para assinar",
         signatureModalTitle: "Assinatura eletrônica",
-        signer1Role: "ACORDANTE 1",
-        signer2Role: "ACORDANTE 2",
         witnessRole: "TESTEMUNHA",
-        signer2Short: "Acordante 2",
-        witness2Short: "Testemunha 2",
         witness1Default: "TESTEMUNHA 1",
         witness2Default: "TESTEMUNHA 2",
     },
@@ -168,11 +164,7 @@ const CONTRACT_UI_COPY = {
         signAgain: "Sign again",
         clickToSign: "Click to sign",
         signatureModalTitle: "Electronic signature",
-        signer1Role: "SIGNATORY 1",
-        signer2Role: "SIGNATORY 2",
         witnessRole: "WITNESS",
-        signer2Short: "Signatory 2",
-        witness2Short: "Witness 2",
         witness1Default: "WITNESS 1",
         witness2Default: "WITNESS 2",
     },
@@ -227,11 +219,7 @@ const CONTRACT_UI_COPY = {
         signAgain: "Firmar nuevamente",
         clickToSign: "Haz clic para firmar",
         signatureModalTitle: "Firma electrónica",
-        signer1Role: "FIRMANTE 1",
-        signer2Role: "FIRMANTE 2",
         witnessRole: "TESTIGO",
-        signer2Short: "Firmante 2",
-        witness2Short: "Testigo 2",
         witness1Default: "TESTIGO 1",
         witness2Default: "TESTIGO 2",
     },
@@ -1689,18 +1677,18 @@ const BriefPage = () => {
                         <div className="mt-10 border-t border-stroke2 pt-8">
                         <div className="mb-4 text-h5">{contractCopy.signaturesTitle}</div>
                         <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
-                            {signatureParticipants.map((participant) => (
-                                (() => {
-                                    const signatureEntry = signatures[participant.id];
-                                    const signatureSrc =
-                                        typeof signatureEntry === "string"
-                                            ? signatureEntry
-                                            : signatureEntry?.dataUrl;
-                                    const inkTone =
-                                        typeof signatureEntry === "string"
-                                            ? null
-                                            : signatureEntry?.inkTone;
-                                    return (
+                            {signatureParticipants.map((participant) => {
+                                const signatureEntry = signatures[participant.id];
+                                const signatureSrc =
+                                    typeof signatureEntry === "string"
+                                        ? signatureEntry
+                                        : signatureEntry?.dataUrl;
+                                const inkTone =
+                                    typeof signatureEntry === "string"
+                                        ? null
+                                        : signatureEntry?.inkTone;
+
+                                return (
                                 <div
                                     key={participant.id}
                                     className="rounded-2xl border border-stroke2 bg-b-surface1 p-4"
@@ -1763,9 +1751,8 @@ const BriefPage = () => {
                                         </Button>
                                     )}
                                 </div>
-                                    );
-                                })()
-                            ))}
+                                );
+                            })}
                         </div>
                         </div>
                     )}
