@@ -2,8 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
-import Icon from "@/components/Icon";
+import MyDatePicker from "@/components/MyDatePicker";
 import { formatCPF, formatCNPJ, formatSSN, formatEIN } from "@/lib/masks";
+import {
+    formatCurrencyFromDigits,
+    parseDigitsFromInput,
+    type CurrencyId,
+} from "@/lib/currency";
 import { DRAFT_KEYS, loadDraft, saveDraft } from "@/lib/draftStorage";
 
 /** 0=CPF, 1=CNPJ, 2=SSN (EUA), 3=EIN (EUA), 4=VAT/NIF (Europa), 5=Outro */
@@ -55,12 +60,27 @@ function isDocTypeNumeric(docType: DocTypeId): boolean {
     return docType <= 3; // CPF, CNPJ, SSN, EIN
 }
 
+function sanitizePaymentTerms(value: string): string {
+    return value.replace(/\s*['"“”‘’`´]+\s*$/u, "");
+}
+
 const STEP_KEYS = [
     "contractStep1",
     "contractStep2",
     "contractStep3",
-    "contractStep5",
+    "contractStep4",
+    "stepPayment",
+    "contractStep6",
+    "contractStep7",
 ] as const;
+
+const CURRENCY_OPTIONS: { id: number; label: string; symbol: string }[] = [
+    { id: 1, label: "USD ($)", symbol: "$" },
+    { id: 2, label: "EUR (€)", symbol: "€" },
+    { id: 0, label: "BRL (R$)", symbol: "R$" },
+];
+
+const PAYMENT_OPTIONS = [0, 1] as const; // 0=50/50, 1=per stage
 
 const cardClass = (active: boolean) =>
     `w-[calc(50%-1rem)] mt-4 mx-2 px-6 py-5.5 border-[1.5px] border-stroke1 rounded-[1.25rem] text-heading font-medium! text-t-secondary fill-t-secondary hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary hover:fill-t-primary cursor-pointer transition-all max-md:w-[calc(50%-0.75rem)] max-md:mt-3 max-md:mx-1.5 ${
@@ -77,13 +97,26 @@ const ContractForm = () => {
                 contractorDocType: DocTypeId;
                 contractorDocument: string;
                 contractorEmail: string;
+                contractorAddress: string;
                 clientName: string;
                 clientDocType: DocTypeId;
                 clientDocument: string;
                 clientEmail: string;
+                clientAddress: string;
                 projectProposalLink: string;
                 projectDescription: string;
-                termination: number | null;
+                contractValue: string;
+                paymentTerms: string;
+                billingModel: number | null;
+                paymentMethod: number | null;
+                billingAndPaymentOther: string;
+                projectStartDate: string;
+                projectDeliveryDate: string;
+                warrantyDays: string;
+                forumCity: string;
+                signatureCity: string;
+                signatureDate: string;
+                currency: number | null;
             }>(DRAFT_KEYS.contractWizard),
         []
     );
@@ -98,6 +131,9 @@ const ContractForm = () => {
         initialDraft?.contractorDocument ?? ""
     );
     const [contractorEmail, setContractorEmail] = useState(initialDraft?.contractorEmail ?? "");
+    const [contractorAddress, setContractorAddress] = useState(
+        initialDraft?.contractorAddress ?? ""
+    );
 
     // Step 2: Client data
     const [clientName, setClientName] = useState(initialDraft?.clientName ?? "");
@@ -106,6 +142,7 @@ const ContractForm = () => {
     );
     const [clientDocument, setClientDocument] = useState(initialDraft?.clientDocument ?? "");
     const [clientEmail, setClientEmail] = useState(initialDraft?.clientEmail ?? "");
+    const [clientAddress, setClientAddress] = useState(initialDraft?.clientAddress ?? "");
 
     const [projectProposalLink, setProjectProposalLink] = useState(
         initialDraft?.projectProposalLink ?? ""
@@ -113,10 +150,39 @@ const ContractForm = () => {
     const [projectDescription, setProjectDescription] = useState(
         initialDraft?.projectDescription ?? ""
     );
-
-    const [termination, setTermination] = useState<number | null>(
-        initialDraft?.termination ?? null
+    const [contractValue, setContractValue] = useState(initialDraft?.contractValue ?? "");
+    const [paymentMethod, setPaymentMethod] = useState<number | null>(
+        initialDraft?.paymentMethod ?? null
     );
+    const [billingAndPaymentOther, setBillingAndPaymentOther] = useState(
+        sanitizePaymentTerms(
+            initialDraft?.billingAndPaymentOther ?? initialDraft?.paymentTerms ?? ""
+        )
+    );
+    const [projectStartDate, setProjectStartDate] = useState(
+        initialDraft?.projectStartDate ?? ""
+    );
+    const [projectDeliveryDate, setProjectDeliveryDate] = useState(
+        initialDraft?.projectDeliveryDate ?? ""
+    );
+    const [warrantyDays, setWarrantyDays] = useState(initialDraft?.warrantyDays ?? "");
+    const [forumCity, setForumCity] = useState(initialDraft?.forumCity ?? "");
+    const [signatureCity, setSignatureCity] = useState(
+        initialDraft?.signatureCity ?? ""
+    );
+    const [signatureDate, setSignatureDate] = useState(
+        initialDraft?.signatureDate ?? ""
+    );
+    const [currency, setCurrency] = useState<number | null>(initialDraft?.currency ?? 1);
+
+    const paymentLabel =
+        paymentMethod === 0
+            ? t("payment5050")
+            : paymentMethod === 1
+              ? t("paymentPerStage")
+              : "";
+    const otherPaymentText = sanitizePaymentTerms(billingAndPaymentOther);
+    const paymentTerms = otherPaymentText || paymentLabel;
 
     useEffect(() => {
         saveDraft(DRAFT_KEYS.contractWizard, {
@@ -125,13 +191,25 @@ const ContractForm = () => {
             contractorDocType,
             contractorDocument,
             contractorEmail,
+            contractorAddress,
             clientName,
             clientDocType,
             clientDocument,
             clientEmail,
+            clientAddress,
             projectProposalLink,
             projectDescription,
-            termination,
+            contractValue,
+            paymentTerms: sanitizePaymentTerms(paymentTerms),
+            paymentMethod,
+            billingAndPaymentOther: otherPaymentText,
+            projectStartDate,
+            projectDeliveryDate,
+            warrantyDays,
+            forumCity,
+            signatureCity,
+            signatureDate,
+            currency,
         });
     }, [
         activeId,
@@ -139,13 +217,25 @@ const ContractForm = () => {
         contractorDocType,
         contractorDocument,
         contractorEmail,
+        contractorAddress,
         clientName,
         clientDocType,
         clientDocument,
         clientEmail,
+        clientAddress,
         projectProposalLink,
         projectDescription,
-        termination,
+        contractValue,
+        paymentTerms,
+        paymentMethod,
+        otherPaymentText,
+        projectStartDate,
+        projectDeliveryDate,
+        warrantyDays,
+        forumCity,
+        signatureCity,
+        signatureDate,
+        currency,
     ]);
 
     const totalSteps = STEP_KEYS.length;
@@ -232,6 +322,18 @@ const ContractForm = () => {
                                 required
                             />
                         </div>
+                        <div className="mt-6">
+                            <Field
+                                label={t("contractorAddress")}
+                                value={contractorAddress}
+                                onChange={(e) => setContractorAddress(e.target.value)}
+                                name="contractor-address"
+                                placeholder={t("contractorAddressPlaceholder")}
+                                isLarge
+                                required
+                                maxLength={300}
+                            />
+                        </div>
                     </>
                 )}
                 {activeId === 1 && (
@@ -295,6 +397,18 @@ const ContractForm = () => {
                                 required
                             />
                         </div>
+                        <div className="mt-6">
+                            <Field
+                                label={t("clientAddress")}
+                                value={clientAddress}
+                                onChange={(e) => setClientAddress(e.target.value)}
+                                name="client-address"
+                                placeholder={t("clientAddressPlaceholder")}
+                                isLarge
+                                required
+                                maxLength={300}
+                            />
+                        </div>
                     </>
                 )}
                 {activeId === 2 && (
@@ -323,20 +437,136 @@ const ContractForm = () => {
                     </>
                 )}
                 {activeId === 3 && (
-                    <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                        {[0, 1].map((id) => (
-                            <div
-                                key={id}
-                                className={cardClass(termination === id)}
-                                onClick={() => setTermination(id)}
-                            >
-                                <Icon className="mb-5 fill-inherit max-3xl:mb-4" name={id === 0 ? "check" : "close-small"} />
-                                <div className="text-body-bold">{t(id === 0 ? "terminationNoRefund" : "terminationProportionalRefund")}</div>
-                                <div className="mt-2 text-body text-t-secondary leading-snug">
-                                    {t(id === 0 ? "terminationYesDesc" : "terminationNoDesc")}
-                                </div>
+                    <div className="space-y-6">
+                        <Field
+                            label={t("contractValue")}
+                            value={formatCurrencyFromDigits(contractValue, (currency ?? 1) as CurrencyId)}
+                            onChange={(e) => setContractValue(parseDigitsFromInput(e.target.value))}
+                            name="contract-value"
+                            placeholder={(currency ?? 1) === 1 ? "0.00" : "0,00"}
+                            currency={CURRENCY_OPTIONS.find((o) => o.id === currency)?.symbol ?? "$"}
+                            isLarge
+                            required
+                            inputMode="decimal"
+                        />
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">{t("stepCurrencyLabel")}</div>
+                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                                {CURRENCY_OPTIONS.map((opt) => (
+                                    <div
+                                        key={opt.id}
+                                        className={cardClass(currency === opt.id)}
+                                        onClick={() => setCurrency(opt.id)}
+                                    >
+                                        <div className="">{opt.label}</div>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        </div>
+                    </div>
+                )}
+                {activeId === 4 && (
+                    <div className="space-y-8">
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">{t("stepPaymentLabel")}</div>
+                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
+                                {PAYMENT_OPTIONS.map((id) => (
+                                    <div
+                                        key={id}
+                                        className={cardClass(paymentMethod === id)}
+                                        onClick={() => setPaymentMethod(id)}
+                                    >
+                                        <div className="">
+                                            {t(id === 0 ? "payment5050" : "paymentPerStage")}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        <div>
+                            <div className="mb-3 text-body-bold text-t-primary">
+                                {t("billingPaymentOtherLabel")}
+                            </div>
+                            <Field
+                                label=""
+                                value={billingAndPaymentOther}
+                                onChange={(e) =>
+                                    setBillingAndPaymentOther(
+                                        sanitizePaymentTerms(e.target.value)
+                                    )
+                                }
+                                name="billing-payment-other"
+                                placeholder={t("billingPaymentOtherPlaceholder")}
+                                isLarge
+                                maxLength={300}
+                            />
+                        </div>
+                    </div>
+                )}
+                {activeId === 5 && (
+                    <div className="space-y-6">
+                        <MyDatePicker
+                            label={t("projectStartDate")}
+                            name="project-start-date"
+                            value={projectStartDate}
+                            onChange={(e) => setProjectStartDate(e.target.value)}
+                        />
+                        <MyDatePicker
+                            label={t("projectDeliveryDate")}
+                            name="project-delivery-date"
+                            value={projectDeliveryDate}
+                            onChange={(e) => setProjectDeliveryDate(e.target.value)}
+                        />
+                        <div className="relative">
+                            <Field
+                                classInput="pr-20"
+                                label={t("warrantyDays")}
+                                value={warrantyDays}
+                                onChange={(e) => setWarrantyDays(e.target.value)}
+                                name="warranty-days"
+                                placeholder={t("warrantyDaysPlaceholder")}
+                                isLarge
+                                onlyNumeric
+                                required
+                                maxLength={4}
+                            />
+                            <div className="pointer-events-none absolute top-1/2 right-6 -translate-y-1/2 text-button text-t-tertiary">
+                                dias
+                            </div>
+                        </div>
+                        <p className="text-body text-t-secondary">
+                            {t("warrantyDaysHint")}
+                        </p>
+                    </div>
+                )}
+                {activeId === 6 && (
+                    <div className="space-y-6">
+                        <Field
+                            label={t("forumCity")}
+                            value={forumCity}
+                            onChange={(e) => setForumCity(e.target.value)}
+                            name="forum-city"
+                            placeholder={t("forumCityPlaceholder")}
+                            isLarge
+                            required
+                            maxLength={120}
+                        />
+                        <Field
+                            label={t("signatureCity")}
+                            value={signatureCity}
+                            onChange={(e) => setSignatureCity(e.target.value)}
+                            name="signature-city"
+                            placeholder={t("signatureCityPlaceholder")}
+                            isLarge
+                            required
+                            maxLength={120}
+                        />
+                        <MyDatePicker
+                            label={t("signatureDate")}
+                            name="signature-date"
+                            value={signatureDate}
+                            onChange={(e) => setSignatureDate(e.target.value)}
+                        />
                     </div>
                 )}
             </div>

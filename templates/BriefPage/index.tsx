@@ -15,6 +15,40 @@ import { DRAFT_KEYS, loadDraft } from "@/lib/draftStorage";
 import { digitsToNumber, type CurrencyId } from "@/lib/currency";
 import Actions from "./Actions";
 
+type ContractDocTypeId = 0 | 1 | 2 | 3 | 4 | 5;
+type ContractWizardDraft = {
+    contractorName: string;
+    contractorDocType: ContractDocTypeId;
+    contractorDocument: string;
+    contractorEmail: string;
+    contractorAddress: string;
+    clientName: string;
+    clientDocType: ContractDocTypeId;
+    clientDocument: string;
+    clientEmail: string;
+    clientAddress: string;
+    projectProposalLink: string;
+    projectDescription: string;
+    contractValue: string;
+    paymentTerms: string;
+    projectStartDate: string;
+    projectDeliveryDate: string;
+    warrantyDays: string;
+    forumCity: string;
+    signatureCity: string;
+    signatureDate: string;
+    currency: number | null;
+};
+
+function getContractDocTypeLabel(docType: ContractDocTypeId | null | undefined): string {
+    if (docType === 0) return "CPF";
+    if (docType === 1) return "CNPJ";
+    if (docType === 2) return "SSN";
+    if (docType === 3) return "EIN";
+    if (docType === 4) return "VAT/NIF";
+    return "Documento";
+}
+
 const contractContent = {
     introduction: (
         <div className="space-y-3">
@@ -327,6 +361,176 @@ const contractContent = {
         </div>
     ),
 };
+
+function buildContractContentFromDraft(
+    draft: ContractWizardDraft | null
+): Omit<ProposalContentShape, "images"> {
+    if (!draft) return contractContent;
+
+    const contractorName = draft.contractorName?.trim() || "CONTRATADA";
+    const contractorEmail = draft.contractorEmail?.trim() || "não informado";
+    const contractorAddress = draft.contractorAddress?.trim() || "endereço não informado";
+    const contractorDocument = draft.contractorDocument?.trim() || "não informado";
+    const contractorDocLabel = getContractDocTypeLabel(draft.contractorDocType);
+
+    const clientName = draft.clientName?.trim() || "CONTRATANTE";
+    const clientEmail = draft.clientEmail?.trim() || "não informado";
+    const clientAddress = draft.clientAddress?.trim() || "endereço não informado";
+    const clientDocument = draft.clientDocument?.trim() || "não informado";
+    const clientDocLabel = getContractDocTypeLabel(draft.clientDocType);
+
+    const projectDescription =
+        draft.projectDescription?.trim() ||
+        "Escopo do projeto a ser desenvolvido conforme briefing e proposta comercial.";
+    const projectProposalLink = draft.projectProposalLink?.trim();
+    const contractValue = formatProposalBudget(
+        draft.contractValue,
+        draft.currency,
+        "A definir"
+    );
+    const paymentTerms =
+        draft.paymentTerms?.trim().replace(/\s*['"]+\s*$/, "") ||
+        "Condições de pagamento a definir entre as partes.";
+    const projectStartDate = draft.projectStartDate?.trim() || "A definir";
+    const projectDeliveryDate = draft.projectDeliveryDate?.trim() || "A definir";
+    const warrantyDays = draft.warrantyDays?.trim() || "";
+    const forumCity = draft.forumCity?.trim() || "A definir";
+    const signatureCity = draft.signatureCity?.trim() || forumCity;
+    const signatureDate = draft.signatureDate?.trim() || "A definir";
+    const terminationClause =
+        "A rescisão do presente instrumento não extinguirá os direitos e obrigações que as partes tenham entre si e para com terceiros, não havendo estorno do valor já pago, caso o projeto já tenha sido iniciado.";
+
+    return {
+        introduction: (
+            <div className="space-y-3">
+                <p>
+                    Pelo presente instrumento particular de contrato, de um lado,
+                    doravante denominada simplesmente <strong>CONTRATANTE</strong>,{" "}
+                    {clientName}, inscrita no {clientDocLabel} Nº {clientDocument}, com
+                    sede em {clientAddress}, e e-mail {clientEmail}.
+                </p>
+                <p>
+                    E, de outro lado, doravante denominada <strong>CONTRATADA</strong>,{" "}
+                    {contractorName}, inscrita no {contractorDocLabel} Nº{" "}
+                    {contractorDocument}, com sede em {contractorAddress}, e e-mail{" "}
+                    {contractorEmail}, têm entre si, justo e contratado o que segue:
+                </p>
+            </div>
+        ),
+        goals: (
+            <div className="space-y-3">
+                <p>
+                    <strong>DO OBJETO DO CONTRATO</strong>
+                </p>
+                <p>
+                    <strong>CLÁUSULA 1ª</strong> - Constitui objeto deste contrato a
+                    prestação dos serviços pela CONTRATADA à CONTRATANTE, conforme
+                    escopo abaixo:
+                </p>
+                <p>{projectDescription}</p>
+                {projectProposalLink && (
+                    <p>
+                        Referência da proposta do projeto:{" "}
+                        <a
+                            href={projectProposalLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline decoration-1 underline-offset-2"
+                        >
+                            {projectProposalLink}
+                        </a>
+                        .
+                    </p>
+                )}
+            </div>
+        ),
+        timeline: contractContent.timeline,
+        budget: (
+            <div className="space-y-3">
+                <p>
+                    <strong>DO CUSTO E DA FORMA DE PAGAMENTO</strong>
+                </p>
+                <p>
+                    <strong>CLÁUSULA 4ª</strong> - Pela prestação de serviços
+                    referidos na cláusula 1 supra, a CONTRATANTE pagará à
+                    CONTRATADA o valor total de <strong>{contractValue}</strong>,
+                    conforme condições abaixo:
+                </p>
+                <p>{paymentTerms}</p>
+                <p>
+                    <strong>DO PRAZO</strong>
+                </p>
+                <p>
+                    O presente contrato inicia em <strong>{projectStartDate}</strong>{" "}
+                    e possui entrega prevista para{" "}
+                    <strong>{projectDeliveryDate}</strong>.
+                </p>
+                {warrantyDays && (
+                    <p>
+                        <strong>GARANTIA</strong> - O projeto possui{" "}
+                        <strong>{warrantyDays} dias</strong> de garantia para
+                        eventuais ajustes e correção de bugs.
+                    </p>
+                )}
+            </div>
+        ),
+        references: (
+            <div className="space-y-3">
+                <p>
+                    <strong>DA RESCISÃO</strong>
+                </p>
+                <p>
+                    <strong>CLÁUSULA 5ª</strong> - {terminationClause}
+                </p>
+                <p>
+                    <strong>CLÁUSULA 6ª</strong> - A CONTRATADA agirá segundo as normas
+                    do Código de Ética da Associação dos Designes Gráficos, e também
+                    assume obrigação e o compromisso de manter em sigilo todas as
+                    informações que. lhe forem prestadas pela CONTRATANTE para que
+                    possa proceder ao desenvolvimento do projeto gráfico, assim também
+                    em relação ao trabalho em desenvolvimento.
+                </p>
+                <p>
+                    <strong>DOS DIREITOS À PROPRIEDADE INDUSTRIAL</strong>
+                </p>
+                <p>
+                    <strong>CLÁUSULA 7ª</strong> - Caso a consultoria resulte invenção,
+                    descobertas, aperfeiçoamentos ou inovações, os direitos de
+                    propriedade pertencerão à CONTRATANTE autor do trabalho que gerou
+                    desenvolvimento tecnológico, nos termos da Lei n° 9.279/96
+                    (Código de Propriedade Industrial) ou legislação aplicável 1.
+                </p>
+                <p>
+                    <strong>CLAUSULA 8ª</strong> - A equipe envolvida neste projeto se
+                    compromete a manter sigilo sobre os dados e informações decorrentes
+                    da consecução do presente contrato, salvo o CONTRATANTE autorize
+                    em contrário.
+                </p>
+            </div>
+        ),
+        conclusion: (
+            <div className="space-y-3">
+                <p>
+                    <strong>DO FORO</strong>
+                </p>
+                <p>
+                    <strong>CLÁUSULA 12ª</strong> - Para dirimir quaisquer
+                    controvérsias oriundas do contrato, as partes elegem o foro da
+                    comarca de <strong>{forumCity}</strong>.
+                </p>
+                <p>
+                    As partes acima já qualificadas ora contratadas, resolvem na
+                    melhor forma de direito firmar o presente contrato.
+                </p>
+                <p>
+                    <strong>
+                        {signatureCity} {signatureDate}
+                    </strong>
+                </p>
+            </div>
+        ),
+    };
+}
 
 const prdContent = {
     introduction: (
@@ -753,9 +957,14 @@ const BriefPage = () => {
     const [proposalContentState, setProposalContentState] = useState<ProposalContentShape>(
         defaultProposalContent
     );
+    const [contractDraftState, setContractDraftState] =
+        useState<ContractWizardDraft | null>(null);
+    const [contractContentState, setContractContentState] = useState<
+        Omit<ProposalContentShape, "images">
+    >(contractContent);
     const displayedContent =
         featureType === "contract"
-            ? contractContent
+            ? contractContentState
             : featureType === "prd"
             ? prdContent
             : proposalContentState;
@@ -818,6 +1027,7 @@ const BriefPage = () => {
     const [signatureModalVersion, setSignatureModalVersion] = useState(0);
     const [activeSigner, setActiveSigner] = useState("");
     const [signatures, setSignatures] = useState<Record<string, string>>({});
+    const [signatureNames, setSignatureNames] = useState<Record<string, string>>({});
     const [isEditingDocumentTitle, setIsEditingDocumentTitle] = useState(false);
     const [isEditingSubtitle, setIsEditingSubtitle] = useState(false);
 
@@ -915,6 +1125,13 @@ const BriefPage = () => {
                     setEditableDocumentTitle(dynamicTitle);
                 }
             }
+            if (featureType === "contract") {
+                const contractDraft = loadDraft<ContractWizardDraft>(
+                    DRAFT_KEYS.contractWizard
+                );
+                setContractDraftState(contractDraft);
+                setContractContentState(buildContractContentFromDraft(contractDraft));
+            }
             setIsDraftHydrated(true);
         }
     }, [featureType, storageKey, locale, tBrief, tQuizText]);
@@ -954,60 +1171,85 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "prd"
             : "proposal";
-    const signatureParticipants: SignatureParticipant[] =
-        featureType === "contract"
-            ? [
-                  {
-                      id: "ACORDANTE_1",
-                      role: "ACORDANTE 1",
-                      organization: "BEST SOLUTIONS GROUP USA LLC",
-                      shortLabel: "AC",
-                      fullName: "ALEXANDRE LUIS CAMARGO SOLE",
-                  },
-                  {
-                      id: "TESTEMUNHA_1",
-                      role: "TESTEMUNHA",
-                      fullName: "MARIO MARCIO ALBINO PAVÃO",
-                  },
-                  {
-                      id: "ACORDANTE_2",
-                      role: "ACORDANTE 2",
-                      organization: "AICRUS",
-                      shortLabel: "Aicrus T",
-                      fullName: "PAULO MORALES DIAZ DA COSTA",
-                  },
-                  {
-                      id: "TESTEMUNHA_2",
-                      role: "TESTEMUNHA",
-                      shortLabel: "Taina S",
-                      fullName: "TAINÁ EVANGELISTA DA SILVA",
-                  },
-              ]
-            : featureType === "prd"
-            ? [
-                  {
-                      id: "RESPONSAVEL_PRODUTO",
-                      role: "RESPONSÁVEL PELO PRODUTO",
-                      fullName: "Assinante 1",
-                  },
-                  {
-                      id: "RESPONSAVEL_TECNICO",
-                      role: "RESPONSÁVEL TÉCNICO",
-                      fullName: "Assinante 2",
-                  },
-              ]
-            : [
-                  {
-                      id: "CONTRATANTE",
-                      role: "CONTRATANTE",
-                      fullName: "Assinante 1",
-                  },
-                  {
-                      id: "CONTRATADA",
-                      role: "CONTRATADA",
-                      fullName: "Assinante 2",
-                  },
-              ];
+    const signatureParticipants: SignatureParticipant[] = useMemo(
+        () =>
+            featureType === "contract"
+                ? [
+                      {
+                          id: "ACORDANTE_1",
+                          role: "ACORDANTE 1",
+                          organization:
+                              contractDraftState?.clientName?.trim() || "CONTRATANTE",
+                          shortLabel: "AC",
+                          fullName:
+                              contractDraftState?.clientName?.trim() ||
+                              "CONTRATANTE",
+                      },
+                      {
+                          id: "TESTEMUNHA_1",
+                          role: "TESTEMUNHA",
+                          fullName: "TESTEMUNHA 1",
+                      },
+                      {
+                          id: "ACORDANTE_2",
+                          role: "ACORDANTE 2",
+                          organization:
+                              contractDraftState?.contractorName?.trim() ||
+                              "CONTRATADA",
+                          shortLabel: "Acordante 2",
+                          fullName:
+                              contractDraftState?.contractorName?.trim() ||
+                              "CONTRATADA",
+                      },
+                      {
+                          id: "TESTEMUNHA_2",
+                          role: "TESTEMUNHA",
+                          shortLabel: "Testemunha 2",
+                          fullName: "TESTEMUNHA 2",
+                      },
+                  ]
+                : featureType === "prd"
+                ? [
+                      {
+                          id: "RESPONSAVEL_PRODUTO",
+                          role: "RESPONSÁVEL PELO PRODUTO",
+                          fullName: "Assinante 1",
+                      },
+                      {
+                          id: "RESPONSAVEL_TECNICO",
+                          role: "RESPONSÁVEL TÉCNICO",
+                          fullName: "Assinante 2",
+                      },
+                  ]
+                : [
+                      {
+                          id: "CONTRATANTE",
+                          role: "CONTRATANTE",
+                          fullName: "Assinante 1",
+                      },
+                      {
+                          id: "CONTRATADA",
+                          role: "CONTRATADA",
+                          fullName: "Assinante 2",
+                      },
+                  ],
+        [featureType, contractDraftState?.clientName, contractDraftState?.contractorName]
+    );
+
+    useEffect(() => {
+        if (featureType !== "contract") return;
+        setSignatureNames((prev) => {
+            let changed = false;
+            const next = { ...prev };
+            signatureParticipants.forEach((participant) => {
+                if (!next[participant.id]) {
+                    next[participant.id] = participant.fullName;
+                    changed = true;
+                }
+            });
+            return changed ? next : prev;
+        });
+    }, [featureType, signatureParticipants]);
 
     return (
         <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>
@@ -1245,17 +1487,37 @@ const BriefPage = () => {
                                             {participant.shortLabel}
                                         </div>
                                     )}
-                                    <div className="mb-3 text-small text-t-primary">
-                                        {participant.fullName}
-                                    </div>
-                                    {signatures[participant.id] ? (
-                                        <Image
-                                            src={signatures[participant.id]}
-                                            alt={`Assinatura ${participant.role}`}
-                                            width={280}
-                                            height={56}
-                                            className="mb-3 h-14 w-auto object-contain"
+                                    {!isReadOnlyView ? (
+                                        <input
+                                            className="mb-3 w-full bg-transparent border-0 border-b border-stroke2 pb-1 outline-0 text-small text-t-primary"
+                                            value={
+                                                signatureNames[participant.id] ??
+                                                participant.fullName
+                                            }
+                                            onChange={(e) =>
+                                                setSignatureNames((prev) => ({
+                                                    ...prev,
+                                                    [participant.id]: e.target.value,
+                                                }))
+                                            }
+                                            placeholder="Nome do assinante"
                                         />
+                                    ) : (
+                                        <div className="mb-3 text-small text-t-primary">
+                                            {signatureNames[participant.id] ??
+                                                participant.fullName}
+                                        </div>
+                                    )}
+                                    {signatures[participant.id] ? (
+                                        <div className="mb-3 inline-flex max-w-full rounded-lg bg-[#D1D5DB] p-1.5 dark:bg-[#4B5563]">
+                                            <Image
+                                                src={signatures[participant.id]}
+                                                alt={`Assinatura ${participant.role}`}
+                                                width={280}
+                                                height={56}
+                                                className="h-14 w-auto object-contain"
+                                            />
+                                        </div>
                                     ) : (
                                         <div className="mb-3 h-14 w-full rounded-lg border border-dashed border-stroke2" />
                                     )}
@@ -1287,7 +1549,7 @@ const BriefPage = () => {
                     open={signatureModalOpen}
                     onClose={() => setSignatureModalOpen(false)}
                     title="Assinatura eletrônica"
-                    signerName={activeSigner}
+                    signerName={signatureNames[activeSigner] || activeSigner}
                     onSave={(dataUrl) =>
                         setSignatures((prev) => ({
                             ...prev,

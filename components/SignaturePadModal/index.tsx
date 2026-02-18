@@ -25,6 +25,9 @@ const SignaturePadModal = ({
     useEffect(() => {
         if (!open || !canvasRef.current) return;
         const canvas = canvasRef.current;
+        const isDarkMode =
+            typeof document !== "undefined" &&
+            document.documentElement.classList.contains("dark");
         const ratio = window.devicePixelRatio || 1;
         const width = canvas.clientWidth;
         const height = canvas.clientHeight;
@@ -36,7 +39,7 @@ const SignaturePadModal = ({
         ctx.lineWidth = 2;
         ctx.lineJoin = "round";
         ctx.lineCap = "round";
-        ctx.strokeStyle = "#111111";
+        ctx.strokeStyle = isDarkMode ? "#F5F5F5" : "#111111";
         ctx.clearRect(0, 0, width, height);
     }, [open]);
 
@@ -111,7 +114,7 @@ const SignaturePadModal = ({
             <div className="rounded-2xl border border-stroke2 bg-b-surface1 p-3">
                 <canvas
                     ref={canvasRef}
-                    className="h-52 w-full touch-none rounded-xl bg-white"
+                    className="h-52 w-full touch-none rounded-xl bg-white dark:bg-[#1A1A1A]"
                     onPointerDown={handlePointerDown}
                     onPointerMove={handlePointerMove}
                     onPointerUp={handlePointerUp}

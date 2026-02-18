@@ -24,9 +24,18 @@ registerLocale("es", es);
 type MyDatePickerProps = {
     value: string;
     onChange: (e: { target: { value: string } }) => void;
+    label?: string;
+    name?: string;
+    required?: boolean;
 };
 
-const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
+const MyDatePicker = ({
+    value,
+    onChange,
+    label,
+    name = "date",
+    required = true,
+}: MyDatePickerProps) => {
     const t = useTranslations("datePicker");
     const locale = useLocale();
     const [activeOption, setActiveOption] = useState<string | null>(null);
@@ -87,7 +96,7 @@ const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
 
     return (
         <>
-            <Popover>
+            <Popover className="relative z-30">
                 {({ close }) => (
                     <>
                         <PopoverButton
@@ -96,19 +105,19 @@ const MyDatePicker = ({ value, onChange }: MyDatePickerProps) => {
                         >
                             <Field
                                 classInput="truncate cursor-pointer group-[[data-open]]:border-[#A8A8A8]/50!"
-                                label={t("label")}
+                                label={label ?? t("label")}
                                 value={value}
                                 onChange={handleInputChange}
-                                name="date"
+                                name={name}
                                 placeholder={t("placeholder")}
                                 isLarge
-                                required
+                                required={required}
                             />
                         </PopoverButton>
                         <PopoverPanel
                             anchor="bottom"
                             transition
-                            className="flex [--anchor-gap:0.5rem] w-(--button-width) p-6 shadow-hover bg-b-surface2 rounded-3xl outline-0 origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0 max-md:justify-center"
+                            className="z-60 flex [--anchor-gap:0.5rem] w-(--button-width) p-6 shadow-hover bg-b-surface2 rounded-3xl outline-0 origin-top transition duration-200 ease-out data-closed:scale-95 data-closed:opacity-0 max-md:justify-center"
                         >
                             <div className="shrink-0">
                                 <DatePicker
