@@ -115,7 +115,7 @@
         "prdStep7": "Diseño y tema",
         "prdStep8": "Reglas de negocio y notas técnicas",
         "integrationsHint": "Marca las que apliquen",
-        "featuresHint": "Desmarca solo las que no necesites",
+        "featuresHint": "Selecciona solo las que necesites",
         "projectName": "Nombre del proyecto",
         "projectNamePlaceholder": "ej. Studio Exemplo Web Design",
         "projectGoals": "Objetivos del proyecto",

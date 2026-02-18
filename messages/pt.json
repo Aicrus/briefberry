@@ -115,7 +115,7 @@
         "prdStep7": "Como será o design?",
         "prdStep8": "Regras e detalhes técnicos",
         "integrationsHint": "Marque as que se aplicam",
-        "featuresHint": "Desmarque apenas as que não precisa",
+        "featuresHint": "Selecione apenas as que precisa",
         "projectName": "Nome do projeto",
         "projectNamePlaceholder": "ex: Studio Exemplo Web Design",
         "projectGoals": "Objetivos do projeto",

@@ -115,7 +115,7 @@
         "prdStep7": "Design and theme",
         "prdStep8": "Business rules and technical notes",
         "integrationsHint": "Select all that apply",
-        "featuresHint": "Uncheck only the ones you don't need",
+        "featuresHint": "Select only the ones you need",
         "projectName": "Project name",
         "projectNamePlaceholder": "e.g. Studio Exemplo Web Design",
         "projectGoals": "Project goals",

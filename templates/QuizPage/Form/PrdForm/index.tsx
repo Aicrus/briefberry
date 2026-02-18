@@ -88,12 +88,12 @@ const PrdForm = () => {
 
     const [features, setFeatures] = useState<Record<string, boolean>>(
         initialDraft?.features ?? {
-            featAuth: true,
-            featPayments: true,
-            featUpload: true,
-            featRealtime: true,
-            featOffline: true,
-            featExternalApis: true,
+            featAuth: false,
+            featPayments: false,
+            featUpload: false,
+            featRealtime: false,
+            featOffline: false,
+            featExternalApis: false,
         }
     );
     const [otherFeaturesTags, setOtherFeaturesTags] = useState<string[]>(
