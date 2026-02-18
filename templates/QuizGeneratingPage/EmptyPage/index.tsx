@@ -4,18 +4,9 @@ import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { DRAFT_KEYS, loadDraft } from "@/lib/draftStorage";
 
-type ProposalTypeDraft = { active: number | null; otherType: string };
 type ProposalWizardDraft = { projectName: string };
 type ContractWizardDraft = { clientName: string };
 type PrdWizardDraft = { projectName: string };
-
-const PROPOSAL_TYPE_KEYS: Record<number, string> = {
-    0: "typeWebApp",
-    1: "typeMobileApp",
-    2: "typeUiDesign",
-    3: "typeBranding",
-    4: "typeLandingPage",
-};
 
 type EmptyPageProps = {
     className?: string;
@@ -25,20 +16,7 @@ type EmptyPageProps = {
 const EmptyPage = ({ className, featureType = "proposal" }: EmptyPageProps) => {
     const locale = useLocale();
     const tMyBriefs = useTranslations("myBriefs");
-    const tQuiz = useTranslations("quiz");
     const tBrief = useTranslations("brief");
-
-    const proposalTypeDraft =
-        featureType === "proposal"
-            ? loadDraft<ProposalTypeDraft>(DRAFT_KEYS.proposalTypeBrief)
-            : null;
-    const proposalTypeLabel =
-        proposalTypeDraft?.active === 5 && proposalTypeDraft.otherType?.trim()
-            ? proposalTypeDraft.otherType.trim()
-            : proposalTypeDraft?.active != null &&
-              PROPOSAL_TYPE_KEYS[proposalTypeDraft.active]
-            ? tQuiz(PROPOSAL_TYPE_KEYS[proposalTypeDraft.active])
-            : null;
 
     const previewContext =
         featureType === "proposal"
@@ -62,22 +40,19 @@ const EmptyPage = ({ className, featureType = "proposal" }: EmptyPageProps) => {
             : featureType === "prd"
             ? tBrief("prd")
             : tBrief("proposal");
-    const documentTitle =
+    const contextLabel =
         featureType === "contract"
-            ? tBrief("contractTitle")
-            : featureType === "prd"
-            ? tBrief("prdTitle")
-            : tBrief("proposalDocumentTitle", {
-                  type: proposalTypeLabel || tBrief("proposalDefaultTypeLabel"),
-              });
-    const topRightLabel =
-        featureType === "prd"
-            ? new Intl.DateTimeFormat(locale, {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-              }).format(new Date())
-            : documentTitle;
+            ? tBrief("previewClientLabel")
+            : tBrief("previewProjectLabel");
+    const contextText = `${contextLabel}: ${previewContext || tBrief("proposalToDefine")}`;
+    const todayText = `${tBrief("previewTodayLabel")}: ${new Intl.DateTimeFormat(
+        locale,
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+        }
+    ).format(new Date())}`;
 
     return (
         <div
@@ -90,10 +65,13 @@ const EmptyPage = ({ className, featureType = "proposal" }: EmptyPageProps) => {
                     <div className="shrink-0 size-3 mr-2 bg-primary2 rounded-full max-md:size-1.75 max-md:mr-1"></div>
                     <div className="">{myBriefsTitle}</div>
                     <div className="mx-2 max-md:mx-1">/</div>
-                    <div className="text-t-primary/80">{topRightLabel}</div>
+                    <div className="text-t-primary/80">{documentTypeLabel}</div>
                 </div>
                 <div className="text-hairline text-t-secondary max-md:text-[0.5rem]">
-                    {previewContext || tBrief("documentTypeLabel", { type: documentTypeLabel })}
+                    {contextText}
+                </div>
+                <div className="mt-0.5 text-caption text-t-tertiary/90 max-md:text-[0.5rem]">
+                    {todayText}
                 </div>
             </div>
             <ul className="flex flex-col gap-2.5 not-last:mb-12 max-md:gap-1.5 max-md:not-last:mb-6 *:h-1.5 *:rounded-xs *:bg-t-secondary/10 max-md:*:h-1 *:first:w-49 max-md:*:first:w-27">
