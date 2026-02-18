@@ -284,10 +284,10 @@ const ContractForm = () => {
                                             setContractorDocType(id);
                                             setContractorDocument("");
                                         }}
-                                        className={`rounded-full border-[1.5px] px-4 py-2 text-hairline font-medium transition-all ${
+                                        className={`rounded-full border-[1.5px] px-4 py-2 text-hairline font-medium text-t-secondary transition-all cursor-pointer hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary ${
                                             contractorDocType === id
-                                                ? "border-stroke-focus bg-b-surface2 text-t-primary"
-                                                : "border-stroke1 text-t-secondary hover:border-stroke-focus"
+                                                ? "border-stroke-focus text-t-primary"
+                                                : "border-stroke1"
                                         }`}
                                     >
                                         {t(getDocTypeLabelKey(id))}
@@ -359,10 +359,10 @@ const ContractForm = () => {
                                             setClientDocType(id);
                                             setClientDocument("");
                                         }}
-                                        className={`rounded-full border-[1.5px] px-4 py-2 text-hairline font-medium transition-all ${
+                                        className={`rounded-full border-[1.5px] px-4 py-2 text-hairline font-medium text-t-secondary transition-all cursor-pointer hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary ${
                                             clientDocType === id
-                                                ? "border-stroke-focus bg-b-surface2 text-t-primary"
-                                                : "border-stroke1 text-t-secondary hover:border-stroke-focus"
+                                                ? "border-stroke-focus text-t-primary"
+                                                : "border-stroke1"
                                         }`}
                                     >
                                         {t(getDocTypeLabelKey(id))}
