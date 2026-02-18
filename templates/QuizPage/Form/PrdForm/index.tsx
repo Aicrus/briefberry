@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import Button from "@/components/Button";
 import Field from "@/components/Field";
 import Icon from "@/components/Icon";
@@ -46,9 +47,31 @@ const cardClass = (active: boolean) =>
     `w-[calc(50%-1rem)] mt-4 mx-2 px-6 py-5.5 border-[1.5px] border-stroke1 rounded-[1.25rem] text-heading font-medium! text-t-secondary fill-t-secondary hover:border-transparent hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary hover:fill-t-primary cursor-pointer transition-all max-md:w-[calc(50%-0.75rem)] max-md:mt-3 max-md:mx-1.5 ${
         active ? "border-stroke-focus! text-t-primary! fill-t-primary!" : ""
     }`;
+const tagsBoxClass =
+    "min-h-40 w-full rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1 px-4 py-4 transition-colors focus-within:border-stroke-highlight";
+const tagPillClass =
+    "group inline-flex h-8 items-center rounded-full bg-b-surface1 pl-4 pr-2 shadow-[inset_0_0_0_1.5px_var(--color-stroke1)] text-hairline font-medium text-t-secondary transition-all hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary";
+const tagRemoveButtonClass =
+    "ml-1 inline-flex size-5 items-center justify-center rounded-full fill-t-secondary transition-colors group-hover:fill-t-primary hover:bg-b-surface3 hover:fill-t-primary";
 
-const FEATURE_KEYS = ["featAuth", "featPayments", "featUpload", "featRealtime", "featOffline", "featExternalApis"] as const;
-const INTEGRATION_KEYS = ["payments", "ai", "external_api", "whatsapp"] as const;
+const FEATURE_OPTIONS = [
+    { key: "featAuth", labelKey: "featAuth" as const },
+    { key: "featPayments", labelKey: "featPayments" as const },
+    { key: "featUpload", labelKey: "featUpload" as const },
+    { key: "featRealtime", labelKey: "featRealtime" as const },
+    { key: "featOffline", labelKey: "featOffline" as const },
+    { key: "featExternalApis", labelKey: "featExternalApis" as const },
+] as const;
+const INTEGRATION_OPTIONS = [
+    { key: "payments", labelKey: "integrationPayments" as const },
+    { key: "ai", labelKey: "integrationAi" as const },
+    { key: "external_api", labelKey: "integrationExternal_api" as const },
+    { key: "whatsapp", labelKey: "integrationWhatsapp" as const },
+    { key: "analytics", labelKey: "integrationAnalytics" as const },
+    { key: "crm", labelKey: "integrationCrm" as const },
+    { key: "email", labelKey: "integrationEmail" as const },
+    { key: "push", labelKey: "integrationPush" as const },
+] as const;
 
 const WEB_FRAMEWORK_OPTIONS = [
     { name: "Next.js", descKey: "webFrameworkNextDesc" as const },
@@ -104,6 +127,7 @@ type AuthSelection = {
 };
 type PrdDraft = {
     activeId: number;
+    projectName: string;
     language: number | null;
     languageOther: string;
     platform: number | null;
@@ -131,27 +155,26 @@ type PrdDraft = {
     otherIntegrationsTags: string[];
     otherIntegrationsInput: string;
     projectDeadline: string;
-    designSystem: number | null;
     theme: number | null;
     icons: number | null;
     customRules: string;
 };
 
-const DEFAULT_FEATURES: Record<string, boolean> = {
-    featAuth: false,
-    featPayments: false,
-    featUpload: false,
-    featRealtime: false,
-    featOffline: false,
-    featExternalApis: false,
-};
+const DEFAULT_FEATURES: Record<string, boolean> = FEATURE_OPTIONS.reduce(
+    (acc, option) => {
+        acc[option.key] = false;
+        return acc;
+    },
+    {} as Record<string, boolean>
+);
 
-const DEFAULT_INTEGRATIONS: Record<string, boolean> = {
-    payments: false,
-    ai: false,
-    external_api: false,
-    whatsapp: false,
-};
+const DEFAULT_INTEGRATIONS: Record<string, boolean> = INTEGRATION_OPTIONS.reduce(
+    (acc, option) => {
+        acc[option.key] = false;
+        return acc;
+    },
+    {} as Record<string, boolean>
+);
 
 const normalizeAuthentication = (value: unknown): AuthSelection => {
     if (typeof value === "number") {
@@ -171,11 +194,22 @@ const normalizeAuthentication = (value: unknown): AuthSelection => {
     return { emailPassword: false, socialLogin: false };
 };
 
+const normalizeTag = (value: string) => value.trim().toLowerCase();
+
+const splitCommaValues = (value: string) =>
+    value
+        .split(",")
+        .map((part) => part.trim())
+        .filter(Boolean);
+
 const PrdForm = () => {
     const t = useTranslations("quiz");
+    const searchParams = useSearchParams();
+    const isEditMode = searchParams.get("edit") === "1";
     const [activeId, setActiveId] = useState(0);
     const [isDraftHydrated, setIsDraftHydrated] = useState(false);
 
+    const [projectName, setProjectName] = useState("");
     const [language, setLanguage] = useState<number | null>(null);
     const [languageOther, setLanguageOther] = useState("");
     const [platform, setPlatform] = useState<number | null>(null);
@@ -200,7 +234,6 @@ const PrdForm = () => {
     const [otherIntegrationsInput, setOtherIntegrationsInput] = useState("");
 
     const [projectDeadline, setProjectDeadline] = useState("");
-    const [designSystem, setDesignSystem] = useState<number | null>(null);
     const [theme, setTheme] = useState<number | null>(null);
     const [icons, setIcons] = useState<number | null>(null);
     const [customRules, setCustomRules] = useState("");
@@ -236,7 +269,8 @@ const PrdForm = () => {
         const draft = loadDraft<PrdDraft>(DRAFT_KEYS.prdWizard);
         queueMicrotask(() => {
             if (draft) {
-                setActiveId(draft.activeId ?? 0);
+                setActiveId(isEditMode ? 0 : draft.activeId ?? 0);
+                setProjectName(draft.projectName ?? "");
                 setLanguage(draft.language ?? null);
                 setLanguageOther(draft.languageOther ?? "");
                 setPlatform(draft.platform ?? null);
@@ -250,27 +284,35 @@ const PrdForm = () => {
                 setMobileDesignLibrary(draft.mobileDesignLibrary ?? null);
                 setMobileDesignLibraryOther(draft.mobileDesignLibraryOther ?? "");
                 setBackendTech(draft.backendTech ?? null);
-                setAuthentication(normalizeAuthentication(draft.authentication));
-                setFeatures({ ...DEFAULT_FEATURES, ...(draft.features ?? {}) });
+                const normalizedAuth = normalizeAuthentication(draft.authentication);
+                setAuthentication(normalizedAuth);
+                setFeatures({
+                    ...DEFAULT_FEATURES,
+                    ...(draft.features ?? {}),
+                    featAuth:
+                        draft.features?.featAuth ??
+                        (normalizedAuth.emailPassword ||
+                            normalizedAuth.socialLogin),
+                });
                 setOtherFeaturesTags(draft.otherFeaturesTags ?? []);
                 setOtherFeaturesInput(draft.otherFeaturesInput ?? "");
                 setIntegrations({ ...DEFAULT_INTEGRATIONS, ...(draft.integrations ?? {}) });
                 setOtherIntegrationsTags(draft.otherIntegrationsTags ?? []);
                 setOtherIntegrationsInput(draft.otherIntegrationsInput ?? "");
                 setProjectDeadline(draft.projectDeadline ?? "");
-                setDesignSystem(draft.designSystem ?? null);
                 setTheme(draft.theme ?? null);
                 setIcons(draft.icons ?? null);
                 setCustomRules(draft.customRules ?? "");
             }
             setIsDraftHydrated(true);
         });
-    }, []);
+    }, [isEditMode]);
 
     useEffect(() => {
         if (!isDraftHydrated) return;
         saveDraft(DRAFT_KEYS.prdWizard, {
             activeId: currentStepIndex,
+            projectName,
             language,
             languageOther,
             platform,
@@ -292,7 +334,6 @@ const PrdForm = () => {
             otherIntegrationsTags,
             otherIntegrationsInput,
             projectDeadline,
-            designSystem,
             theme,
             icons,
             customRules,
@@ -300,6 +341,7 @@ const PrdForm = () => {
     }, [
         isDraftHydrated,
         currentStepIndex,
+        projectName,
         language,
         languageOther,
         platform,
@@ -321,26 +363,34 @@ const PrdForm = () => {
         otherIntegrationsTags,
         otherIntegrationsInput,
         projectDeadline,
-        designSystem,
         theme,
         icons,
         customRules,
     ]);
 
     const handleNext = () => {
-        if (currentStepIndex < totalSteps - 1) setActiveId(currentStepIndex + 1);
+        if (currentStepIndex >= totalSteps - 1) return;
+        if (
+            currentStep === "backendAndAuth" &&
+            (authentication.emailPassword || authentication.socialLogin)
+        ) {
+            setFeatures((prev) =>
+                prev.featAuth ? prev : { ...prev, featAuth: true }
+            );
+        }
+        setActiveId(currentStepIndex + 1);
     };
 
     const handlePrevious = () => {
         if (currentStepIndex > 0) setActiveId(currentStepIndex - 1);
     };
 
-    const toggleFeature = (key: string) => {
-        setFeatures((prev) => ({ ...prev, [key]: !prev[key] }));
+    const setFeatureSelected = (key: string, selected: boolean) => {
+        setFeatures((prev) => ({ ...prev, [key]: selected }));
     };
 
-    const toggleIntegration = (key: string) => {
-        setIntegrations((prev) => ({ ...prev, [key]: !prev[key] }));
+    const setIntegrationSelected = (key: string, selected: boolean) => {
+        setIntegrations((prev) => ({ ...prev, [key]: selected }));
     };
 
     const toggleAuthentication = (id: number) => {
@@ -365,12 +415,129 @@ const PrdForm = () => {
         { id: 4, key: "langOther" as const },
     ];
 
-    const integrationLabelKey: Record<string, string> = {
-        payments: "integrationPayments",
-        ai: "integrationAi",
-        external_api: "integrationExternal_api",
-        whatsapp: "integrationWhatsapp",
+    const selectedIntegrationOptions = useMemo(
+        () => INTEGRATION_OPTIONS.filter((option) => integrations[option.key]),
+        [integrations]
+    );
+    const availableIntegrationOptions = useMemo(
+        () => INTEGRATION_OPTIONS.filter((option) => !integrations[option.key]),
+        [integrations]
+    );
+    const filteredIntegrationOptions = useMemo(() => {
+        const query = normalizeTag(otherIntegrationsInput);
+        if (!query) return availableIntegrationOptions;
+        return availableIntegrationOptions.filter((option) =>
+            normalizeTag(t(option.labelKey)).includes(query)
+        );
+    }, [availableIntegrationOptions, otherIntegrationsInput, t]);
+
+    const addCustomIntegrationTag = (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return;
+        setOtherIntegrationsTags((prev) => {
+            if (prev.some((tag) => normalizeTag(tag) === normalizeTag(trimmed))) {
+                return prev;
+            }
+            return [...prev, trimmed];
+        });
     };
+
+    const addIntegrationFromInputValue = (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return;
+
+        const exactMatch = INTEGRATION_OPTIONS.find(
+            (option) => normalizeTag(t(option.labelKey)) === normalizeTag(trimmed)
+        );
+        if (exactMatch) {
+            setIntegrationSelected(exactMatch.key, true);
+            return;
+        }
+
+        const partialMatches = INTEGRATION_OPTIONS.filter(
+            (option) =>
+                !integrations[option.key] &&
+                normalizeTag(t(option.labelKey)).includes(normalizeTag(trimmed))
+        );
+        if (partialMatches.length === 1) {
+            setIntegrationSelected(partialMatches[0].key, true);
+            return;
+        }
+
+        addCustomIntegrationTag(trimmed);
+    };
+
+    const commitIntegrationInput = (commitSingle = false) => {
+        const hasComma = otherIntegrationsInput.includes(",");
+        const values = splitCommaValues(otherIntegrationsInput);
+        if (values.length === 0) return;
+        if (!commitSingle && !hasComma) return;
+        values.forEach(addIntegrationFromInputValue);
+        setOtherIntegrationsInput("");
+    };
+
+    const selectedFeatureOptions = useMemo(
+        () => FEATURE_OPTIONS.filter((option) => features[option.key]),
+        [features]
+    );
+    const availableFeatureOptions = useMemo(
+        () => FEATURE_OPTIONS.filter((option) => !features[option.key]),
+        [features]
+    );
+    const filteredFeatureOptions = useMemo(() => {
+        const query = normalizeTag(otherFeaturesInput);
+        if (!query) return availableFeatureOptions;
+        return availableFeatureOptions.filter((option) =>
+            normalizeTag(t(option.labelKey)).includes(query)
+        );
+    }, [availableFeatureOptions, otherFeaturesInput, t]);
+
+    const addCustomFeatureTag = (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return;
+        setOtherFeaturesTags((prev) => {
+            if (prev.some((tag) => normalizeTag(tag) === normalizeTag(trimmed))) {
+                return prev;
+            }
+            return [...prev, trimmed];
+        });
+    };
+
+    const addFeatureFromInputValue = (value: string) => {
+        const trimmed = value.trim();
+        if (!trimmed) return;
+
+        const exactMatch = FEATURE_OPTIONS.find(
+            (option) => normalizeTag(t(option.labelKey)) === normalizeTag(trimmed)
+        );
+        if (exactMatch) {
+            setFeatureSelected(exactMatch.key, true);
+            return;
+        }
+
+        const partialMatches = FEATURE_OPTIONS.filter(
+            (option) =>
+                !features[option.key] &&
+                normalizeTag(t(option.labelKey)).includes(normalizeTag(trimmed))
+        );
+        if (partialMatches.length === 1) {
+            setFeatureSelected(partialMatches[0].key, true);
+            return;
+        }
+
+        addCustomFeatureTag(trimmed);
+    };
+
+    const commitFeatureInput = () => {
+        const values = splitCommaValues(otherFeaturesInput);
+        if (values.length === 0) return;
+        values.forEach(addFeatureFromInputValue);
+        setOtherFeaturesInput("");
+    };
+
+    const canSubmitPrd =
+        projectName.trim().length >= 3 &&
+        customRules.length >= 100;
 
     return (
         <div className="flex flex-col w-full max-w-152 max-h-200 h-full max-3xl:max-w-127 max-3xl:max-h-169 max-xl:max-w-136 max-md:max-h-full">
@@ -623,36 +790,32 @@ const PrdForm = () => {
                 {currentStep === "features" && (
                     <>
                         <div className="mb-5 text-body text-t-secondary max-md:mb-4">{t("featuresHint")}</div>
-                        <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                            {FEATURE_KEYS.map((key) => (
-                                <div
-                                    key={key}
-                                    className={cardClass(features[key] ?? false)}
-                                    onClick={() => toggleFeature(key)}
-                                >
-                                    <div className="">{t(key)}</div>
-                                </div>
-                            ))}
-                        </div>
-                        <div className="mt-6">
-                            <div className="min-h-40 w-full rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1 px-4 py-4 focus-within:border-[#A8A8A8]/50">
-                                <div className="flex flex-wrap gap-2">
-                                    {otherFeaturesTags.map((tag, index) => (
-                                        <span
-                                            key={`${tag}-${index}`}
-                                            className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-stroke1 bg-b-surface2 pl-3 pr-1.5 py-1.5 text-body text-t-primary"
+                        <div className="mb-6">
+                            {availableFeatureOptions.length > 0 ? (
+                                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                                    {availableFeatureOptions.map((option) => (
+                                        <button
+                                            key={option.key}
+                                            type="button"
+                                            className="shrink-0 h-8 px-4 bg-b-surface1 shadow-[inset_0_0_0_1.5px_var(--color-stroke1)] rounded-full text-hairline font-medium text-t-secondary transition-all hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary"
+                                            onClick={() => {
+                                                setFeatureSelected(option.key, true);
+                                                setOtherFeaturesInput("");
+                                            }}
                                         >
-                                            {tag}
-                                            <button
-                                                type="button"
-                                                onClick={() => setOtherFeaturesTags((prev) => prev.filter((_, i) => i !== index))}
-                                                className="flex size-6 items-center justify-center rounded-full fill-t-secondary transition-colors hover:bg-b-surface3 hover:fill-t-primary"
-                                                aria-label="Remover"
-                                            >
-                                                <Icon className="size-3.5 fill-inherit" name="close" />
-                                            </button>
-                                        </span>
+                                            {t(option.labelKey)}
+                                        </button>
                                     ))}
+                                </div>
+                            ) : (
+                                <p className="text-hairline text-t-tertiary">
+                                    {t("featuresSuggestedEmpty")}
+                                </p>
+                            )}
+                        </div>
+                        <div>
+                            <div className={tagsBoxClass}>
+                                <div className="mb-3">
                                     <input
                                         type="text"
                                         value={otherFeaturesInput}
@@ -660,23 +823,68 @@ const PrdForm = () => {
                                         onKeyDown={(e) => {
                                             if (e.key === "Enter" || e.key === ",") {
                                                 e.preventDefault();
-                                                const parts = otherFeaturesInput.split(",").map((s) => s.trim()).filter(Boolean);
-                                                if (parts.length > 0) {
-                                                    setOtherFeaturesTags((prev) => [...prev, ...parts]);
-                                                    setOtherFeaturesInput("");
-                                                }
+                                                commitFeatureInput();
                                             }
                                         }}
-                                        onBlur={() => {
-                                            const parts = otherFeaturesInput.split(",").map((s) => s.trim()).filter(Boolean);
-                                            if (parts.length > 0) {
-                                                setOtherFeaturesTags((prev) => [...prev, ...parts]);
-                                                setOtherFeaturesInput("");
-                                            }
-                                        }}
-                                        placeholder={otherFeaturesTags.length === 0 ? t("otherFeaturesPlaceholder") : ""}
-                                        className="min-w-48 flex-1 shrink-0 border-0 bg-transparent px-1 py-1 text-body font-medium text-t-primary outline-0 placeholder:text-t-tertiary"
+                                        onBlur={commitFeatureInput}
+                                        placeholder={t("featureSearchPlaceholder")}
+                                        className="w-full border-0 bg-transparent px-1 py-1 text-hairline font-medium text-t-primary outline-0 placeholder:text-t-tertiary"
                                     />
+                                    {otherFeaturesInput.trim().length > 0 &&
+                                        filteredFeatureOptions.length > 0 && (
+                                            <div className="mt-2 flex flex-wrap gap-2">
+                                                {filteredFeatureOptions.slice(0, 4).map((option) => (
+                                                    <button
+                                                        key={`${option.key}-search`}
+                                                        type="button"
+                                                        className="shrink-0 h-8 px-4 bg-b-surface1 shadow-[inset_0_0_0_1.5px_var(--color-stroke1)] rounded-full text-hairline font-medium text-t-secondary transition-all hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary"
+                                                        onMouseDown={(e) => e.preventDefault()}
+                                                        onClick={() => {
+                                                            setFeatureSelected(option.key, true);
+                                                            setOtherFeaturesInput("");
+                                                        }}
+                                                    >
+                                                        {t(option.labelKey)}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    {selectedFeatureOptions.map((option) => (
+                                        <span
+                                            key={`selected-feature-${option.key}`}
+                                            className={tagPillClass}
+                                        >
+                                            {t(option.labelKey)}
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setFeatureSelected(option.key, false)
+                                                }
+                                                className={tagRemoveButtonClass}
+                                                aria-label="Remover"
+                                            >
+                                                <Icon className="size-3 fill-inherit" name="close" />
+                                            </button>
+                                        </span>
+                                    ))}
+                                    {otherFeaturesTags.map((tag, index) => (
+                                        <span
+                                            key={`${tag}-${index}`}
+                                            className={tagPillClass}
+                                        >
+                                            {tag}
+                                            <button
+                                                type="button"
+                                                onClick={() => setOtherFeaturesTags((prev) => prev.filter((_, i) => i !== index))}
+                                                className={tagRemoveButtonClass}
+                                                aria-label="Remover"
+                                            >
+                                                <Icon className="size-3 fill-inherit" name="close" />
+                                            </button>
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
                         </div>
@@ -687,60 +895,113 @@ const PrdForm = () => {
                 {currentStep === "integrations" && (
                     <>
                         <div className="mb-5 text-body text-t-secondary max-md:mb-4">{t("integrationsHint")}</div>
-                        <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                            {INTEGRATION_KEYS.map((key) => (
-                                <div
-                                    key={key}
-                                    className={cardClass(integrations[key] ?? false)}
-                                    onClick={() => toggleIntegration(key)}
-                                >
-                                    <div className="">{t(integrationLabelKey[key])}</div>
+                        <div className="mb-6">
+                            {availableIntegrationOptions.length > 0 ? (
+                                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+                                    {availableIntegrationOptions.map((option) => (
+                                        <button
+                                            key={option.key}
+                                            type="button"
+                                            className="shrink-0 h-8 px-4 bg-b-surface1 shadow-[inset_0_0_0_1.5px_var(--color-stroke1)] rounded-full text-hairline font-medium text-t-secondary transition-all hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary"
+                                            onClick={() => {
+                                                setIntegrationSelected(option.key, true);
+                                                setOtherIntegrationsInput("");
+                                            }}
+                                        >
+                                            {t(option.labelKey)}
+                                        </button>
+                                    ))}
                                 </div>
-                            ))}
+                            ) : (
+                                <p className="text-hairline text-t-tertiary">
+                                    {t("integrationsSuggestedEmpty")}
+                                </p>
+                            )}
                         </div>
-                        <div className="mt-6">
-                            <div className="min-h-40 w-full rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1 px-4 py-4 focus-within:border-[#A8A8A8]/50">
+                        <div>
+                            <div className={tagsBoxClass}>
+                                <div className="mb-3">
+                                    <input
+                                        type="text"
+                                        value={otherIntegrationsInput}
+                                        onChange={(e) =>
+                                            setOtherIntegrationsInput(e.target.value)
+                                        }
+                                        onKeyDown={(e) => {
+                                            if (e.key === "Enter" || e.key === ",") {
+                                                e.preventDefault();
+                                                commitIntegrationInput(true);
+                                            }
+                                        }}
+                                        onBlur={() => commitIntegrationInput(false)}
+                                        placeholder={t("integrationSearchPlaceholder")}
+                                        className="w-full border-0 bg-transparent px-1 py-1 text-hairline font-medium text-t-primary outline-0 placeholder:text-t-tertiary"
+                                    />
+                                    {otherIntegrationsInput.trim().length > 0 &&
+                                        filteredIntegrationOptions.length > 0 && (
+                                            <div className="mt-2 flex flex-wrap gap-2">
+                                                {filteredIntegrationOptions
+                                                    .slice(0, 4)
+                                                    .map((option) => (
+                                                        <button
+                                                            key={`${option.key}-search`}
+                                                            type="button"
+                                                            className="shrink-0 h-8 px-4 bg-b-surface1 shadow-[inset_0_0_0_1.5px_var(--color-stroke1)] rounded-full text-hairline font-medium text-t-secondary transition-all hover:bg-b-surface2 hover:shadow-hover hover:text-t-primary"
+                                                            onMouseDown={(e) =>
+                                                                e.preventDefault()
+                                                            }
+                                                            onClick={() => {
+                                                                setIntegrationSelected(
+                                                                    option.key,
+                                                                    true
+                                                                );
+                                                                setOtherIntegrationsInput("");
+                                                            }}
+                                                        >
+                                                            {t(option.labelKey)}
+                                                        </button>
+                                                    ))}
+                                            </div>
+                                        )}
+                                </div>
                                 <div className="flex flex-wrap gap-2">
+                                    {selectedIntegrationOptions.map((option) => (
+                                        <span
+                                            key={`selected-${option.key}`}
+                                            className={tagPillClass}
+                                        >
+                                            {t(option.labelKey)}
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    setIntegrationSelected(option.key, false)
+                                                }
+                                                className={tagRemoveButtonClass}
+                                                aria-label="Remover"
+                                            >
+                                                <Icon
+                                                    className="size-3 fill-inherit"
+                                                    name="close"
+                                                />
+                                            </button>
+                                        </span>
+                                    ))}
                                     {otherIntegrationsTags.map((tag, index) => (
                                         <span
                                             key={`${tag}-${index}`}
-                                            className="inline-flex items-center gap-1.5 rounded-full border-[1.5px] border-stroke1 bg-b-surface2 pl-3 pr-1.5 py-1.5 text-body text-t-primary"
+                                            className={tagPillClass}
                                         >
                                             {tag}
                                             <button
                                                 type="button"
                                                 onClick={() => setOtherIntegrationsTags((prev) => prev.filter((_, i) => i !== index))}
-                                                className="flex size-6 items-center justify-center rounded-full fill-t-secondary transition-colors hover:bg-b-surface3 hover:fill-t-primary"
+                                                className={tagRemoveButtonClass}
                                                 aria-label="Remover"
                                             >
-                                                <Icon className="size-3.5 fill-inherit" name="close" />
+                                                <Icon className="size-3 fill-inherit" name="close" />
                                             </button>
                                         </span>
                                     ))}
-                                    <input
-                                        type="text"
-                                        value={otherIntegrationsInput}
-                                        onChange={(e) => setOtherIntegrationsInput(e.target.value)}
-                                        onKeyDown={(e) => {
-                                            if (e.key === "Enter" || e.key === ",") {
-                                                e.preventDefault();
-                                                const parts = otherIntegrationsInput.split(",").map((s) => s.trim()).filter(Boolean);
-                                                if (parts.length > 0) {
-                                                    setOtherIntegrationsTags((prev) => [...prev, ...parts]);
-                                                    setOtherIntegrationsInput("");
-                                                }
-                                            }
-                                        }}
-                                        onBlur={() => {
-                                            const parts = otherIntegrationsInput.split(",").map((s) => s.trim()).filter(Boolean);
-                                            if (parts.length > 0) {
-                                                setOtherIntegrationsTags((prev) => [...prev, ...parts]);
-                                                setOtherIntegrationsInput("");
-                                            }
-                                        }}
-                                        placeholder={otherIntegrationsTags.length === 0 ? t("otherIntegrationsPlaceholder") : ""}
-                                        className="min-w-48 flex-1 shrink-0 border-0 bg-transparent px-1 py-1 text-body font-medium text-t-primary outline-0 placeholder:text-t-tertiary"
-                                    />
                                 </div>
                             </div>
                         </div>
@@ -750,20 +1011,6 @@ const PrdForm = () => {
                 {/* Design e tema */}
                 {currentStep === "design" && (
                     <div className="space-y-8">
-                        <div>
-                            <div className="mb-3 text-body-bold text-t-primary">{t("designSectionDesign")}</div>
-                            <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
-                                {[0, 1].map((id) => (
-                                    <div
-                                        key={id}
-                                        className={cardClass(designSystem === id)}
-                                        onClick={() => setDesignSystem(id)}
-                                    >
-                                        <div className="">{t(id === 0 ? "designSystemYes" : "designSystemNo")}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                         <div>
                             <div className="mb-3 text-body-bold text-t-primary">{t("designSectionTheme")}</div>
                             <div className="flex flex-wrap -mt-4 -mx-2 max-md:-mt-3 max-md:-mx-1.5">
@@ -798,9 +1045,18 @@ const PrdForm = () => {
                 {/* Projeto */}
                 {currentStep === "projectDetails" && (
                     <>
-                        <p className="mb-4 text-body text-t-secondary">
-                            {t("customRulesHint")}
-                        </p>
+                        <Field
+                            className="mb-6"
+                            label={t("projectName")}
+                            value={projectName}
+                            onChange={(e) => setProjectName(e.target.value)}
+                            name="project-name"
+                            placeholder={t("projectNamePlaceholder")}
+                            isLarge
+                            required
+                            minLength={3}
+                            maxLength={180}
+                        />
                         <Field
                             label={t("customRules")}
                             value={customRules}
@@ -830,7 +1086,7 @@ const PrdForm = () => {
                     </Button>
                 )}
                 {currentStep === "projectDetails" ? (
-                    customRules.length >= 100 ? (
+                    canSubmitPrd ? (
                         <Button
                             className="min-w-40 ml-auto max-md:min-w-[calc(50%-0.5rem)] max-md:mx-1"
                             isSecondary
@@ -849,7 +1105,7 @@ const PrdForm = () => {
                                 {t("continue")}
                             </Button>
                             <p className="mt-2 text-hairline text-t-tertiary">
-                                {t("minCharsToContinue")}
+                                {t("prdDetailsToContinue")}
                             </p>
                         </div>
                     )

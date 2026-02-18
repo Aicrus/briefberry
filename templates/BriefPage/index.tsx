@@ -776,55 +776,754 @@ function buildContractContentFromDraft(
     };
 }
 
-const prdContent = {
-    introduction: (
-        <>
-            Este PRD descreve a visão do produto, requisitos funcionais e
-            critérios de entrega para orientar design, desenvolvimento e
-            validação do projeto de ponta a ponta.
-        </>
-    ),
-    goals: (
-        <>
-            O documento busca alinhar objetivos de negócio e produto, com foco
-            em experiência do usuário, escopo técnico viável e definição de
-            prioridades para execução em ciclos.
-        </>
-    ),
-    timeline: (
-        <>
-            O cronograma organiza discovery, arquitetura, implementação,
-            testes e entrega, com checkpoints por sprint para acompanhar avanço,
-            riscos e ajustes de prioridade.
-        </>
-    ),
-    budget: (
-        <>
-            O investimento é distribuído por fases de produto, contemplando
-            design, desenvolvimento, QA, integrações e ajustes pós-lançamento
-            conforme o volume e a complexidade das funcionalidades.
-        </>
-    ),
-    references: (
-        <>
-            <p>
-                As referências visuais e técnicas servem de base para decisões
-                de UX, arquitetura e identidade do produto.
-            </p>
-            <p>
-                Incluem benchmarks, fluxos parecidos, padrões de interface e
-                integrações que orientam as escolhas durante a execução.
-            </p>
-        </>
-    ),
-    conclusion: (
-        <>
-            Com requisitos, prioridades e critérios definidos, o PRD reduz
-            retrabalho, aumenta previsibilidade e acelera a entrega com mais
-            qualidade e alinhamento entre time e cliente.
-        </>
-    ),
+const PRD_LANGUAGE_KEYS = [
+    "langPtBr",
+    "langEn",
+    "langEs",
+    "langMulti",
+    "langOther",
+] as const;
+const PRD_PLATFORM_KEYS = [
+    "platformWeb",
+    "platformMobile",
+    "platformWebAndMobile",
+    "other",
+] as const;
+const PRD_WEB_FRAMEWORK_NAMES = [
+    "Next.js",
+    "Nuxt.js",
+    "Remix",
+    "Astro",
+    "SvelteKit",
+] as const;
+const PRD_MOBILE_FRAMEWORK_NAMES = [
+    "Flutter",
+    "React Native",
+    "Expo (React Native)",
+    "Ionic",
+    "Nativo (Swift/Kotlin)",
+] as const;
+const PRD_WEB_DESIGN_LABEL_KEY: Record<string, string> = {
+    tailwind: "webDesignLibTailwind",
+    mui: "webDesignLibMui",
+    chakra: "webDesignLibChakra",
+    shadcn: "webDesignLibShadcn",
 };
+const PRD_MOBILE_DESIGN_LABEL_KEY: Record<string, string> = {
+    material: "mobileDesignLibMaterial",
+    cupertino: "mobileDesignLibCupertino",
+    paper: "mobileDesignLibPaper",
+    nativebase: "mobileDesignLibNativebase",
+    tamagui: "mobileDesignLibTamagui",
+    ionic: "mobileDesignLibIonic",
+};
+const PRD_INTEGRATION_LABEL_KEY: Record<string, string> = {
+    payments: "integrationPayments",
+    ai: "integrationAi",
+    external_api: "integrationExternal_api",
+    whatsapp: "integrationWhatsapp",
+    analytics: "integrationAnalytics",
+    crm: "integrationCrm",
+    email: "integrationEmail",
+    push: "integrationPush",
+};
+const PRD_BACKEND_NAMES = ["Supabase", "Node.js", "Laravel", "Firebase"] as const;
+const PRD_ICON_LABEL_KEYS = ["iconsLucide", "iconsFeather", "iconsHeroicons"] as const;
+
+type PrdWizardDraft = {
+    activeId: number;
+    projectName: string;
+    projectGoals?: string;
+    language: number | null;
+    languageOther: string;
+    platform: number | null;
+    platformOther: string;
+    webFramework: number | null;
+    webFrameworkOther: string;
+    webDesignLibrary: string | null;
+    webDesignLibraryOther: string;
+    mobileFramework: number | null;
+    mobileFrameworkOther: string;
+    mobileDesignLibrary: string | null;
+    mobileDesignLibraryOther: string;
+    backendTech: number | null;
+    authentication:
+        | number
+        | null
+        | {
+              emailPassword: boolean;
+              socialLogin: boolean;
+          };
+    features: Record<string, boolean>;
+    otherFeaturesTags: string[];
+    integrations: Record<string, boolean>;
+    otherIntegrationsTags: string[];
+    projectDeadline: string;
+    designSystem: number | null;
+    theme: number | null;
+    icons: number | null;
+    customRules: string;
+};
+
+type PrdAuthSelection = {
+    emailPassword: boolean;
+    socialLogin: boolean;
+};
+
+const PRD_UI_COPY = {
+    pt: {
+        documentTitle: "Documento de Requisitos do Produto",
+        subtitle: "PRD",
+        sectionIntroduction: "Visão Geral e Público-Alvo",
+        sectionGoals: "Escopo Funcional e User Stories",
+        sectionTimeline: "Jornadas e Requisitos Técnicos",
+        sectionBudget: "Dados e Fluxos Principais",
+        sectionReferences: "Regras de Negócio e Interface",
+        sectionConclusion: "Segurança e Métricas",
+        toDefine: "A definir",
+        notApplicable: "Não se aplica",
+        notInformed: "não informado",
+        projectNameFallback: "Projeto",
+        projectGoalsFallback:
+            "Objetivos detalhados serão refinados na fase de discovery.",
+        overviewHeading: "1. Visão Geral",
+        audienceHeading: "2. Público-Alvo",
+        mainFeaturesHeading: "3. Funcionalidades Principais",
+        userStoriesHeading: "4. User Stories",
+        journeysHeading: "5. User Journeys (GIVEN / WHEN / THEN)",
+        technicalHeading: "6. Requisitos Técnicos",
+        entitiesHeading: "7. Entidades do Banco de Dados (alto nível)",
+        flowsHeading: "8. Fluxos Principais de Uso",
+        rulesHeading: "9. Regras de Negócio",
+        screensHeading: "10. Telas e Interface (Design System)",
+        securityHeading: "11. Segurança e Conformidade",
+        metricsHeading: "12. Métricas de Sucesso",
+        projectLanguageLabel: "Idioma do projeto",
+        platformLabel: "Plataforma",
+        deadlineLabel: "Prazo de entrega",
+        webLabel: "Web",
+        mobileLabel: "Mobile",
+        backendLabel: "Backend",
+        authenticationLabel: "Autenticação",
+        integrationsLabel: "Integrações",
+        designSystemLabel: "Design System",
+        themeLabel: "Tema",
+        iconsLabel: "Ícones",
+        additionalDetailsLabel: "Requisitos adicionais informados no formulário",
+        defaultStory:
+            "USER-01 Como usuário, quero um fluxo principal claro para utilizar o produto com rapidez e segurança.",
+        storyTemplate: "Como usuário, quero {feature} para atingir o objetivo do produto.",
+        journeyOnboarding:
+            "GIVEN um usuário elegível, WHEN acessa o sistema pela primeira vez, THEN conclui onboarding e inicia o uso sem bloqueios.",
+        journeyAuthentication:
+            "GIVEN um usuário cadastrado, WHEN informa credenciais válidas, THEN acessa as funcionalidades permitidas para seu perfil.",
+        journeyPayments:
+            "GIVEN itens elegíveis para cobrança, WHEN o usuário confirma a ação, THEN o sistema registra pagamento e atualiza status.",
+        journeyUploads:
+            "GIVEN arquivos válidos, WHEN o usuário realiza upload, THEN o sistema armazena e disponibiliza os anexos no contexto correto.",
+        journeyRealtime:
+            "GIVEN múltiplos usuários ativos, WHEN ocorre atualização de dados, THEN o sistema sincroniza a informação em tempo real.",
+        journeyOffline:
+            "GIVEN ausência de internet, WHEN o usuário interage com o app, THEN os dados são enfileirados e sincronizados ao reconectar.",
+        journeyIntegrations:
+            "GIVEN integrações configuradas, WHEN um evento externo é disparado, THEN o sistema recebe/processa o payload conforme regras.",
+        flowOnboarding:
+            "Cadastro/login inicial, configuração de perfil e validação de acesso.",
+        flowCore:
+            "Execução do fluxo principal de negócio com registro de ações e persistência de dados.",
+        flowOperations:
+            "Operação diária com consulta, edição e acompanhamento dos itens críticos.",
+        flowMonitoring:
+            "Acompanhamento por indicadores, alertas e ajustes contínuos de processo.",
+        ruleAccess:
+            "Controle de acesso por papéis/perfis para áreas e ações críticas.",
+        ruleAudit:
+            "Operações sensíveis devem gerar trilha de auditoria com data, usuário e contexto.",
+        rulePayments:
+            "Transações financeiras exigem validação de status e tratamento de falhas/estorno.",
+        ruleUploads:
+            "Uploads devem validar formato, tamanho e permissões antes de persistir.",
+        ruleIntegrations:
+            "Integrações externas devem prever timeout, retry e logs técnicos para suporte.",
+        screenLogin: "Tela de login e recuperação de acesso (`/login`).",
+        screenDashboard:
+            "Dashboard com visão de KPIs, tarefas pendentes e status operacional (`/dashboard`).",
+        screenCore:
+            "Telas do fluxo principal de negócio com formulários, listagens e detalhes.",
+        screenSettings: "Configurações de conta, permissões e preferências.",
+        security1: "Autenticação e autorização por perfil de acesso.",
+        security2: "Criptografia de dados sensíveis e armazenamento seguro de credenciais.",
+        security3:
+            "Validação de entrada para mitigar injeção, abuso e inconsistência de dados.",
+        security4:
+            "Arquivos de ambiente obrigatórios: `.env` e `.env.example` com variáveis documentadas.",
+        metricAdoption:
+            "Taxa de ativação e conclusão do fluxo principal nos primeiros dias de uso.",
+        metricDelivery:
+            "Cumprimento do prazo definido ({deadline}) com redução de retrabalho.",
+        metricPayments:
+            "Taxa de conversão e aprovação de pagamentos dentro do fluxo de compra.",
+        metricReliability:
+            "Estabilidade operacional (latência/erros) e satisfação do usuário final.",
+    },
+    en: {
+        documentTitle: "Product Requirements Document",
+        subtitle: "PRD",
+        sectionIntroduction: "Overview and Target Audience",
+        sectionGoals: "Functional Scope and User Stories",
+        sectionTimeline: "Journeys and Technical Requirements",
+        sectionBudget: "Data Model and Main Flows",
+        sectionReferences: "Business Rules and Interface",
+        sectionConclusion: "Security and Success Metrics",
+        toDefine: "To be defined",
+        notApplicable: "Not applicable",
+        notInformed: "not informed",
+        projectNameFallback: "Project",
+        projectGoalsFallback:
+            "Detailed goals will be refined during the discovery phase.",
+        overviewHeading: "1. Overview",
+        audienceHeading: "2. Target Audience",
+        mainFeaturesHeading: "3. Main Features",
+        userStoriesHeading: "4. User Stories",
+        journeysHeading: "5. User Journeys (GIVEN / WHEN / THEN)",
+        technicalHeading: "6. Technical Requirements",
+        entitiesHeading: "7. Database Entities (high-level)",
+        flowsHeading: "8. Main Usage Flows",
+        rulesHeading: "9. Business Rules",
+        screensHeading: "10. Screens and Interface (Design System)",
+        securityHeading: "11. Security and Compliance",
+        metricsHeading: "12. Success Metrics",
+        projectLanguageLabel: "Project language",
+        platformLabel: "Platform",
+        deadlineLabel: "Delivery deadline",
+        webLabel: "Web",
+        mobileLabel: "Mobile",
+        backendLabel: "Backend",
+        authenticationLabel: "Authentication",
+        integrationsLabel: "Integrations",
+        designSystemLabel: "Design System",
+        themeLabel: "Theme",
+        iconsLabel: "Icons",
+        additionalDetailsLabel: "Additional requirements provided in the form",
+        defaultStory:
+            "USER-01 As a user, I want a clear main flow so I can use the product quickly and safely.",
+        storyTemplate:
+            "As a user, I want {feature} so I can achieve the product goal.",
+        journeyOnboarding:
+            "GIVEN an eligible user, WHEN they access the system for the first time, THEN they complete onboarding and start using it without blockers.",
+        journeyAuthentication:
+            "GIVEN a registered user, WHEN valid credentials are submitted, THEN access is granted according to role permissions.",
+        journeyPayments:
+            "GIVEN billable items, WHEN the user confirms the action, THEN the system records payment and updates status.",
+        journeyUploads:
+            "GIVEN valid files, WHEN the user uploads them, THEN the system stores and links the files to the right context.",
+        journeyRealtime:
+            "GIVEN multiple active users, WHEN data changes, THEN the system synchronizes updates in real time.",
+        journeyOffline:
+            "GIVEN no internet connection, WHEN the user interacts with the app, THEN actions are queued and synced once online again.",
+        journeyIntegrations:
+            "GIVEN configured integrations, WHEN an external event occurs, THEN the system receives/processes the payload according to rules.",
+        flowOnboarding:
+            "Initial sign-up/sign-in, profile setup, and access validation.",
+        flowCore:
+            "Execution of the core business flow with action tracking and data persistence.",
+        flowOperations:
+            "Daily operation with search, update, and monitoring of critical items.",
+        flowMonitoring:
+            "Performance monitoring through KPIs, alerts, and continuous process adjustments.",
+        ruleAccess:
+            "Role-based access control for critical areas and actions.",
+        ruleAudit:
+            "Sensitive operations must generate audit logs with date, user, and context.",
+        rulePayments:
+            "Financial transactions require status validation and failure/refund handling.",
+        ruleUploads:
+            "Uploads must validate format, size, and permissions before persisting.",
+        ruleIntegrations:
+            "External integrations must include timeout, retry, and technical logging for support.",
+        screenLogin: "Login and password recovery (`/login`).",
+        screenDashboard:
+            "Dashboard with KPIs, pending tasks, and operational status (`/dashboard`).",
+        screenCore:
+            "Core business flow screens with forms, lists, and detail views.",
+        screenSettings: "Account settings, permissions, and preferences.",
+        security1: "Authentication and authorization based on user role.",
+        security2: "Sensitive data encryption and secure credential handling.",
+        security3:
+            "Input validation to mitigate injection, abuse, and data inconsistencies.",
+        security4:
+            "Required environment files: `.env` and `.env.example` with documented variables.",
+        metricAdoption:
+            "Activation rate and completion of the core flow in the first days of usage.",
+        metricDelivery:
+            "Deadline compliance ({deadline}) with reduced rework.",
+        metricPayments:
+            "Payment conversion and approval rate within the purchase flow.",
+        metricReliability:
+            "Operational stability (latency/errors) and end-user satisfaction.",
+    },
+    es: {
+        documentTitle: "Documento de Requisitos del Producto",
+        subtitle: "PRD",
+        sectionIntroduction: "Visión General y Público Objetivo",
+        sectionGoals: "Alcance Funcional e Historias de Usuario",
+        sectionTimeline: "Jornadas y Requisitos Técnicos",
+        sectionBudget: "Modelo de Datos y Flujos Principales",
+        sectionReferences: "Reglas de Negocio e Interfaz",
+        sectionConclusion: "Seguridad y Métricas de Éxito",
+        toDefine: "Por definir",
+        notApplicable: "No aplica",
+        notInformed: "no informado",
+        projectNameFallback: "Proyecto",
+        projectGoalsFallback:
+            "Los objetivos detallados se ajustarán durante la fase de discovery.",
+        overviewHeading: "1. Visión General",
+        audienceHeading: "2. Público Objetivo",
+        mainFeaturesHeading: "3. Funcionalidades Principales",
+        userStoriesHeading: "4. Historias de Usuario",
+        journeysHeading: "5. User Journeys (GIVEN / WHEN / THEN)",
+        technicalHeading: "6. Requisitos Técnicos",
+        entitiesHeading: "7. Entidades de Base de Datos (alto nivel)",
+        flowsHeading: "8. Flujos Principales de Uso",
+        rulesHeading: "9. Reglas de Negocio",
+        screensHeading: "10. Pantallas e Interfaz (Design System)",
+        securityHeading: "11. Seguridad y Cumplimiento",
+        metricsHeading: "12. Métricas de Éxito",
+        projectLanguageLabel: "Idioma del proyecto",
+        platformLabel: "Plataforma",
+        deadlineLabel: "Plazo de entrega",
+        webLabel: "Web",
+        mobileLabel: "Mobile",
+        backendLabel: "Backend",
+        authenticationLabel: "Autenticación",
+        integrationsLabel: "Integraciones",
+        designSystemLabel: "Design System",
+        themeLabel: "Tema",
+        iconsLabel: "Íconos",
+        additionalDetailsLabel: "Requisitos adicionales informados en el formulario",
+        defaultStory:
+            "USER-01 Como usuario, quiero un flujo principal claro para usar el producto de forma rápida y segura.",
+        storyTemplate:
+            "Como usuario, quiero {feature} para alcanzar el objetivo del producto.",
+        journeyOnboarding:
+            "GIVEN un usuario elegible, WHEN accede al sistema por primera vez, THEN completa onboarding e inicia uso sin bloqueos.",
+        journeyAuthentication:
+            "GIVEN un usuario registrado, WHEN envía credenciales válidas, THEN accede según los permisos de su rol.",
+        journeyPayments:
+            "GIVEN elementos cobrables, WHEN el usuario confirma la acción, THEN el sistema registra el pago y actualiza el estado.",
+        journeyUploads:
+            "GIVEN archivos válidos, WHEN el usuario realiza la carga, THEN el sistema guarda y vincula los archivos al contexto correcto.",
+        journeyRealtime:
+            "GIVEN múltiples usuarios activos, WHEN cambian los datos, THEN el sistema sincroniza la información en tiempo real.",
+        journeyOffline:
+            "GIVEN falta de internet, WHEN el usuario interactúa con la app, THEN las acciones se encolan y sincronizan al reconectar.",
+        journeyIntegrations:
+            "GIVEN integraciones configuradas, WHEN ocurre un evento externo, THEN el sistema recibe/procesa el payload según reglas.",
+        flowOnboarding:
+            "Registro/login inicial, configuración de perfil y validación de acceso.",
+        flowCore:
+            "Ejecución del flujo central del negocio con registro de acciones y persistencia de datos.",
+        flowOperations:
+            "Operación diaria con consulta, edición y seguimiento de elementos críticos.",
+        flowMonitoring:
+            "Seguimiento por KPIs, alertas y ajustes continuos del proceso.",
+        ruleAccess:
+            "Control de acceso por roles/perfiles para áreas y acciones críticas.",
+        ruleAudit:
+            "Operaciones sensibles deben generar trazabilidad con fecha, usuario y contexto.",
+        rulePayments:
+            "Transacciones financieras requieren validación de estado y manejo de fallos/reembolsos.",
+        ruleUploads:
+            "Las cargas deben validar formato, tamaño y permisos antes de persistir.",
+        ruleIntegrations:
+            "Integraciones externas deben contemplar timeout, retry y logs técnicos de soporte.",
+        screenLogin: "Pantalla de login y recuperación de acceso (`/login`).",
+        screenDashboard:
+            "Dashboard con KPIs, tareas pendientes y estado operativo (`/dashboard`).",
+        screenCore:
+            "Pantallas del flujo principal con formularios, listados y vistas de detalle.",
+        screenSettings: "Configuraciones de cuenta, permisos y preferencias.",
+        security1: "Autenticación y autorización por perfil de acceso.",
+        security2: "Cifrado de datos sensibles y gestión segura de credenciales.",
+        security3:
+            "Validación de entrada para mitigar inyección, abuso e inconsistencias de datos.",
+        security4:
+            "Archivos de entorno requeridos: `.env` y `.env.example` con variables documentadas.",
+        metricAdoption:
+            "Tasa de activación y finalización del flujo principal en los primeros días.",
+        metricDelivery:
+            "Cumplimiento del plazo definido ({deadline}) con menor retrabajo.",
+        metricPayments:
+            "Tasa de conversión y aprobación de pagos dentro del flujo de compra.",
+        metricReliability:
+            "Estabilidad operativa (latencia/errores) y satisfacción del usuario final.",
+    },
+} as const;
+
+function normalizePrdAuthentication(value: unknown): PrdAuthSelection {
+    if (typeof value === "number") {
+        if (value === 1) return { emailPassword: true, socialLogin: false };
+        if (value === 2) return { emailPassword: false, socialLogin: true };
+        return { emailPassword: false, socialLogin: false };
+    }
+    if (value && typeof value === "object") {
+        const auth = value as Partial<PrdAuthSelection>;
+        return {
+            emailPassword: Boolean(auth.emailPassword),
+            socialLogin: Boolean(auth.socialLogin),
+        };
+    }
+    return { emailPassword: false, socialLogin: false };
+}
+
+function cleanList(values: string[] | null | undefined): string[] {
+    if (!values) return [];
+    const seen = new Set<string>();
+    const output: string[] = [];
+    values.forEach((value) => {
+        const normalized = value?.trim();
+        if (!normalized) return;
+        const key = normalized.toLowerCase();
+        if (seen.has(key)) return;
+        seen.add(key);
+        output.push(normalized);
+    });
+    return output;
+}
+
+function truncateText(value: string, maxLength: number): string {
+    if (value.length <= maxLength) return value;
+    return `${value.slice(0, maxLength).trimEnd()}...`;
+}
+
+function buildPrdContentFromDraft(
+    draft: PrdWizardDraft | null,
+    docLocale: DocLocale,
+    tQuiz: TranslateFn
+) {
+    const copy = PRD_UI_COPY[docLocale];
+    const projectName = draft?.projectName?.trim() || copy.projectNameFallback;
+    const projectSummarySource =
+        draft?.customRules?.trim() ||
+        draft?.projectGoals?.trim() ||
+        copy.projectGoalsFallback;
+    const projectSummary = truncateText(projectSummarySource, 460);
+    const deadline = draft?.projectDeadline?.trim() || copy.toDefine;
+
+    const languageLabel =
+        draft?.language === 4
+            ? draft.languageOther?.trim() || copy.toDefine
+            : draft?.language != null && PRD_LANGUAGE_KEYS[draft.language]
+            ? tQuiz(PRD_LANGUAGE_KEYS[draft.language])
+            : copy.toDefine;
+    const hasWeb = draft?.platform === 0 || draft?.platform === 2;
+    const hasMobile = draft?.platform === 1 || draft?.platform === 2;
+    const platformLabel =
+        draft?.platform === 3
+            ? draft.platformOther?.trim() || copy.toDefine
+            : draft?.platform != null && PRD_PLATFORM_KEYS[draft.platform]
+            ? tQuiz(PRD_PLATFORM_KEYS[draft.platform])
+            : copy.toDefine;
+
+    const webFrameworkLabel = !hasWeb
+        ? copy.notApplicable
+        : draft?.webFramework === PRD_WEB_FRAMEWORK_NAMES.length
+        ? draft.webFrameworkOther?.trim() || copy.toDefine
+        : draft?.webFramework != null && PRD_WEB_FRAMEWORK_NAMES[draft.webFramework]
+        ? PRD_WEB_FRAMEWORK_NAMES[draft.webFramework]
+        : copy.toDefine;
+    const webDesignLibraryLabel = !hasWeb
+        ? copy.notApplicable
+        : draft?.webDesignLibrary === "other"
+        ? draft.webDesignLibraryOther?.trim() || copy.toDefine
+        : draft?.webDesignLibrary &&
+          PRD_WEB_DESIGN_LABEL_KEY[draft.webDesignLibrary]
+        ? tQuiz(PRD_WEB_DESIGN_LABEL_KEY[draft.webDesignLibrary])
+        : copy.toDefine;
+
+    const mobileFrameworkLabel = !hasMobile
+        ? copy.notApplicable
+        : draft?.mobileFramework === PRD_MOBILE_FRAMEWORK_NAMES.length
+        ? draft.mobileFrameworkOther?.trim() || copy.toDefine
+        : draft?.mobileFramework != null &&
+          PRD_MOBILE_FRAMEWORK_NAMES[draft.mobileFramework]
+        ? PRD_MOBILE_FRAMEWORK_NAMES[draft.mobileFramework]
+        : copy.toDefine;
+    const mobileDesignLibraryLabel = !hasMobile
+        ? copy.notApplicable
+        : draft?.mobileDesignLibrary === "other"
+        ? draft.mobileDesignLibraryOther?.trim() || copy.toDefine
+        : draft?.mobileDesignLibrary &&
+          PRD_MOBILE_DESIGN_LABEL_KEY[draft.mobileDesignLibrary]
+        ? tQuiz(PRD_MOBILE_DESIGN_LABEL_KEY[draft.mobileDesignLibrary])
+        : copy.toDefine;
+
+    const backendLabel =
+        draft?.backendTech != null && PRD_BACKEND_NAMES[draft.backendTech]
+            ? PRD_BACKEND_NAMES[draft.backendTech]
+            : copy.toDefine;
+    const auth = normalizePrdAuthentication(draft?.authentication);
+    const authLabel =
+        auth.emailPassword && auth.socialLogin
+            ? `${tQuiz("authEmailPassword")} + ${tQuiz("authSocialLogin")}`
+            : auth.emailPassword
+            ? tQuiz("authEmailPassword")
+            : auth.socialLogin
+            ? tQuiz("authSocialLogin")
+            : tQuiz("authNone");
+    const themeLabel =
+        draft?.theme == null
+            ? copy.toDefine
+            : draft.theme === 0
+            ? tQuiz("themeLightOnly")
+            : tQuiz("themeLightDark");
+    const iconsLabel =
+        draft?.icons == null
+            ? copy.toDefine
+            : draft.icons === 3
+            ? tQuiz("other")
+            : PRD_ICON_LABEL_KEYS[draft.icons]
+            ? tQuiz(PRD_ICON_LABEL_KEYS[draft.icons])
+            : copy.toDefine;
+
+    const selectedFeatureKeys = Object.entries(draft?.features ?? {})
+        .filter(([, enabled]) => Boolean(enabled))
+        .map(([key]) => key);
+    const selectedFeatureLabels = cleanList([
+        ...selectedFeatureKeys.map((key) => tQuiz(key)),
+        ...cleanList(draft?.otherFeaturesTags),
+    ]);
+    const selectedIntegrationLabels = cleanList([
+        ...Object.entries(draft?.integrations ?? {})
+            .filter(([, enabled]) => Boolean(enabled))
+            .map(([key]) => {
+                const labelKey = PRD_INTEGRATION_LABEL_KEY[key];
+                return labelKey ? tQuiz(labelKey) : key;
+            }),
+        ...cleanList(draft?.otherIntegrationsTags),
+    ]);
+
+    const stories =
+        selectedFeatureLabels.length > 0
+            ? selectedFeatureLabels.map(
+                  (featureLabel, index) =>
+                      `USER-${String(index + 1).padStart(2, "0")} ${copy.storyTemplate.replace(
+                          "{feature}",
+                          featureLabel
+                      )}`
+              )
+            : [copy.defaultStory];
+    const journeys = [
+        copy.journeyOnboarding,
+        ...(auth.emailPassword || auth.socialLogin
+            ? [copy.journeyAuthentication]
+            : []),
+        ...(selectedFeatureKeys.includes("featPayments")
+            ? [copy.journeyPayments]
+            : []),
+        ...(selectedFeatureKeys.includes("featUpload") ? [copy.journeyUploads] : []),
+        ...(selectedFeatureKeys.includes("featRealtime")
+            ? [copy.journeyRealtime]
+            : []),
+        ...(selectedFeatureKeys.includes("featOffline") ? [copy.journeyOffline] : []),
+        ...(selectedIntegrationLabels.length > 0 ? [copy.journeyIntegrations] : []),
+    ];
+    const entities = [
+        "usuarios",
+        "perfis_permissoes",
+        "logs_auditoria",
+        ...(selectedFeatureKeys.includes("featPayments") ||
+        selectedIntegrationLabels.some((item) => /pagamento|payment/i.test(item))
+            ? ["transacoes_pagamento"]
+            : []),
+        ...(selectedFeatureKeys.includes("featUpload") ? ["arquivos"] : []),
+        ...(selectedFeatureKeys.includes("featRealtime")
+            ? ["eventos_tempo_real"]
+            : []),
+        ...(selectedIntegrationLabels.some((item) => /api|integra/i.test(item))
+            ? ["integracoes_externas"]
+            : []),
+        ...(selectedIntegrationLabels.some((item) => /whatsapp/i.test(item))
+            ? ["mensagens_whatsapp"]
+            : []),
+    ];
+    const businessRules = [
+        copy.ruleAccess,
+        copy.ruleAudit,
+        ...(selectedFeatureKeys.includes("featPayments") ? [copy.rulePayments] : []),
+        ...(selectedFeatureKeys.includes("featUpload") ? [copy.ruleUploads] : []),
+        ...(selectedIntegrationLabels.length > 0 ? [copy.ruleIntegrations] : []),
+    ];
+    const screens = [
+        copy.screenLogin,
+        copy.screenDashboard,
+        copy.screenCore,
+        copy.screenSettings,
+    ];
+    const successMetrics = [
+        copy.metricAdoption,
+        copy.metricDelivery.replace("{deadline}", deadline),
+        ...(selectedFeatureKeys.includes("featPayments")
+            ? [copy.metricPayments]
+            : []),
+        copy.metricReliability,
+    ];
+    const additionalDetails =
+        draft?.customRules?.trim() || copy.notInformed;
+    const additionalDetailsSummary = truncateText(additionalDetails, 1800);
+
+    return {
+        introduction: (
+            <div className="space-y-3">
+                <p>
+                    <strong>{copy.overviewHeading}</strong>
+                </p>
+                <p>
+                    {projectName}: {projectSummary}
+                </p>
+                <p>
+                    <strong>{copy.projectLanguageLabel}:</strong> {languageLabel}.
+                </p>
+                <p>
+                    <strong>{copy.platformLabel}:</strong> {platformLabel}.
+                </p>
+                <p>
+                    <strong>{copy.deadlineLabel}:</strong> {deadline}.
+                </p>
+                <p>
+                    <strong>{copy.audienceHeading}</strong>
+                </p>
+                <p>{projectSummary}</p>
+            </div>
+        ),
+        goals: (
+            <div className="space-y-3">
+                <p>
+                    <strong>{copy.mainFeaturesHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {(selectedFeatureLabels.length > 0
+                        ? selectedFeatureLabels
+                        : [copy.toDefine]
+                    ).map((feature, index) => (
+                        <li key={`${feature}-${index}`}>{feature}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.userStoriesHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {stories.map((story, index) => (
+                        <li key={`${story}-${index}`}>{story}</li>
+                    ))}
+                </ul>
+            </div>
+        ),
+        timeline: (
+            <div className="space-y-3">
+                <p>
+                    <strong>{copy.journeysHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {journeys.map((journey, index) => (
+                        <li key={`${journey}-${index}`}>{journey}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.technicalHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    <li>
+                        {copy.webLabel}: {webFrameworkLabel} ({webDesignLibraryLabel})
+                    </li>
+                    <li>
+                        {copy.mobileLabel}: {mobileFrameworkLabel} ({mobileDesignLibraryLabel})
+                    </li>
+                    <li>
+                        {copy.backendLabel}: {backendLabel}
+                    </li>
+                    <li>
+                        {copy.authenticationLabel}: {authLabel}
+                    </li>
+                    <li>
+                        {copy.integrationsLabel}:{" "}
+                        {selectedIntegrationLabels.length > 0
+                            ? selectedIntegrationLabels.join(", ")
+                            : copy.toDefine}
+                    </li>
+                    <li>
+                        {copy.themeLabel}: {themeLabel}; {copy.iconsLabel}: {iconsLabel}
+                    </li>
+                </ul>
+            </div>
+        ),
+        budget: (
+            <div className="space-y-3">
+                <p>
+                    <strong>{copy.entitiesHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {entities.map((entity, index) => (
+                        <li key={`${entity}-${index}`}>{entity}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.flowsHeading}</strong>
+                </p>
+                <ol className="list-decimal pl-8 space-y-1 [&>li]:leading-7">
+                    <li>{copy.flowOnboarding}</li>
+                    <li>{copy.flowCore}</li>
+                    <li>{copy.flowOperations}</li>
+                    <li>{copy.flowMonitoring}</li>
+                </ol>
+            </div>
+        ),
+        references: (
+            <div className="space-y-3">
+                <p>
+                    <strong>{copy.rulesHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {businessRules.map((rule, index) => (
+                        <li key={`${rule}-${index}`}>{rule}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.additionalDetailsLabel}:</strong> {additionalDetailsSummary}
+                </p>
+                <p>
+                    <strong>{copy.screensHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {screens.map((screen, index) => (
+                        <li key={`${screen}-${index}`}>{screen}</li>
+                    ))}
+                </ul>
+            </div>
+        ),
+        conclusion: (
+            <div className="space-y-3">
+                <p>
+                    <strong>{copy.securityHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    <li>{copy.security1}</li>
+                    <li>{copy.security2}</li>
+                    <li>{copy.security3}</li>
+                    <li>{copy.security4}</li>
+                </ul>
+                <p>
+                    <strong>{copy.metricsHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {successMetrics.map((metric, index) => (
+                        <li key={`${metric}-${index}`}>{metric}</li>
+                    ))}
+                </ul>
+            </div>
+        ),
+    };
+}
 
 const DOC_DRAFT_TTL_MS = 1000 * 60 * 60 * 24;
 type SectionKey =
@@ -1149,6 +1848,7 @@ const BriefPage = () => {
     const docLocale = resolveDocLocale(locale);
     const contractCopy = CONTRACT_UI_COPY[docLocale];
     const genericSignatureCopy = GENERIC_SIGNATURE_COPY[docLocale];
+    const prdCopy = PRD_UI_COPY[docLocale];
     const tBrief = useMemo<TranslateFn>(
         () =>
             ((key: string, values?: Record<string, string | number>) =>
@@ -1194,11 +1894,15 @@ const BriefPage = () => {
             ),
         [tBrief, tQuizText]
     );
+    const defaultPrdContent = useMemo(
+        () => buildPrdContentFromDraft(null, docLocale, tQuizText),
+        [docLocale, tQuizText]
+    );
     const documentTitle =
         featureType === "contract"
             ? contractCopy.documentTitle
             : featureType === "prd"
-            ? t("prdTitle")
+            ? prdCopy.documentTitle
             : defaultProposalTitle;
     const [proposalContentState, setProposalContentState] = useState<ProposalContentShape>(
         defaultProposalContent
@@ -1208,11 +1912,14 @@ const BriefPage = () => {
     const [contractContentState, setContractContentState] = useState<
         Omit<ProposalContentShape, "images">
     >(buildContractContentFromDraft(null, docLocale));
+    const [prdContentState, setPrdContentState] = useState<
+        Omit<ProposalContentShape, "images">
+    >(defaultPrdContent);
     const displayedContent =
         featureType === "contract"
             ? contractContentState
             : featureType === "prd"
-            ? prdContent
+            ? prdContentState
             : proposalContentState;
     const sectionTitles = useMemo(
         () =>
@@ -1227,12 +1934,12 @@ const BriefPage = () => {
                   }
                 : featureType === "prd"
                 ? {
-                      introduction: tQuiz("prdStep0"),
-                      goals: tQuiz("prdStepLangAndDeadline"),
-                      timeline: tQuiz("prdStepBackendAndAuth"),
-                      budget: tQuiz("prdStepFeaturesAndIntegrations"),
-                      references: tQuiz("prdStep7"),
-                      conclusion: tQuiz("prdStep8"),
+                      introduction: prdCopy.sectionIntroduction,
+                      goals: prdCopy.sectionGoals,
+                      timeline: prdCopy.sectionTimeline,
+                      budget: prdCopy.sectionBudget,
+                      references: prdCopy.sectionReferences,
+                      conclusion: prdCopy.sectionConclusion,
                   }
                 : {
                       introduction: t("proposalSectionSummary"),
@@ -1242,15 +1949,16 @@ const BriefPage = () => {
                       references: t("proposalSectionReferences"),
                       conclusion: t("proposalSectionConditions"),
                   },
-        [contractCopy, featureType, t, tQuiz]
+        [contractCopy, featureType, prdCopy, t]
     );
     const subtitleDefault =
-        featureType === "contract"
-            ? t("contract")
-            : featureType === "prd"
-            ? t("prd")
-            : t("proposal");
-    const storageKey = `briefberry:doc-edit:${featureType}:${docLocale}:v13`;
+        featureType === "prd"
+            ? prdCopy.subtitle
+            : t("documentTypeLabel", {
+                  type: featureType === "contract" ? t("contract") : t("proposal"),
+              });
+    const storageVersion = featureType === "prd" ? "v14" : "v13";
+    const storageKey = `briefberry:doc-edit:${featureType}:${docLocale}:${storageVersion}`;
 
     const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
     const [editableSubtitle, setEditableSubtitle] = useState(subtitleDefault);
@@ -1282,7 +1990,9 @@ const BriefPage = () => {
     useEffect(() => {
         if (typeof window === "undefined") return;
         let hasPersistedTitle = false;
+        let hasPersistedSubtitle = false;
         let persistedTitleValue = "";
+        let persistedSubtitleValue = "";
         let hasPersistedReferenceImages = false;
         try {
             const raw = window.localStorage.getItem(storageKey);
@@ -1308,7 +2018,11 @@ const BriefPage = () => {
                 hasPersistedTitle = true;
                 persistedTitleValue = parsed.documentTitle;
             }
-            if (parsed.subtitle) setEditableSubtitle(parsed.subtitle);
+            if (parsed.subtitle) {
+                setEditableSubtitle(parsed.subtitle);
+                hasPersistedSubtitle = true;
+                persistedSubtitleValue = parsed.subtitle;
+            }
             if (parsed.sectionTitles) setEditableSectionTitles(parsed.sectionTitles);
             if (parsed.sectionContents) {
                 const nextContents = { ...parsed.sectionContents };
@@ -1324,6 +2038,24 @@ const BriefPage = () => {
         } catch {
             // Ignore corrupted draft payloads
         } finally {
+            const isLegacyPrdEnglishTitle =
+                persistedTitleValue === "Product Requirements Document" ||
+                persistedTitleValue === "Product Requirements Document (PRD)";
+            const isLegacySimpleSubtitle =
+                persistedSubtitleValue === "Proposta" ||
+                persistedSubtitleValue === "Proposal" ||
+                persistedSubtitleValue === "Propuesta" ||
+                persistedSubtitleValue === "Contrato" ||
+                persistedSubtitleValue === "Contract" ||
+                persistedSubtitleValue === "PRD" ||
+                persistedSubtitleValue === "Product Requirements Document (PRD)";
+            const isLegacyPrdSubtitle =
+                persistedSubtitleValue === "Especificação completa do projeto" ||
+                persistedSubtitleValue === "Complete project specification" ||
+                persistedSubtitleValue === "Especificación completa del proyecto" ||
+                persistedSubtitleValue === "Documento: PRD" ||
+                persistedSubtitleValue === "Document: PRD";
+
             if (featureType === "proposal") {
                 const proposalTypeDraft =
                     loadDraft<ProposalTypeDraft>(DRAFT_KEYS.proposalTypeBrief);
@@ -1358,6 +2090,12 @@ const BriefPage = () => {
                 const dynamicTitle = tBrief("proposalDocumentTitle", {
                     type: typeLabel,
                 });
+                const isPrdDefaultTitle =
+                    persistedTitleValue === "PRD" ||
+                    isLegacyPrdEnglishTitle ||
+                    persistedTitleValue === prdCopy.documentTitle;
+                const isContractDefaultTitle =
+                    persistedTitleValue === contractCopy.documentTitle;
                 const isLegacyModelTitle =
                     persistedTitleValue === "Proposta Modelo 2026" ||
                     persistedTitleValue === "Proposal Model 2026" ||
@@ -1368,9 +2106,20 @@ const BriefPage = () => {
                 const shouldOverrideTitle =
                     !hasPersistedTitle ||
                     isLegacyModelTitle ||
-                    isLegacyDynamicTitle;
+                    isLegacyDynamicTitle ||
+                    isPrdDefaultTitle ||
+                    isContractDefaultTitle;
                 if (shouldOverrideTitle) {
                     setEditableDocumentTitle(dynamicTitle);
+                }
+                if (
+                    !hasPersistedSubtitle ||
+                    isLegacySimpleSubtitle ||
+                    isLegacyPrdSubtitle ||
+                    isPrdDefaultTitle ||
+                    isContractDefaultTitle
+                ) {
+                    setEditableSubtitle(subtitleDefault);
                 }
             }
             if (featureType === "contract") {
@@ -1381,10 +2130,71 @@ const BriefPage = () => {
                 setContractContentState(
                     buildContractContentFromDraft(contractDraft, docLocale)
                 );
+                const isProposalTitle = /^(Proposta Comercial de|Commercial Proposal for|Propuesta Comercial de)\s/i.test(
+                    persistedTitleValue
+                );
+                const isPrdTitle =
+                    persistedTitleValue === "PRD" ||
+                    isLegacyPrdEnglishTitle ||
+                    persistedTitleValue === prdCopy.documentTitle;
+                if (!hasPersistedTitle || isProposalTitle || isPrdTitle) {
+                    setEditableDocumentTitle(contractCopy.documentTitle);
+                }
+                if (
+                    !hasPersistedSubtitle ||
+                    isLegacySimpleSubtitle ||
+                    isLegacyPrdSubtitle ||
+                    isProposalTitle ||
+                    isPrdTitle
+                ) {
+                    setEditableSubtitle(subtitleDefault);
+                }
+            }
+            if (featureType === "prd") {
+                const prdDraft = loadDraft<PrdWizardDraft>(DRAFT_KEYS.prdWizard);
+                setPrdContentState(
+                    buildPrdContentFromDraft(prdDraft, docLocale, tQuizText)
+                );
+                const isLegacyPrdTitle =
+                    persistedTitleValue === "PRD" ||
+                    isLegacyPrdEnglishTitle;
+                const isProposalTitle = /^(Proposta Comercial de|Commercial Proposal for|Propuesta Comercial de)\s/i.test(
+                    persistedTitleValue
+                );
+                const isContractTitle =
+                    persistedTitleValue === contractCopy.documentTitle;
+                if (
+                    !hasPersistedTitle ||
+                    isLegacyPrdTitle ||
+                    isProposalTitle ||
+                    isContractTitle
+                ) {
+                    setEditableDocumentTitle(prdCopy.documentTitle);
+                }
+                if (
+                    !hasPersistedSubtitle ||
+                    isLegacySimpleSubtitle ||
+                    isLegacyPrdSubtitle ||
+                    isProposalTitle ||
+                    isContractTitle
+                ) {
+                    setEditableSubtitle(subtitleDefault);
+                }
             }
             setIsDraftHydrated(true);
         }
-    }, [docLocale, featureType, storageKey, locale, tBrief, tQuizText]);
+    }, [
+        docLocale,
+        featureType,
+        storageKey,
+        locale,
+        contractCopy.documentTitle,
+        prdCopy,
+        subtitleDefault,
+        t,
+        tBrief,
+        tQuizText,
+    ]);
 
     useEffect(() => {
         if (!isDraftHydrated) return;

@@ -116,9 +116,18 @@ const QuizGeneratingPage = () => {
                     </div>
                     <div className="relative h-127.5 mask-b-from-0 mask-b-to-80% text-center overflow-hidden max-3xl:mask-b-to-100% max-md:-mx-4">
                         <div className="relative h-187 max-md:h-102.5">
-                            <EmptyPage className="absolute top-0 left-1/2 z-2 -translate-x-1/2" />
-                            <EmptyPage className="absolute top-20 left-[calc(50%-26.5rem)] -rotate-8 max-3xl:left-[calc(50%-23.625rem)] max-xl:top-16 max-xl:left-[calc(50%-22.625rem)] max-md:top-9 max-md:max-md:left-[calc(50%-11.25rem)]" />
-                            <EmptyPage className="absolute top-20 right-[calc(50%-26.5rem)] rotate-8 max-3xl:right-[calc(50%-23.625rem)] max-xl:top-16 max-xl:right-[calc(50%-22.625rem)] max-md:top-9 max-md:max-md:right-[calc(50%-11.25rem)]" />
+                            <EmptyPage
+                                className="absolute top-0 left-1/2 z-2 -translate-x-1/2"
+                                featureType={featureType}
+                            />
+                            <EmptyPage
+                                className="absolute top-20 left-[calc(50%-26.5rem)] -rotate-8 max-3xl:left-[calc(50%-23.625rem)] max-xl:top-16 max-xl:left-[calc(50%-22.625rem)] max-md:top-9 max-md:max-md:left-[calc(50%-11.25rem)]"
+                                featureType={featureType}
+                            />
+                            <EmptyPage
+                                className="absolute top-20 right-[calc(50%-26.5rem)] rotate-8 max-3xl:right-[calc(50%-23.625rem)] max-xl:top-16 max-xl:right-[calc(50%-22.625rem)] max-md:top-9 max-md:max-md:right-[calc(50%-11.25rem)]"
+                                featureType={featureType}
+                            />
                         </div>
                     </div>
                 </div>
