@@ -8,7 +8,7 @@ type SignaturePadModalProps = {
     title: string;
     signerName: string;
     onClose: () => void;
-    onSave: (dataUrl: string) => void;
+    onSave: (dataUrl: string, inkTone: "light" | "dark") => void;
 };
 
 const SignaturePadModal = ({
@@ -39,6 +39,7 @@ const SignaturePadModal = ({
     } as const;
     const copy = textByLang[lang];
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const inkToneRef = useRef<"light" | "dark">("dark");
     const isDrawingRef = useRef(false);
     const lastPointRef = useRef<{ x: number; y: number } | null>(null);
     const [hasStroke, setHasStroke] = useState(false);
@@ -50,6 +51,7 @@ const SignaturePadModal = ({
             typeof document !== "undefined" &&
             (document.documentElement.getAttribute("data-theme") === "dark" ||
                 document.documentElement.classList.contains("dark"));
+        inkToneRef.current = isDarkMode ? "light" : "dark";
         const ratio = window.devicePixelRatio || 1;
         const width = canvas.clientWidth;
         const height = canvas.clientHeight;
@@ -117,7 +119,7 @@ const SignaturePadModal = ({
     const handleSave = () => {
         const canvas = canvasRef.current;
         if (!canvas || !hasStroke) return;
-        onSave(canvas.toDataURL("image/png"));
+        onSave(canvas.toDataURL("image/png"), inkToneRef.current);
         onClose();
     };
 

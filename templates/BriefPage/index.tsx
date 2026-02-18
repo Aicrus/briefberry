@@ -820,6 +820,7 @@ type SignatureParticipant = {
     shortLabel?: string;
     fullName: string;
 };
+type SignatureAsset = { dataUrl: string; inkTone: "light" | "dark" };
 
 const PROPOSAL_TYPE_KEYS: Record<number, string> = {
     0: "typeWebApp",
@@ -1251,7 +1252,9 @@ const BriefPage = () => {
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
     const [signatureModalVersion, setSignatureModalVersion] = useState(0);
     const [activeSigner, setActiveSigner] = useState("");
-    const [signatures, setSignatures] = useState<Record<string, string>>({});
+    const [signatures, setSignatures] = useState<
+        Record<string, SignatureAsset | string>
+    >({});
     const [signatureNames, setSignatureNames] = useState<Record<string, string>>({});
     const [isEditingDocumentTitle, setIsEditingDocumentTitle] = useState(false);
     const [isEditingSubtitle, setIsEditingSubtitle] = useState(false);
@@ -1698,6 +1701,17 @@ const BriefPage = () => {
                         <div className="mb-4 text-h5">{contractCopy.signaturesTitle}</div>
                         <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                             {signatureParticipants.map((participant) => (
+                                (() => {
+                                    const signatureEntry = signatures[participant.id];
+                                    const signatureSrc =
+                                        typeof signatureEntry === "string"
+                                            ? signatureEntry
+                                            : signatureEntry?.dataUrl;
+                                    const inkTone =
+                                        typeof signatureEntry === "string"
+                                            ? null
+                                            : signatureEntry?.inkTone;
+                                    return (
                                 <div
                                     key={participant.id}
                                     className="rounded-2xl border border-stroke2 bg-b-surface1 p-4"
@@ -1736,18 +1750,24 @@ const BriefPage = () => {
                                                 participant.fullName}
                                         </div>
                                     )}
-                                    {signatures[participant.id] ? (
-                                        <div className="mb-3 inline-flex max-w-full rounded-lg bg-b-surface2 p-1.5">
+                                    {signatureSrc ? (
+                                        <div
+                                            className={`mb-3 inline-flex max-w-full rounded-lg border border-stroke2 p-1.5 bg-[#D6DEE7]`}
+                                        >
                                             <Image
-                                                src={signatures[participant.id]}
+                                                src={signatureSrc}
                                                 alt={`Assinatura ${participant.role}`}
                                                 width={280}
                                                 height={56}
-                                                className="h-14 w-auto object-contain"
+                                                className={`h-14 w-auto object-contain ${
+                                                    inkTone === "light"
+                                                        ? "brightness-0"
+                                                        : ""
+                                                }`}
                                             />
                                         </div>
                                     ) : (
-                                        <div className="mb-3 h-14 w-full rounded-lg border border-dashed border-stroke2 bg-b-surface2" />
+                                        <div className="mb-3 h-14 w-full rounded-lg border border-dashed border-stroke2 bg-[#D6DEE7]/65" />
                                     )}
                                     {!isReadOnlyView && (
                                         <Button
@@ -1758,12 +1778,14 @@ const BriefPage = () => {
                                                 setSignatureModalOpen(true);
                                             }}
                                         >
-                                            {signatures[participant.id]
+                                            {signatureSrc
                                                 ? contractCopy.signAgain
                                                 : contractCopy.clickToSign}
                                         </Button>
                                     )}
                                 </div>
+                                    );
+                                })()
                             ))}
                         </div>
                         </div>
@@ -1778,10 +1800,10 @@ const BriefPage = () => {
                     onClose={() => setSignatureModalOpen(false)}
                     title={contractCopy.signatureModalTitle}
                     signerName={signatureNames[activeSigner] || activeSigner}
-                    onSave={(dataUrl) =>
+                    onSave={(dataUrl, inkTone) =>
                         setSignatures((prev) => ({
                             ...prev,
-                            [activeSigner]: dataUrl,
+                            [activeSigner]: { dataUrl, inkTone },
                         }))
                     }
                 />
