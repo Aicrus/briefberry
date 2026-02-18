@@ -816,8 +816,6 @@ type SectionKey =
 type SignatureParticipant = {
     id: string;
     role: string;
-    organization?: string;
-    shortLabel?: string;
     fullName: string;
 };
 type SignatureAsset = { dataUrl: string; inkTone: "light" | "dark" };
@@ -1407,35 +1405,26 @@ const BriefPage = () => {
                 ? [
                       {
                           id: "ACORDANTE_1",
-                          role: contractCopy.signer1Role,
-                          organization:
-                              contractDraftState?.clientName?.trim() ||
-                              contractCopy.clientLabel,
-                          shortLabel: "AC",
+                          role: contractCopy.clientLabel,
                           fullName:
                               contractDraftState?.clientName?.trim() ||
                               contractCopy.clientLabel,
                       },
                       {
                           id: "TESTEMUNHA_1",
-                          role: contractCopy.witnessRole,
+                          role: `${contractCopy.witnessRole} 1`,
                           fullName: contractCopy.witness1Default,
                       },
                       {
                           id: "ACORDANTE_2",
-                          role: contractCopy.signer2Role,
-                          organization:
-                              contractDraftState?.contractorName?.trim() ||
-                              contractCopy.contractorLabel,
-                          shortLabel: contractCopy.signer2Short,
+                          role: contractCopy.contractorLabel,
                           fullName:
                               contractDraftState?.contractorName?.trim() ||
                               contractCopy.contractorLabel,
                       },
                       {
                           id: "TESTEMUNHA_2",
-                          role: contractCopy.witnessRole,
-                          shortLabel: contractCopy.witness2Short,
+                          role: `${contractCopy.witnessRole} 2`,
                           fullName: contractCopy.witness2Default,
                       },
                   ]
@@ -1719,16 +1708,6 @@ const BriefPage = () => {
                                     <div className="mb-3 text-small text-t-secondary">
                                         {participant.role}
                                     </div>
-                                    {participant.organization && (
-                                        <div className="mb-1 text-caption text-t-primary">
-                                            {participant.organization}
-                                        </div>
-                                    )}
-                                    {participant.shortLabel && (
-                                        <div className="mb-1 text-caption text-t-secondary">
-                                            {participant.shortLabel}
-                                        </div>
-                                    )}
                                     {!isReadOnlyView ? (
                                         <input
                                             className="mb-3 w-full bg-transparent border-0 border-b border-stroke2 pb-1 outline-0 text-small text-t-primary"
