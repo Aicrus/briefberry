@@ -40,13 +40,16 @@ type ContractWizardDraft = {
     currency: number | null;
 };
 
-function getContractDocTypeLabel(docType: ContractDocTypeId | null | undefined): string {
+function getContractDocTypeLabel(
+    docType: ContractDocTypeId | null | undefined,
+    docLocale: DocLocale
+): string {
     if (docType === 0) return "CPF";
     if (docType === 1) return "CNPJ";
     if (docType === 2) return "SSN";
     if (docType === 3) return "EIN";
     if (docType === 4) return "VAT/NIF";
-    return "Documento";
+    return docLocale === "en" ? "Document" : "Documento";
 }
 
 type DocLocale = "pt" | "en" | "es";
@@ -222,6 +225,33 @@ const CONTRACT_UI_COPY = {
         witnessRole: "TESTIGO",
         witness1Default: "TESTIGO 1",
         witness2Default: "TESTIGO 2",
+    },
+} as const;
+
+const GENERIC_SIGNATURE_COPY = {
+    pt: {
+        proposalClientRole: "CONTRATANTE",
+        proposalProviderRole: "CONTRATADA",
+        prdOwnerRole: "RESPONSÁVEL PELO PRODUTO",
+        prdTechRole: "RESPONSÁVEL TÉCNICO",
+        signer1: "Assinante 1",
+        signer2: "Assinante 2",
+    },
+    en: {
+        proposalClientRole: "CLIENT",
+        proposalProviderRole: "CONTRACTOR",
+        prdOwnerRole: "PRODUCT OWNER",
+        prdTechRole: "TECHNICAL LEAD",
+        signer1: "Signer 1",
+        signer2: "Signer 2",
+    },
+    es: {
+        proposalClientRole: "CLIENTE",
+        proposalProviderRole: "CONTRATISTA",
+        prdOwnerRole: "RESPONSABLE DEL PRODUCTO",
+        prdTechRole: "RESPONSABLE TÉCNICO",
+        signer1: "Firmante 1",
+        signer2: "Firmante 2",
     },
 } as const;
 
@@ -550,13 +580,16 @@ function buildContractContentFromDraft(
     const contractorAddress =
         draft?.contractorAddress?.trim() || copy.addressNotInformed;
     const contractorDocument = draft?.contractorDocument?.trim() || copy.notInformed;
-    const contractorDocLabel = getContractDocTypeLabel(draft?.contractorDocType);
+    const contractorDocLabel = getContractDocTypeLabel(
+        draft?.contractorDocType,
+        docLocale
+    );
 
     const clientName = draft?.clientName?.trim() || copy.clientLabel;
     const clientEmail = draft?.clientEmail?.trim() || copy.notInformed;
     const clientAddress = draft?.clientAddress?.trim() || copy.addressNotInformed;
     const clientDocument = draft?.clientDocument?.trim() || copy.notInformed;
-    const clientDocLabel = getContractDocTypeLabel(draft?.clientDocType);
+    const clientDocLabel = getContractDocTypeLabel(draft?.clientDocType, docLocale);
 
     const projectDescription =
         draft?.projectDescription?.trim() ||
@@ -1115,6 +1148,7 @@ const BriefPage = () => {
     const locale = useLocale();
     const docLocale = resolveDocLocale(locale);
     const contractCopy = CONTRACT_UI_COPY[docLocale];
+    const genericSignatureCopy = GENERIC_SIGNATURE_COPY[docLocale];
     const tBrief = useMemo<TranslateFn>(
         () =>
             ((key: string, values?: Record<string, string | number>) =>
@@ -1399,11 +1433,6 @@ const BriefPage = () => {
                               contractCopy.clientLabel,
                       },
                       {
-                          id: "TESTEMUNHA_1",
-                          role: `${contractCopy.witnessRole} 1`,
-                          fullName: contractCopy.witness1Default,
-                      },
-                      {
                           id: "ACORDANTE_2",
                           role: contractCopy.contractorLabel,
                           fullName:
@@ -1411,53 +1440,75 @@ const BriefPage = () => {
                               contractCopy.contractorLabel,
                       },
                       {
+                          id: "TESTEMUNHA_1",
+                          role: `${contractCopy.witnessRole} 1`,
+                          fullName: "",
+                      },
+                      {
                           id: "TESTEMUNHA_2",
                           role: `${contractCopy.witnessRole} 2`,
-                          fullName: contractCopy.witness2Default,
+                          fullName: "",
                       },
                   ]
                 : featureType === "prd"
                 ? [
                       {
                           id: "RESPONSAVEL_PRODUTO",
-                          role: "RESPONSÁVEL PELO PRODUTO",
-                          fullName: "Assinante 1",
+                          role: genericSignatureCopy.prdOwnerRole,
+                          fullName: genericSignatureCopy.signer1,
                       },
                       {
                           id: "RESPONSAVEL_TECNICO",
-                          role: "RESPONSÁVEL TÉCNICO",
-                          fullName: "Assinante 2",
+                          role: genericSignatureCopy.prdTechRole,
+                          fullName: genericSignatureCopy.signer2,
                       },
                   ]
                 : [
                       {
                           id: "CONTRATANTE",
-                          role: "CONTRATANTE",
-                          fullName: "Assinante 1",
+                          role: genericSignatureCopy.proposalClientRole,
+                          fullName: genericSignatureCopy.signer1,
                       },
                       {
                           id: "CONTRATADA",
-                          role: "CONTRATADA",
-                          fullName: "Assinante 2",
+                          role: genericSignatureCopy.proposalProviderRole,
+                          fullName: genericSignatureCopy.signer2,
                       },
                   ],
-        [contractCopy, featureType, contractDraftState?.clientName, contractDraftState?.contractorName]
+        [
+            contractCopy,
+            featureType,
+            contractDraftState?.clientName,
+            contractDraftState?.contractorName,
+            genericSignatureCopy,
+        ]
     );
 
     useEffect(() => {
         if (featureType !== "contract") return;
         setSignatureNames((prev) => {
-            let changed = false;
             const next = { ...prev };
-            signatureParticipants.forEach((participant) => {
-                if (!next[participant.id]) {
-                    next[participant.id] = participant.fullName;
-                    changed = true;
-                }
-            });
-            return changed ? next : prev;
+
+            // Keep client/contractor always synced from the form.
+            next.ACORDANTE_1 =
+                contractDraftState?.clientName?.trim() || contractCopy.clientLabel;
+            next.ACORDANTE_2 =
+                contractDraftState?.contractorName?.trim() ||
+                contractCopy.contractorLabel;
+
+            // Witnesses are filled manually later by the user.
+            if (next.TESTEMUNHA_1 == null) next.TESTEMUNHA_1 = "";
+            if (next.TESTEMUNHA_2 == null) next.TESTEMUNHA_2 = "";
+
+            return next;
         });
-    }, [featureType, signatureParticipants]);
+    }, [
+        contractCopy.clientLabel,
+        contractCopy.contractorLabel,
+        contractDraftState?.clientName,
+        contractDraftState?.contractorName,
+        featureType,
+    ]);
 
     return (
         <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>

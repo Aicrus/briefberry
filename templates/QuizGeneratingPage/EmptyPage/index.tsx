@@ -9,6 +9,7 @@ type EmptyPageProps = {
 const EmptyPage = ({ className }: EmptyPageProps) => {
     const tMyBriefs = useTranslations("myBriefs");
     const tQuiz = useTranslations("quiz");
+    const tBrief = useTranslations("brief");
 
     return (
         <div
@@ -22,8 +23,8 @@ const EmptyPage = ({ className }: EmptyPageProps) => {
                     <div className="">{tMyBriefs("title")}</div>
                     <div className="mx-2 max-md:mx-1">/</div>
                     <div className="text-t-primary/80">
-                        {tQuiz("proposalDocumentTitle", {
-                            type: tQuiz("proposalDefaultTypeLabel"),
+                        {tBrief("proposalDocumentTitle", {
+                            type: tBrief("proposalDefaultTypeLabel"),
                         })}
                     </div>
                 </div>
