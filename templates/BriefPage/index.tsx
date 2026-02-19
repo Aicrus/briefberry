@@ -67,7 +67,9 @@ const CONTRACT_UI_COPY = {
         sectionGoals: "Objeto do Contrato e Escopo",
         sectionTimeline: "Execução e Obrigações",
         sectionBudget: "Termos e Condições de Pagamento",
-        sectionReferences: "Rescisão, Sigilo e Direitos",
+        sectionTermination: "Rescisão",
+        sectionConfidentiality: "Sigilo e Confidencialidade",
+        sectionRights: "Direitos e Propriedade",
         sectionConclusion: "Foro e Assinaturas",
         toDefine: "A definir",
         notInformed: "não informado",
@@ -122,7 +124,9 @@ const CONTRACT_UI_COPY = {
         sectionGoals: "Contract Scope and Object",
         sectionTimeline: "Execution and Obligations",
         sectionBudget: "Payment Terms and Conditions",
-        sectionReferences: "Termination, Confidentiality and Rights",
+        sectionTermination: "Termination",
+        sectionConfidentiality: "Confidentiality",
+        sectionRights: "Rights and Intellectual Property",
         sectionConclusion: "Jurisdiction and Signatures",
         toDefine: "To be defined",
         notInformed: "not informed",
@@ -177,7 +181,9 @@ const CONTRACT_UI_COPY = {
         sectionGoals: "Objeto y Alcance del Contrato",
         sectionTimeline: "Ejecución y Obligaciones",
         sectionBudget: "Términos y Condiciones de Pago",
-        sectionReferences: "Rescisión, Confidencialidad y Derechos",
+        sectionTermination: "Rescisión",
+        sectionConfidentiality: "Confidencialidad",
+        sectionRights: "Derechos y Propiedad Intelectual",
         sectionConclusion: "Foro y Firmas",
         toDefine: "Por definir",
         notInformed: "no informado",
@@ -252,6 +258,21 @@ const GENERIC_SIGNATURE_COPY = {
         prdTechRole: "RESPONSABLE TÉCNICO",
         signer1: "Firmante 1",
         signer2: "Firmante 2",
+    },
+} as const;
+
+const PROPOSAL_SECTION_COPY = {
+    pt: {
+        sectionTimeline: "Prazo de Entrega",
+        sectionPayment: "Modelo de Cobrança e Pagamento",
+    },
+    en: {
+        sectionTimeline: "Delivery Timeline",
+        sectionPayment: "Billing and Payment Model",
+    },
+    es: {
+        sectionTimeline: "Plazo de Entrega",
+        sectionPayment: "Modelo de Cobro y Pago",
     },
 } as const;
 
@@ -571,7 +592,7 @@ const contractContent = {
 function buildContractContentFromDraft(
     draft: ContractWizardDraft | null,
     docLocale: DocLocale
-): CoreDocumentContent {
+): FullDocumentContent {
     const copy = CONTRACT_UI_COPY[docLocale];
     const isPt = docLocale === "pt";
 
@@ -615,96 +636,115 @@ function buildContractContentFromDraft(
     const signatureDate = draft?.signatureDate?.trim() || copy.toDefine;
 
     return {
-        introduction: (
-            <div className="space-y-3">
-                <p>
-                    {copy.introClientPrefix} <strong>{copy.clientLabel}</strong>,{" "}
-                    {clientName}, {copy.introClientSuffix} {clientDocLabel} Nº{" "}
-                    {clientDocument}, {copy.introClientAddress} {clientAddress},{" "}
-                    {copy.introClientEmail} {clientEmail}.
-                </p>
-                <p>
-                    {copy.introContractorPrefix} <strong>{copy.contractorLabel}</strong>,{" "}
-                    {contractorName}, {copy.introContractorSuffix} {contractorDocLabel} Nº{" "}
-                    {contractorDocument}, {copy.introClientAddress} {contractorAddress},{" "}
-                    {copy.introClientEmail} {contractorEmail}, {copy.introEnding}
-                </p>
-            </div>
-        ),
-        goals: (
-            <div className="space-y-3">
-                <p>
-                    <strong>{copy.objectTitle}</strong>
-                </p>
-                <p>
-                    <strong>{copy.clause1}</strong>
-                </p>
-                <p>{projectDescription}</p>
-                {projectProposalLink && (
+        ...withEmptyExtraSections({
+            introduction: (
+                <div className="space-y-3">
                     <p>
-                        {copy.proposalReferenceLabel}{" "}
-                        <a
-                            href={projectProposalLink}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="underline decoration-1 underline-offset-2"
-                        >
-                            {projectProposalLink}
-                        </a>
-                        .
+                        {copy.introClientPrefix} <strong>{copy.clientLabel}</strong>,{" "}
+                        {clientName}, {copy.introClientSuffix} {clientDocLabel} Nº{" "}
+                        {clientDocument}, {copy.introClientAddress} {clientAddress},{" "}
+                        {copy.introClientEmail} {clientEmail}.
                     </p>
-                )}
-            </div>
-        ),
-        timeline: isPt ? (
-            contractContent.timeline
-        ) : (
-            <div className="space-y-3">
-                <p>
-                    <strong>
+                    <p>
+                        {copy.introContractorPrefix} <strong>{copy.contractorLabel}</strong>,{" "}
+                        {contractorName}, {copy.introContractorSuffix} {contractorDocLabel} Nº{" "}
+                        {contractorDocument}, {copy.introClientAddress} {contractorAddress},{" "}
+                        {copy.introClientEmail} {contractorEmail}, {copy.introEnding}
+                    </p>
+                </div>
+            ),
+            goals: (
+                <div className="space-y-3">
+                    <p>
+                        <strong>{copy.objectTitle}</strong>
+                    </p>
+                    <p>
+                        <strong>{copy.clause1}</strong>
+                    </p>
+                    <p>{projectDescription}</p>
+                    {projectProposalLink && (
+                        <p>
+                            {copy.proposalReferenceLabel}{" "}
+                            <a
+                                href={projectProposalLink}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="underline decoration-1 underline-offset-2"
+                            >
+                                {projectProposalLink}
+                            </a>
+                            .
+                        </p>
+                    )}
+                </div>
+            ),
+            timeline: isPt ? (
+                contractContent.timeline
+            ) : (
+                <div className="space-y-3">
+                    <p>
+                        <strong>
+                            {docLocale === "en"
+                                ? "EXECUTION AND OBLIGATIONS"
+                                : "EJECUCIÓN Y OBLIGACIONES"}
+                        </strong>
+                    </p>
+                    <p>
                         {docLocale === "en"
-                            ? "EXECUTION AND OBLIGATIONS"
-                            : "EJECUCIÓN Y OBLIGACIONES"}
-                    </strong>
-                </p>
-                <p>
-                    {docLocale === "en"
-                        ? "The parties agree to provide all information, access, and materials needed for proper project execution."
-                        : "Las partes se comprometen a proporcionar toda la información, acceso y materiales necesarios para la correcta ejecución del proyecto."}
-                </p>
-                <p>
-                    {docLocale === "en"
-                        ? "The contractor will execute the project according to the approved scope, keeping confidentiality over all data and documents shared during the engagement."
-                        : "La contratista ejecutará el proyecto de acuerdo con el alcance aprobado, manteniendo confidencialidad sobre todos los datos y documentos compartidos durante el servicio."}
-                </p>
-            </div>
-        ),
-        budget: (
-            <div className="space-y-3">
-                <p>
-                    <strong>{copy.paymentTitle}</strong>
-                </p>
-                <p>
-                    <strong>{copy.clause4}</strong> <strong>{contractValue}</strong>,{" "}
-                    {copy.paymentClauseSuffix}
-                </p>
-                <p>{paymentTerms}</p>
-                <p>
-                    <strong>{copy.timelineTitle}</strong>
-                </p>
-                <p>
-                    {copy.timelineTextStart} <strong>{projectStartDate}</strong>{" "}
-                    {copy.timelineTextEnd} <strong>{projectDeliveryDate}</strong>.
-                </p>
-                {warrantyDays && (
-                    <p>
-                        <strong>{copy.warrantyLabel}</strong> - {copy.warrantyText}{" "}
-                        <strong>{warrantyDays}</strong> {copy.warrantyTextSuffix}
+                            ? "The parties agree to provide all information, access, and materials needed for proper project execution."
+                            : "Las partes se comprometen a proporcionar toda la información, acceso y materiales necesarios para la correcta ejecución del proyecto."}
                     </p>
-                )}
-            </div>
-        ),
-        references: isPt ? (
+                    <p>
+                        {docLocale === "en"
+                            ? "The contractor will execute the project according to the approved scope, keeping confidentiality over all data and documents shared during the engagement."
+                            : "La contratista ejecutará el proyecto de acuerdo con el alcance aprobado, manteniendo confidencialidad sobre todos los datos y documentos compartidos durante el servicio."}
+                    </p>
+                </div>
+            ),
+            budget: (
+                <div className="space-y-3">
+                    <p>
+                        <strong>{copy.paymentTitle}</strong>
+                    </p>
+                    <p>
+                        <strong>{copy.clause4}</strong> <strong>{contractValue}</strong>,{" "}
+                        {copy.paymentClauseSuffix}
+                    </p>
+                    <p>{paymentTerms}</p>
+                    <p>
+                        <strong>{copy.timelineTitle}</strong>
+                    </p>
+                    <p>
+                        {copy.timelineTextStart} <strong>{projectStartDate}</strong>{" "}
+                        {copy.timelineTextEnd} <strong>{projectDeliveryDate}</strong>.
+                    </p>
+                    {warrantyDays && (
+                        <p>
+                            <strong>{copy.warrantyLabel}</strong> - {copy.warrantyText}{" "}
+                            <strong>{warrantyDays}</strong> {copy.warrantyTextSuffix}
+                        </p>
+                    )}
+                </div>
+            ),
+            references: null,
+            conclusion: (
+                <div className="space-y-3">
+                    <p>
+                        <strong>{copy.forumTitle}</strong>
+                    </p>
+                    <p>
+                        <strong>{copy.clause12}</strong> <strong>{forumCity}</strong>.
+                    </p>
+                    <p>{copy.closingLine}</p>
+                    <p>
+                        <strong>
+                            {signatureCity} {signatureDate}
+                        </strong>
+                    </p>
+                </div>
+            ),
+        }),
+        contractTermination: (
             <div className="space-y-3">
                 <p>
                     <strong>{copy.rescissionTitle}</strong>
@@ -712,64 +752,49 @@ function buildContractContentFromDraft(
                 <p>
                     <strong>{copy.clause5Prefix}</strong> {copy.noRefundClause}
                 </p>
+            </div>
+        ),
+        contractConfidentiality: isPt ? (
+            <div className="space-y-3">
                 <p>
                     <strong>CLÁUSULA 6ª</strong> - A CONTRATADA agirá segundo as normas
-                    do Código de Ética da Associação dos Designes Gráficos, e também
-                    assume obrigação e o compromisso de manter em sigilo todas as
-                    informações que. lhe forem prestadas pela CONTRATANTE para que
-                    possa proceder ao desenvolvimento do projeto gráfico, assim também
-                    em relação ao trabalho em desenvolvimento.
+                    do Código de Ética da Associação dos Designes Gráficos e assume o
+                    compromisso de manter em sigilo todas as informações prestadas pela
+                    CONTRATANTE para execução do projeto.
                 </p>
                 <p>
-                    <strong>DOS DIREITOS À PROPRIEDADE INDUSTRIAL</strong>
-                </p>
-                <p>
-                    <strong>CLÁUSULA 7ª</strong> - Caso a consultoria resulte invenção,
-                    descobertas, aperfeiçoamentos ou inovações, os direitos de
-                    propriedade pertencerão à CONTRATANTE autor do trabalho que gerou
-                    desenvolvimento tecnológico, nos termos da Lei n° 9.279/96
-                    (Código de Propriedade Industrial) ou legislação aplicável 1.
-                </p>
-                <p>
-                    <strong>CLAUSULA 8ª</strong> - A equipe envolvida neste projeto se
+                    <strong>CLÁUSULA 8ª</strong> - A equipe envolvida neste projeto se
                     compromete a manter sigilo sobre os dados e informações decorrentes
-                    da consecução do presente contrato, salvo o CONTRATANTE autorize
-                    em contrário.
+                    da execução do contrato, salvo autorização expressa da CONTRATANTE.
                 </p>
             </div>
         ) : (
             <div className="space-y-3">
-                <p>
-                    <strong>{copy.rescissionTitle}</strong>
-                </p>
-                <p>
-                    <strong>{copy.clause5Prefix}</strong> {copy.noRefundClause}
-                </p>
                 <p>
                     {docLocale === "en"
                         ? "Both parties agree to confidentiality over all technical, operational, and strategic information shared under this agreement."
                         : "Ambas partes se comprometen a la confidencialidad sobre toda la información técnica, operativa y estratégica compartida en este contrato."}
                 </p>
+            </div>
+        ),
+        contractRights: isPt ? (
+            <div className="space-y-3">
+                <p>
+                    <strong>DOS DIREITOS À PROPRIEDADE INDUSTRIAL</strong>
+                </p>
+                <p>
+                    <strong>CLÁUSULA 7ª</strong> - Caso a consultoria resulte em
+                    invenções, descobertas, aperfeiçoamentos ou inovações, os direitos
+                    de propriedade pertencerão à CONTRATANTE, conforme legislação
+                    aplicável.
+                </p>
+            </div>
+        ) : (
+            <div className="space-y-3">
                 <p>
                     {docLocale === "en"
                         ? "All intellectual property rights resulting from the contracted work shall belong to the client after full payment."
                         : "Todos los derechos de propiedad intelectual resultantes del trabajo contratado pertenecerán al cliente tras el pago total."}
-                </p>
-            </div>
-        ),
-        conclusion: (
-            <div className="space-y-3">
-                <p>
-                    <strong>{copy.forumTitle}</strong>
-                </p>
-                <p>
-                    <strong>{copy.clause12}</strong> <strong>{forumCity}</strong>.
-                </p>
-                <p>{copy.closingLine}</p>
-                <p>
-                    <strong>
-                        {signatureCity} {signatureDate}
-                    </strong>
                 </p>
             </div>
         ),
@@ -921,10 +946,39 @@ const PRD_UI_COPY = {
         designSystemLabel: "Design System",
         themeLabel: "Tema",
         iconsLabel: "Ícones",
-        additionalDetailsLabel: "Requisitos adicionais informados no formulário",
+        additionalDetailsLabel: "Contexto adicional do briefing",
+        rolesHeading: "3.1 Perfis de Usuário e Responsabilidades",
+        roleEndUserLabel: "Usuário final",
+        roleOperationsLabel: "Operação",
+        roleAdminLabel: "Administração",
+        roleEndUserCore: "Executar o fluxo principal com eficiência e clareza.",
+        roleEndUserAuth: "Autenticar, recuperar acesso e manter dados de perfil.",
+        roleEndUserPayments: "Concluir pagamento e acompanhar status da transação.",
+        roleEndUserUploads: "Enviar e consultar arquivos vinculados ao processo.",
+        roleEndUserTracking:
+            "Acompanhar atualizações e progresso do fluxo em tempo real.",
+        roleOperationsCore:
+            "Monitorar execução diária, filas e incidentes operacionais.",
+        roleOperationsIntegrations:
+            "Validar falhas de integração e atuar em reprocessamento quando necessário.",
+        roleOperationsRealtime:
+            "Acompanhar eventos em tempo real para resposta rápida a desvios.",
+        roleOperationsPayments:
+            "Tratar exceções de pagamento e apoiar conciliação operacional.",
+        roleAdminAccess:
+            "Definir papéis, permissões e políticas de acesso por domínio.",
+        roleAdminAudit:
+            "Garantir trilha de auditoria e conformidade de mudanças críticas.",
+        roleAdminCompliance:
+            "Gerenciar políticas de privacidade, retenção e governança de dados.",
         defaultStory:
             "USER-01 Como usuário, quero um fluxo principal claro para utilizar o produto com rapidez e segurança.",
         storyTemplate: "Como usuário, quero {feature} para atingir o objetivo do produto.",
+        storyOperatorTemplate:
+            "Como operação, quero monitorar {feature} para garantir continuidade e qualidade do serviço.",
+        storyAdminTemplate:
+            "Como administrador, quero configurar regras de {feature} para manter governança e controle.",
+        storyDetailedHeading: "4.1 Histórias Complementares por Papel",
         journeyOnboarding:
             "GIVEN um usuário elegível, WHEN acessa o sistema pela primeira vez, THEN conclui onboarding e inicia o uso sem bloqueios.",
         journeyAuthentication:
@@ -939,6 +993,14 @@ const PRD_UI_COPY = {
             "GIVEN ausência de internet, WHEN o usuário interage com o app, THEN os dados são enfileirados e sincronizados ao reconectar.",
         journeyIntegrations:
             "GIVEN integrações configuradas, WHEN um evento externo é disparado, THEN o sistema recebe/processa o payload conforme regras.",
+        journeysScenariosHeading:
+            "5.1 Cenários de Jornada por Funcionalidade (Happy Path)",
+        journeyFeatureScenarioTemplate:
+            "FEATURE-{index} GIVEN um usuário com permissão, WHEN utiliza {feature}, THEN o sistema conclui a ação e registra estado final auditável.",
+        journeyIntegrationScenarioTemplate:
+            "INTEGRATION-{index} GIVEN {integration} configurada, WHEN ocorre um evento externo válido, THEN o sistema processa o payload e atualiza o fluxo relacionado.",
+        journeyScenarioFallback:
+            "FEATURE-01 GIVEN um usuário elegível, WHEN executa o fluxo principal, THEN conclui a jornada com confirmação e rastreabilidade.",
         flowOnboarding:
             "Cadastro/login inicial, configuração de perfil e validação de acesso.",
         flowCore:
@@ -1043,7 +1105,7 @@ const PRD_UI_COPY = {
         outOfScopeFallback:
             "Exemplos de oportunidades para próximas fases foram adicionados como referência.",
         evolutionAnnexLead:
-            "Sugestões geradas pela IA com base no formulário para evoluções fora do escopo atual.",
+            "Sugestões com base no formulário para evoluções fora do escopo atual.",
         evolutionAnnexOptional:
             "Anexo opcional: use como referência rápida para próximas fases.",
         evolutionExamplesIntro:
@@ -1146,11 +1208,37 @@ const PRD_UI_COPY = {
         designSystemLabel: "Design System",
         themeLabel: "Theme",
         iconsLabel: "Icons",
-        additionalDetailsLabel: "Additional requirements provided in the form",
+        additionalDetailsLabel: "Additional context from the briefing",
+        rolesHeading: "3.1 User Roles and Responsibilities",
+        roleEndUserLabel: "End user",
+        roleOperationsLabel: "Operations",
+        roleAdminLabel: "Administration",
+        roleEndUserCore: "Execute the main flow with efficiency and clarity.",
+        roleEndUserAuth: "Authenticate, recover access, and manage profile data.",
+        roleEndUserPayments: "Complete payment and track transaction status.",
+        roleEndUserUploads: "Upload and review files linked to the process.",
+        roleEndUserTracking: "Track updates and flow progress in real time.",
+        roleOperationsCore:
+            "Monitor daily execution, queues, and operational incidents.",
+        roleOperationsIntegrations:
+            "Handle integration failures and support reprocessing when needed.",
+        roleOperationsRealtime:
+            "Follow real-time events for faster response to deviations.",
+        roleOperationsPayments:
+            "Handle payment exceptions and support operational reconciliation.",
+        roleAdminAccess: "Define roles, permissions, and access policies by domain.",
+        roleAdminAudit: "Ensure audit trails and compliance for critical changes.",
+        roleAdminCompliance:
+            "Manage privacy, retention, and data governance policies.",
         defaultStory:
             "USER-01 As a user, I want a clear main flow so I can use the product quickly and safely.",
         storyTemplate:
             "As a user, I want {feature} so I can achieve the product goal.",
+        storyOperatorTemplate:
+            "As operations, I want to monitor {feature} to ensure service continuity and quality.",
+        storyAdminTemplate:
+            "As an admin, I want to configure rules for {feature} to maintain governance and control.",
+        storyDetailedHeading: "4.1 Complementary Stories by Role",
         journeyOnboarding:
             "GIVEN an eligible user, WHEN they access the system for the first time, THEN they complete onboarding and start using it without blockers.",
         journeyAuthentication:
@@ -1165,6 +1253,13 @@ const PRD_UI_COPY = {
             "GIVEN no internet connection, WHEN the user interacts with the app, THEN actions are queued and synced once online again.",
         journeyIntegrations:
             "GIVEN configured integrations, WHEN an external event occurs, THEN the system receives/processes the payload according to rules.",
+        journeysScenariosHeading: "5.1 Journey Scenarios by Capability (Happy Path)",
+        journeyFeatureScenarioTemplate:
+            "FEATURE-{index} GIVEN an authorized user, WHEN they use {feature}, THEN the system completes the action and records an auditable final state.",
+        journeyIntegrationScenarioTemplate:
+            "INTEGRATION-{index} GIVEN {integration} configured, WHEN a valid external event occurs, THEN the system processes the payload and updates the related flow.",
+        journeyScenarioFallback:
+            "FEATURE-01 GIVEN an eligible user, WHEN they execute the main flow, THEN the journey is completed with confirmation and traceability.",
         flowOnboarding:
             "Initial sign-up/sign-in, profile setup, and access validation.",
         flowCore:
@@ -1269,7 +1364,7 @@ const PRD_UI_COPY = {
         outOfScopeFallback:
             "Reference examples for future phases were added.",
         evolutionAnnexLead:
-            "AI-generated suggestions based on form inputs for evolutions outside the current scope.",
+            "Suggestions based on form inputs for evolutions outside the current scope.",
         evolutionAnnexOptional:
             "Optional annex: use it as a quick reference for future phases.",
         evolutionExamplesIntro:
@@ -1372,11 +1467,44 @@ const PRD_UI_COPY = {
         designSystemLabel: "Design System",
         themeLabel: "Tema",
         iconsLabel: "Íconos",
-        additionalDetailsLabel: "Requisitos adicionales informados en el formulario",
+        additionalDetailsLabel: "Contexto adicional del briefing",
+        rolesHeading: "3.1 Perfiles de Usuario y Responsabilidades",
+        roleEndUserLabel: "Usuario final",
+        roleOperationsLabel: "Operación",
+        roleAdminLabel: "Administración",
+        roleEndUserCore:
+            "Ejecutar el flujo principal con eficiencia y claridad.",
+        roleEndUserAuth:
+            "Autenticarse, recuperar acceso y gestionar datos de perfil.",
+        roleEndUserPayments:
+            "Completar pago y seguir el estado de la transacción.",
+        roleEndUserUploads:
+            "Subir y consultar archivos vinculados al proceso.",
+        roleEndUserTracking:
+            "Acompañar actualizaciones y progreso del flujo en tiempo real.",
+        roleOperationsCore:
+            "Monitorear ejecución diaria, colas e incidentes operativos.",
+        roleOperationsIntegrations:
+            "Gestionar fallos de integración y reprocesamiento cuando sea necesario.",
+        roleOperationsRealtime:
+            "Seguir eventos en tiempo real para respuesta rápida a desvíos.",
+        roleOperationsPayments:
+            "Tratar excepciones de pago y apoyar conciliación operativa.",
+        roleAdminAccess:
+            "Definir roles, permisos y políticas de acceso por dominio.",
+        roleAdminAudit:
+            "Garantizar trazabilidad y cumplimiento en cambios críticos.",
+        roleAdminCompliance:
+            "Gestionar políticas de privacidad, retención y gobernanza de datos.",
         defaultStory:
             "USER-01 Como usuario, quiero un flujo principal claro para usar el producto de forma rápida y segura.",
         storyTemplate:
             "Como usuario, quiero {feature} para alcanzar el objetivo del producto.",
+        storyOperatorTemplate:
+            "Como operación, quiero monitorear {feature} para garantizar continuidad y calidad del servicio.",
+        storyAdminTemplate:
+            "Como administrador, quiero configurar reglas de {feature} para mantener gobernanza y control.",
+        storyDetailedHeading: "4.1 Historias Complementarias por Rol",
         journeyOnboarding:
             "GIVEN un usuario elegible, WHEN accede al sistema por primera vez, THEN completa onboarding e inicia uso sin bloqueos.",
         journeyAuthentication:
@@ -1391,6 +1519,14 @@ const PRD_UI_COPY = {
             "GIVEN falta de internet, WHEN el usuario interactúa con la app, THEN las acciones se encolan y sincronizan al reconectar.",
         journeyIntegrations:
             "GIVEN integraciones configuradas, WHEN ocurre un evento externo, THEN el sistema recibe/procesa el payload según reglas.",
+        journeysScenariosHeading:
+            "5.1 Escenarios de Jornada por Funcionalidad (Happy Path)",
+        journeyFeatureScenarioTemplate:
+            "FEATURE-{index} GIVEN un usuario con permiso, WHEN utiliza {feature}, THEN el sistema completa la acción y registra estado final auditable.",
+        journeyIntegrationScenarioTemplate:
+            "INTEGRATION-{index} GIVEN {integration} configurada, WHEN ocurre un evento externo válido, THEN el sistema procesa el payload y actualiza el flujo relacionado.",
+        journeyScenarioFallback:
+            "FEATURE-01 GIVEN un usuario elegible, WHEN ejecuta el flujo principal, THEN completa la jornada con confirmación y trazabilidad.",
         flowOnboarding:
             "Registro/login inicial, configuración de perfil y validación de acceso.",
         flowCore:
@@ -1495,7 +1631,7 @@ const PRD_UI_COPY = {
         outOfScopeFallback:
             "Se agregaron ejemplos de referencia para próximas fases.",
         evolutionAnnexLead:
-            "Sugerencias generadas por IA a partir del formulario para evoluciones fuera del alcance actual.",
+            "Sugerencias basadas en el formulario para evoluciones fuera del alcance actual.",
         evolutionAnnexOptional:
             "Anexo opcional: úsalo como referencia rápida para próximas fases.",
         evolutionExamplesIntro:
@@ -2045,11 +2181,13 @@ function buildPrdContentFromDraft(
         copy.aiGuidelineContracts,
         copy.aiGuidelineDelivery,
     ];
-    const additionalDetails =
-        draft?.customRules?.trim() || copy.notInformed;
-    const additionalDetailsSummary = truncateText(additionalDetails, 1800);
+    const additionalDetails = draft?.customRules?.trim() || "";
+    const additionalDetailsSummary = additionalDetails
+        ? truncateText(additionalDetails, 1800)
+        : "";
 
     return {
+        ...withEmptyExtraSections({
         introduction: (
             <div className="space-y-3">
                 <p>
@@ -2173,19 +2311,20 @@ function buildPrdContentFromDraft(
         ),
         references: null,
         conclusion: null,
+        }),
         prdRules: (
             <div className="space-y-3">
-                <p>
-                    <strong>{copy.rulesHeading}</strong>
-                </p>
                 <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {businessRules.map((rule, index) => (
                         <li key={`${rule}-${index}`}>{rule}</li>
                     ))}
                 </ul>
-                <p>
-                    <strong>{copy.additionalDetailsLabel}:</strong> {additionalDetailsSummary}
-                </p>
+                {additionalDetailsSummary && (
+                    <p>
+                        <strong>{copy.additionalDetailsLabel}:</strong>{" "}
+                        {additionalDetailsSummary}
+                    </p>
+                )}
             </div>
         ),
         prdInterface: (
@@ -2309,6 +2448,11 @@ type CoreSectionKey =
     | "budget"
     | "references"
     | "conclusion";
+type ProposalExtraSectionKey = "proposalTimeline" | "proposalPayment";
+type ContractExtraSectionKey =
+    | "contractTermination"
+    | "contractConfidentiality"
+    | "contractRights";
 type PrdExtraSectionKey =
     | "prdRules"
     | "prdInterface"
@@ -2316,18 +2460,34 @@ type PrdExtraSectionKey =
     | "prdSecurity"
     | "prdMetrics"
     | "prdSuggestions";
-type SectionKey = CoreSectionKey | PrdExtraSectionKey;
+type SectionKey =
+    | CoreSectionKey
+    | ProposalExtraSectionKey
+    | ContractExtraSectionKey
+    | PrdExtraSectionKey;
 type SectionTitlesMap = Record<SectionKey, string>;
 type EditableSectionContentsMap = Record<SectionKey, string | null>;
 type CoreDocumentContent = Record<CoreSectionKey, React.ReactNode>;
 type FullDocumentContent = Record<SectionKey, React.ReactNode>;
 
-const CORE_SECTION_ORDER: CoreSectionKey[] = [
+const PROPOSAL_SECTION_ORDER: SectionKey[] = [
     "introduction",
     "goals",
     "timeline",
     "budget",
+    "proposalTimeline",
+    "proposalPayment",
     "references",
+    "conclusion",
+];
+const CONTRACT_SECTION_ORDER: SectionKey[] = [
+    "introduction",
+    "goals",
+    "timeline",
+    "budget",
+    "contractTermination",
+    "contractConfidentiality",
+    "contractRights",
     "conclusion",
 ];
 const PRD_SECTION_ORDER: SectionKey[] = [
@@ -2349,6 +2509,11 @@ const EMPTY_SECTION_TITLES: SectionTitlesMap = {
     budget: "",
     references: "",
     conclusion: "",
+    proposalTimeline: "",
+    proposalPayment: "",
+    contractTermination: "",
+    contractConfidentiality: "",
+    contractRights: "",
     prdRules: "",
     prdInterface: "",
     prdGovernance: "",
@@ -2363,6 +2528,11 @@ const EMPTY_SECTION_CONTENTS: EditableSectionContentsMap = {
     budget: null,
     references: null,
     conclusion: null,
+    proposalTimeline: null,
+    proposalPayment: null,
+    contractTermination: null,
+    contractConfidentiality: null,
+    contractRights: null,
     prdRules: null,
     prdInterface: null,
     prdGovernance: null,
@@ -2370,7 +2540,15 @@ const EMPTY_SECTION_CONTENTS: EditableSectionContentsMap = {
     prdMetrics: null,
     prdSuggestions: null,
 };
-const EMPTY_PRD_EXTRA_CONTENT: Record<PrdExtraSectionKey, React.ReactNode> = {
+const EMPTY_EXTRA_SECTION_CONTENT: Record<
+    ProposalExtraSectionKey | ContractExtraSectionKey | PrdExtraSectionKey,
+    React.ReactNode
+> = {
+    proposalTimeline: null,
+    proposalPayment: null,
+    contractTermination: null,
+    contractConfidentiality: null,
+    contractRights: null,
     prdRules: null,
     prdInterface: null,
     prdGovernance: null,
@@ -2379,10 +2557,10 @@ const EMPTY_PRD_EXTRA_CONTENT: Record<PrdExtraSectionKey, React.ReactNode> = {
     prdSuggestions: null,
 };
 
-function withEmptyPrdSections(content: CoreDocumentContent): FullDocumentContent {
+function withEmptyExtraSections(content: CoreDocumentContent): FullDocumentContent {
     return {
         ...content,
-        ...EMPTY_PRD_EXTRA_CONTENT,
+        ...EMPTY_EXTRA_SECTION_CONTENT,
     };
 }
 type SignatureParticipant = {
@@ -2413,12 +2591,7 @@ type ProposalWizardDraft = {
 };
 type ProposalBudgetItem = { id: number; scope: string; budget: string };
 type ProposalContentShape = {
-    introduction: CoreDocumentContent["introduction"];
-    goals: CoreDocumentContent["goals"];
-    timeline: CoreDocumentContent["timeline"];
-    budget: CoreDocumentContent["budget"];
-    references: CoreDocumentContent["references"];
-    conclusion: CoreDocumentContent["conclusion"];
+    sections: FullDocumentContent;
     images: string[];
 };
 
@@ -2567,128 +2740,138 @@ function buildProposalContentFromDrafts(
     const links = (referenceLinks ?? []).filter((link) => link?.trim());
 
     return {
-        introduction: (
-            <div className="space-y-3">
-                <p>
-                    {tBrief("proposalIntroLine1")}{" "}
-                    <span className="text-[1.08rem] font-semibold">
-                        {projectName}
-                    </span>
-                    .
-                </p>
-                <p>
-                    <strong>{tBrief("proposalProjectTypeLabel")}</strong>{" "}
-                    {projectType}.
-                </p>
-                <p>{tBrief("proposalIntroLine2")}</p>
-            </div>
-        ),
-        goals: (
-            <div className="space-y-3">
-                <p>{projectGoals}</p>
-            </div>
-        ),
-        timeline: (
-            <div className="space-y-3">
-                <p>
-                    <strong>{tBrief("proposalMvpFeaturesLabel")}</strong>
-                </p>
-                {scopes.length > 0 ? (
-                    <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                        {scopes.map((scope, index) => (
-                            <li key={`${scope}-${index}`}>{scope}</li>
-                        ))}
-                    </ul>
-                ) : (
-                    <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                        <li>{tBrief("proposalDefaultScopeLine1")}</li>
-                        <li>{tBrief("proposalDefaultScopeLine2")}</li>
-                        <li>{tBrief("proposalDefaultScopeLine3")}</li>
-                    </ul>
-                )}
-            </div>
-        ),
-        budget: (
-            <div className="space-y-2">
-                <p>
-                    <strong>{tBrief("proposalTotalEstimatedLabel")}</strong>{" "}
-                    {totalBudget}.
-                </p>
-                <p>
-                    <strong>{tBrief("proposalDeadlineLabel")}</strong> {deadline}.
-                </p>
-                <p>
-                    <strong>{tBrief("proposalBillingModelLabel")}</strong>{" "}
-                    {billingModel}.
-                </p>
-                <p>
-                    <strong>{tBrief("proposalPaymentMethodLabel")}</strong>{" "}
-                    {paymentMethod}.
-                </p>
-                {paymentNotes && (
-                    <p>
-                        <strong>{tBrief("proposalCommercialNotesLabel")}</strong>{" "}
-                        {paymentNotes}
-                    </p>
-                )}
-                {stageBudgetRows.length > 0 && (
-                    <>
+        sections: {
+            ...withEmptyExtraSections({
+                introduction: (
+                    <div className="space-y-3">
                         <p>
-                            <strong>{tBrief("proposalStageCompositionLabel")}</strong>
+                            {tBrief("proposalIntroLine1")}{" "}
+                            <span className="text-[1.08rem] font-semibold">
+                                {projectName}
+                            </span>
+                            .
                         </p>
-                        <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                            {stageBudgetRows.map((row, index) => (
-                                <li key={`${row.scope}-${index}`}>
-                                    {row.scope}: {row.budget}
+                        <p>
+                            <strong>{tBrief("proposalProjectTypeLabel")}</strong>{" "}
+                            {projectType}.
+                        </p>
+                        <p>{tBrief("proposalIntroLine2")}</p>
+                    </div>
+                ),
+                goals: (
+                    <div className="space-y-3">
+                        <p>{projectGoals}</p>
+                    </div>
+                ),
+                timeline: (
+                    <div className="space-y-3">
+                        <p>
+                            <strong>{tBrief("proposalMvpFeaturesLabel")}</strong>
+                        </p>
+                        {scopes.length > 0 ? (
+                            <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                                {scopes.map((scope, index) => (
+                                    <li key={`${scope}-${index}`}>{scope}</li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                                <li>{tBrief("proposalDefaultScopeLine1")}</li>
+                                <li>{tBrief("proposalDefaultScopeLine2")}</li>
+                                <li>{tBrief("proposalDefaultScopeLine3")}</li>
+                            </ul>
+                        )}
+                    </div>
+                ),
+                budget: (
+                    <div className="space-y-2">
+                        <p>
+                            <strong>{tBrief("proposalTotalEstimatedLabel")}</strong>{" "}
+                            {totalBudget}.
+                        </p>
+                        {stageBudgetRows.length > 0 && (
+                            <>
+                                <p>
+                                    <strong>{tBrief("proposalStageCompositionLabel")}</strong>
+                                </p>
+                                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                                    {stageBudgetRows.map((row, index) => (
+                                        <li key={`${row.scope}-${index}`}>
+                                            {row.scope}: {row.budget}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
+                    </div>
+                ),
+                references: (
+                    <div className="space-y-3">
+                        {links.length > 0 ? (
+                            <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                                {links.map((link, index) => (
+                                    <li key={`${link}-${index}`}>
+                                        <a
+                                            href={link}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="underline decoration-1 underline-offset-2"
+                                        >
+                                            {link}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>{tBrief("proposalNoReferenceLinks")}</p>
+                        )}
+                        <p>{tBrief("proposalReferencesHelper")}</p>
+                    </div>
+                ),
+                conclusion: (
+                    <div className="space-y-3">
+                        <div className="rounded-2xl border border-primary2/20 bg-primary2/5 p-4">
+                            <ul className="list-disc pl-6 text-left space-y-1 [&>li]:leading-7">
+                                <li>
+                                    {tBrief("proposalSpecialCondition24h")}
+                                    <strong> 10%</strong>. {tBrief("proposalFinalValueLabel")}{" "}
+                                    {discounted24h}.
                                 </li>
-                            ))}
-                        </ul>
-                    </>
-                )}
-            </div>
-        ),
-        references: (
-            <div className="space-y-3">
-                {links.length > 0 ? (
-                    <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                        {links.map((link, index) => (
-                            <li key={`${link}-${index}`}>
-                                <a
-                                    href={link}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="underline decoration-1 underline-offset-2"
-                                >
-                                    {link}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>{tBrief("proposalNoReferenceLinks")}</p>
-                )}
-                <p>{tBrief("proposalReferencesHelper")}</p>
-            </div>
-        ),
-        conclusion: (
-            <div className="space-y-3">
-                <div className="rounded-2xl border border-primary2/20 bg-primary2/5 p-4">
-                    <ul className="list-disc pl-6 space-y-1 [&>li]:leading-7">
-                        <li>
-                            {tBrief("proposalSpecialCondition24h")}
-                            <strong> 10%</strong>. {tBrief("proposalFinalValueLabel")}{" "}
-                            {discounted24h}.
-                        </li>
-                        <li>
-                            {tBrief("proposalSpecialCondition48h")}
-                            <strong> 5%</strong>. {tBrief("proposalFinalValueLabel")}{" "}
-                            {discounted48h}.
-                        </li>
-                    </ul>
+                                <li>
+                                    {tBrief("proposalSpecialCondition48h")}
+                                    <strong> 5%</strong>. {tBrief("proposalFinalValueLabel")}{" "}
+                                    {discounted48h}.
+                                </li>
+                            </ul>
+                        </div>
+                        <p>{tBrief("proposalClosingText")}</p>
+                    </div>
+                ),
+            }),
+            proposalTimeline: (
+                <div className="space-y-2">
+                    <p>
+                        <strong>{tBrief("proposalDeadlineLabel")}</strong> {deadline}.
+                    </p>
                 </div>
-                <p>{tBrief("proposalClosingText")}</p>
-            </div>
-        ),
+            ),
+            proposalPayment: (
+                <div className="space-y-2">
+                    <p>
+                        <strong>{tBrief("proposalBillingModelLabel")}</strong> {billingModel}.
+                    </p>
+                    <p>
+                        <strong>{tBrief("proposalPaymentMethodLabel")}</strong> {paymentMethod}.
+                    </p>
+                    {paymentNotes && (
+                        <p>
+                            <strong>{tBrief("proposalCommercialNotesLabel")}</strong>{" "}
+                            {paymentNotes}
+                        </p>
+                    )}
+                </div>
+            ),
+        },
         images: (referenceImages ?? []).slice(0, 4),
     };
 }
@@ -2700,6 +2883,7 @@ const BriefPage = () => {
     const docLocale = resolveDocLocale(locale);
     const contractCopy = CONTRACT_UI_COPY[docLocale];
     const genericSignatureCopy = GENERIC_SIGNATURE_COPY[docLocale];
+    const proposalSectionCopy = PROPOSAL_SECTION_COPY[docLocale];
     const prdCopy = PRD_UI_COPY[docLocale];
     const tBrief = useMemo<TranslateFn>(
         () =>
@@ -2762,30 +2946,23 @@ const BriefPage = () => {
     const [contractDraftState, setContractDraftState] =
         useState<ContractWizardDraft | null>(null);
     const [contractContentState, setContractContentState] = useState<FullDocumentContent>(
-        withEmptyPrdSections(buildContractContentFromDraft(null, docLocale))
+        buildContractContentFromDraft(null, docLocale)
     );
     const [prdContentState, setPrdContentState] = useState<FullDocumentContent>(
         defaultPrdContent
-    );
-    const proposalSectionContent = useMemo<FullDocumentContent>(
-        () =>
-            withEmptyPrdSections({
-                introduction: proposalContentState.introduction,
-                goals: proposalContentState.goals,
-                timeline: proposalContentState.timeline,
-                budget: proposalContentState.budget,
-                references: proposalContentState.references,
-                conclusion: proposalContentState.conclusion,
-            }),
-        [proposalContentState]
     );
     const displayedContent: FullDocumentContent =
         featureType === "contract"
             ? contractContentState
             : featureType === "prd"
             ? prdContentState
-            : proposalSectionContent;
-    const activeSectionOrder = featureType === "prd" ? PRD_SECTION_ORDER : CORE_SECTION_ORDER;
+            : proposalContentState.sections;
+    const activeSectionOrder =
+        featureType === "contract"
+            ? CONTRACT_SECTION_ORDER
+            : featureType === "prd"
+            ? PRD_SECTION_ORDER
+            : PROPOSAL_SECTION_ORDER;
     const sectionTitles = useMemo<SectionTitlesMap>(() => {
         const defaultTitles: SectionTitlesMap = { ...EMPTY_SECTION_TITLES };
         if (featureType === "contract") {
@@ -2793,7 +2970,9 @@ const BriefPage = () => {
             defaultTitles.goals = contractCopy.sectionGoals;
             defaultTitles.timeline = contractCopy.sectionTimeline;
             defaultTitles.budget = contractCopy.sectionBudget;
-            defaultTitles.references = contractCopy.sectionReferences;
+            defaultTitles.contractTermination = contractCopy.sectionTermination;
+            defaultTitles.contractConfidentiality = contractCopy.sectionConfidentiality;
+            defaultTitles.contractRights = contractCopy.sectionRights;
             defaultTitles.conclusion = contractCopy.sectionConclusion;
             return defaultTitles;
         }
@@ -2814,17 +2993,20 @@ const BriefPage = () => {
         defaultTitles.goals = t("proposalSectionGoals");
         defaultTitles.timeline = t("proposalSectionScope");
         defaultTitles.budget = t("proposalSectionInvestment");
+        defaultTitles.proposalTimeline = proposalSectionCopy.sectionTimeline;
+        defaultTitles.proposalPayment = proposalSectionCopy.sectionPayment;
         defaultTitles.references = t("proposalSectionReferences");
         defaultTitles.conclusion = t("proposalSectionConditions");
         return defaultTitles;
-    }, [contractCopy, featureType, prdCopy, t]);
+    }, [contractCopy, featureType, prdCopy, proposalSectionCopy, t]);
     const subtitleDefault =
         featureType === "prd"
             ? prdCopy.subtitle
             : t("documentTypeLabel", {
                   type: featureType === "contract" ? t("contract") : t("proposal"),
               });
-    const storageVersion = featureType === "prd" ? "v19" : "v13";
+    const storageVersion =
+        featureType === "prd" ? "v19" : featureType === "contract" ? "v14" : "v14";
     const storageKey = `briefberry:doc-edit:${featureType}:${docLocale}:${storageVersion}`;
 
     const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
@@ -3001,9 +3183,7 @@ const BriefPage = () => {
                 );
                 setContractDraftState(contractDraft);
                 setContractContentState(
-                    withEmptyPrdSections(
-                        buildContractContentFromDraft(contractDraft, docLocale)
-                    )
+                    buildContractContentFromDraft(contractDraft, docLocale)
                 );
                 const isProposalTitle = /^(Proposta Comercial de|Commercial Proposal for|Propuesta Comercial de)\s/i.test(
                     persistedTitleValue
