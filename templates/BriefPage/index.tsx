@@ -1936,6 +1936,51 @@ function buildPrdContentFromDraft(
                       )}`
               )
             : [copy.defaultStory];
+    const detailedRoleStories = cleanList([
+        ...selectedFeatureLabels.slice(0, 6).map(
+            (featureLabel, index) =>
+                `OPS-${String(index + 1).padStart(2, "0")} ${copy.storyOperatorTemplate.replace(
+                    "{feature}",
+                    featureLabel
+                )}`
+        ),
+        ...selectedIntegrationLabels.slice(0, 4).map(
+            (integrationLabel, index) =>
+                `ADMIN-${String(index + 1).padStart(2, "0")} ${copy.storyAdminTemplate.replace(
+                    "{feature}",
+                    integrationLabel
+                )}`
+        ),
+    ]);
+    const roleCapabilities = [
+        {
+            role: copy.roleEndUserLabel,
+            capabilities: cleanList([
+                copy.roleEndUserCore,
+                ...(auth.emailPassword || auth.socialLogin ? [copy.roleEndUserAuth] : []),
+                ...(hasPaymentsCapability ? [copy.roleEndUserPayments] : []),
+                ...(hasUploadCapability ? [copy.roleEndUserUploads] : []),
+                ...(hasRealtimeCapability ? [copy.roleEndUserTracking] : []),
+            ]),
+        },
+        {
+            role: copy.roleOperationsLabel,
+            capabilities: cleanList([
+                copy.roleOperationsCore,
+                ...(hasIntegrationCapability ? [copy.roleOperationsIntegrations] : []),
+                ...(hasRealtimeCapability ? [copy.roleOperationsRealtime] : []),
+                ...(hasPaymentsCapability ? [copy.roleOperationsPayments] : []),
+            ]),
+        },
+        {
+            role: copy.roleAdminLabel,
+            capabilities: cleanList([
+                copy.roleAdminAccess,
+                copy.roleAdminAudit,
+                ...(requiresCompliance ? [copy.roleAdminCompliance] : []),
+            ]),
+        },
+    ].filter((item) => item.capabilities.length > 0);
     const journeys = [
         copy.journeyOnboarding,
         ...(auth.emailPassword || auth.socialLogin
@@ -1947,6 +1992,20 @@ function buildPrdContentFromDraft(
         ...(selectedFeatureKeys.includes("featOffline") ? [copy.journeyOffline] : []),
         ...(hasIntegrationCapability ? [copy.journeyIntegrations] : []),
     ];
+    const journeyScenarios = cleanList([
+        ...selectedFeatureLabels.slice(0, 4).map((featureLabel, index) =>
+            copy.journeyFeatureScenarioTemplate
+                .replace("{index}", String(index + 1).padStart(2, "0"))
+                .replace("{feature}", featureLabel)
+        ),
+        ...selectedIntegrationLabels.slice(0, 3).map((integrationLabel, index) =>
+            copy.journeyIntegrationScenarioTemplate
+                .replace("{index}", String(index + 1).padStart(2, "0"))
+                .replace("{integration}", integrationLabel)
+        ),
+    ]);
+    const resolvedJourneyScenarios =
+        journeyScenarios.length > 0 ? journeyScenarios : [copy.journeyScenarioFallback];
     const entities = [
         "usuarios",
         "perfis_permissoes",
@@ -2225,6 +2284,16 @@ function buildPrdContentFromDraft(
                     ))}
                 </ul>
                 <p>
+                    <strong>{copy.rolesHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                    {roleCapabilities.map((item, index) => (
+                        <li key={`${item.role}-${index}`}>
+                            <strong>{item.role}:</strong> {item.capabilities.join(" ")}
+                        </li>
+                    ))}
+                </ul>
+                <p>
                     <strong>{copy.userStoriesHeading}</strong>
                 </p>
                 <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
@@ -2232,6 +2301,18 @@ function buildPrdContentFromDraft(
                         <li key={`${story}-${index}`}>{story}</li>
                     ))}
                 </ul>
+                {detailedRoleStories.length > 0 && (
+                    <>
+                        <p>
+                            <strong>{copy.storyDetailedHeading}</strong>
+                        </p>
+                        <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                            {detailedRoleStories.map((story, index) => (
+                                <li key={`${story}-${index}`}>{story}</li>
+                            ))}
+                        </ul>
+                    </>
+                )}
             </div>
         ),
         timeline: (
@@ -2244,6 +2325,14 @@ function buildPrdContentFromDraft(
                         <li key={`${journey}-${index}`}>{journey}</li>
                     ))}
                 </ul>
+                <p>
+                    <strong>{copy.journeysScenariosHeading}</strong>
+                </p>
+                <ol className="list-decimal pl-8 text-left space-y-1 [&>li]:leading-7">
+                    {resolvedJourneyScenarios.map((scenario, index) => (
+                        <li key={`${scenario}-${index}`}>{scenario}</li>
+                    ))}
+                </ol>
                 <p>
                     <strong>{copy.technicalHeading}</strong>
                 </p>
