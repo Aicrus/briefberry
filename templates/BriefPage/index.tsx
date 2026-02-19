@@ -863,6 +863,10 @@ type PrdWizardDraft = {
     theme: number | null;
     icons: number | null;
     customRules: string;
+    acceptanceCriteria?: string;
+    outOfScope?: string;
+    assumptionsAndRisks?: string;
+    openQuestions?: string;
 };
 
 type PrdAuthSelection = {
@@ -898,6 +902,11 @@ const PRD_UI_COPY = {
         screensHeading: "10. Telas e Interface (Design System)",
         securityHeading: "11. Segurança e Conformidade",
         metricsHeading: "12. Métricas de Sucesso",
+        acceptanceCriteriaHeading: "13. Critérios de Aceite (MVP)",
+        outOfScopeHeading: "14. Fora de Escopo",
+        assumptionsRisksHeading: "15. Assunções, Dependências e Riscos",
+        openQuestionsHeading: "16. Perguntas em Aberto",
+        implementationGuidelinesHeading: "17. Diretrizes para Implementação por IA",
         projectLanguageLabel: "Idioma do projeto",
         platformLabel: "Plataforma",
         deadlineLabel: "Prazo de entrega",
@@ -965,6 +974,28 @@ const PRD_UI_COPY = {
             "Taxa de conversão e aprovação de pagamentos dentro do fluxo de compra.",
         metricReliability:
             "Estabilidade operacional (latência/erros) e satisfação do usuário final.",
+        acceptanceFallbackCore:
+            "MUST: o fluxo principal deve ser concluído sem bloqueio crítico e persistir dados corretamente.",
+        acceptanceFallbackAuth:
+            "MUST: autenticação deve permitir login e proteger rotas privadas.",
+        acceptanceFallbackPayments:
+            "MUST: transações devem registrar status final (sucesso/falha) com idempotência.",
+        acceptanceFallbackIntegrations:
+            "SHOULD: integrações externas devem responder dentro do timeout definido e com retry controlado.",
+        outOfScopeFallback:
+            "Itens não explicitados no escopo funcional atual serão tratados como fora da fase MVP.",
+        assumptionsRisksFallback:
+            "Dependemos de APIs externas e disponibilidade do time no prazo previsto; atrasos de homologação podem impactar cronograma.",
+        openQuestionsFallback:
+            "Não há perguntas abertas registradas no momento. Revisar antes do início da implementação.",
+        aiGuidelineTraceability:
+            "MUST: cada requisito funcional deve ter rastreabilidade para user story, tarefa técnica e teste.",
+        aiGuidelineTests:
+            "MUST: critérios de aceite devem ser cobertos por testes automatizados e checklist de validação manual.",
+        aiGuidelineContracts:
+            "SHOULD: definir contratos de API/esquema antes da implementação para reduzir retrabalho.",
+        aiGuidelineDelivery:
+            "SHOULD: implementar em incrementos pequenos com PRs revisáveis e notas de decisão.",
     },
     en: {
         documentTitle: "Product Requirements Document",
@@ -993,6 +1024,11 @@ const PRD_UI_COPY = {
         screensHeading: "10. Screens and Interface (Design System)",
         securityHeading: "11. Security and Compliance",
         metricsHeading: "12. Success Metrics",
+        acceptanceCriteriaHeading: "13. Acceptance Criteria (MVP)",
+        outOfScopeHeading: "14. Out of Scope",
+        assumptionsRisksHeading: "15. Assumptions, Dependencies and Risks",
+        openQuestionsHeading: "16. Open Questions",
+        implementationGuidelinesHeading: "17. AI Implementation Guidelines",
         projectLanguageLabel: "Project language",
         platformLabel: "Platform",
         deadlineLabel: "Delivery deadline",
@@ -1061,6 +1097,28 @@ const PRD_UI_COPY = {
             "Payment conversion and approval rate within the purchase flow.",
         metricReliability:
             "Operational stability (latency/errors) and end-user satisfaction.",
+        acceptanceFallbackCore:
+            "MUST: the main flow must complete without critical blockers and persist data correctly.",
+        acceptanceFallbackAuth:
+            "MUST: authentication must allow login and protect private routes.",
+        acceptanceFallbackPayments:
+            "MUST: transactions must record a final status (success/failure) with idempotency.",
+        acceptanceFallbackIntegrations:
+            "SHOULD: external integrations should respond within the defined timeout with controlled retries.",
+        outOfScopeFallback:
+            "Items not explicitly listed in the current functional scope are considered out of MVP scope.",
+        assumptionsRisksFallback:
+            "We depend on external APIs and team availability within the planned timeline; certification/approval delays may impact delivery.",
+        openQuestionsFallback:
+            "No open questions are currently recorded. Review before implementation starts.",
+        aiGuidelineTraceability:
+            "MUST: every functional requirement must be traceable to a user story, technical task, and test.",
+        aiGuidelineTests:
+            "MUST: acceptance criteria must be covered by automated tests and a manual validation checklist.",
+        aiGuidelineContracts:
+            "SHOULD: define API/schema contracts before implementation to reduce rework.",
+        aiGuidelineDelivery:
+            "SHOULD: implement in small increments with reviewable PRs and decision notes.",
     },
     es: {
         documentTitle: "Documento de Requisitos del Producto",
@@ -1089,6 +1147,11 @@ const PRD_UI_COPY = {
         screensHeading: "10. Pantallas e Interfaz (Design System)",
         securityHeading: "11. Seguridad y Cumplimiento",
         metricsHeading: "12. Métricas de Éxito",
+        acceptanceCriteriaHeading: "13. Criterios de Aceptación (MVP)",
+        outOfScopeHeading: "14. Fuera de Alcance",
+        assumptionsRisksHeading: "15. Supuestos, Dependencias y Riesgos",
+        openQuestionsHeading: "16. Preguntas Abiertas",
+        implementationGuidelinesHeading: "17. Directrices para Implementación con IA",
         projectLanguageLabel: "Idioma del proyecto",
         platformLabel: "Plataforma",
         deadlineLabel: "Plazo de entrega",
@@ -1157,6 +1220,28 @@ const PRD_UI_COPY = {
             "Tasa de conversión y aprobación de pagos dentro del flujo de compra.",
         metricReliability:
             "Estabilidad operativa (latencia/errores) y satisfacción del usuario final.",
+        acceptanceFallbackCore:
+            "MUST: el flujo principal debe completarse sin bloqueos críticos y persistir los datos correctamente.",
+        acceptanceFallbackAuth:
+            "MUST: la autenticación debe permitir login y proteger rutas privadas.",
+        acceptanceFallbackPayments:
+            "MUST: las transacciones deben registrar estado final (éxito/fallo) con idempotencia.",
+        acceptanceFallbackIntegrations:
+            "SHOULD: las integraciones externas deben responder dentro del timeout definido con reintentos controlados.",
+        outOfScopeFallback:
+            "Los elementos no explícitos en el alcance funcional actual se consideran fuera del alcance del MVP.",
+        assumptionsRisksFallback:
+            "Dependemos de APIs externas y disponibilidad del equipo en el plazo previsto; retrasos de homologación pueden impactar la entrega.",
+        openQuestionsFallback:
+            "No hay preguntas abiertas registradas por ahora. Revisar antes de iniciar la implementación.",
+        aiGuidelineTraceability:
+            "MUST: cada requisito funcional debe tener trazabilidad hacia historia de usuario, tarea técnica y prueba.",
+        aiGuidelineTests:
+            "MUST: los criterios de aceptación deben estar cubiertos por pruebas automatizadas y checklist manual de validación.",
+        aiGuidelineContracts:
+            "SHOULD: definir contratos de API/esquema antes de implementar para reducir retrabajo.",
+        aiGuidelineDelivery:
+            "SHOULD: implementar en incrementos pequeños con PRs revisables y notas de decisión.",
     },
 } as const;
 
@@ -1194,6 +1279,20 @@ function cleanList(values: string[] | null | undefined): string[] {
 function truncateText(value: string, maxLength: number): string {
     if (value.length <= maxLength) return value;
     return `${value.slice(0, maxLength).trimEnd()}...`;
+}
+
+function toStructuredList(value: string | null | undefined): string[] {
+    if (!value) return [];
+    const normalized = value
+        .split(/\n|;/g)
+        .map((item) =>
+            item
+                .trim()
+                .replace(/^[-*•]\s*/, "")
+                .replace(/^\d+[\.)]\s*/, "")
+        )
+        .filter(Boolean);
+    return cleanList(normalized);
 }
 
 function buildPrdContentFromDraft(
@@ -1368,6 +1467,43 @@ function buildPrdContentFromDraft(
             : []),
         copy.metricReliability,
     ];
+    const acceptanceCriteriaItems = toStructuredList(draft?.acceptanceCriteria);
+    const resolvedAcceptanceCriteria =
+        acceptanceCriteriaItems.length > 0
+            ? acceptanceCriteriaItems
+            : cleanList([
+                  copy.acceptanceFallbackCore,
+                  ...(auth.emailPassword || auth.socialLogin
+                      ? [copy.acceptanceFallbackAuth]
+                      : []),
+                  ...(selectedFeatureKeys.includes("featPayments")
+                      ? [copy.acceptanceFallbackPayments]
+                      : []),
+                  ...(selectedIntegrationLabels.length > 0
+                      ? [copy.acceptanceFallbackIntegrations]
+                      : []),
+              ]);
+    const outOfScopeItems = toStructuredList(draft?.outOfScope);
+    const resolvedOutOfScope =
+        outOfScopeItems.length > 0
+            ? outOfScopeItems
+            : [copy.outOfScopeFallback];
+    const assumptionsRisksItems = toStructuredList(draft?.assumptionsAndRisks);
+    const resolvedAssumptionsRisks =
+        assumptionsRisksItems.length > 0
+            ? assumptionsRisksItems
+            : [copy.assumptionsRisksFallback];
+    const openQuestionsItems = toStructuredList(draft?.openQuestions);
+    const resolvedOpenQuestions =
+        openQuestionsItems.length > 0
+            ? openQuestionsItems
+            : [copy.openQuestionsFallback];
+    const aiImplementationGuidelines = [
+        copy.aiGuidelineTraceability,
+        copy.aiGuidelineTests,
+        copy.aiGuidelineContracts,
+        copy.aiGuidelineDelivery,
+    ];
     const additionalDetails =
         draft?.customRules?.trim() || copy.notInformed;
     const additionalDetailsSummary = truncateText(additionalDetails, 1800);
@@ -1492,6 +1628,22 @@ function buildPrdContentFromDraft(
                     <strong>{copy.additionalDetailsLabel}:</strong> {additionalDetailsSummary}
                 </p>
                 <p>
+                    <strong>{copy.outOfScopeHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {resolvedOutOfScope.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.openQuestionsHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {resolvedOpenQuestions.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                    ))}
+                </ul>
+                <p>
                     <strong>{copy.screensHeading}</strong>
                 </p>
                 <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
@@ -1518,6 +1670,30 @@ function buildPrdContentFromDraft(
                 <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
                     {successMetrics.map((metric, index) => (
                         <li key={`${metric}-${index}`}>{metric}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.acceptanceCriteriaHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {resolvedAcceptanceCriteria.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.assumptionsRisksHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {resolvedAssumptionsRisks.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.implementationGuidelinesHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {aiImplementationGuidelines.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
                     ))}
                 </ul>
             </div>
