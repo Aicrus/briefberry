@@ -904,7 +904,8 @@ const PRD_UI_COPY = {
         acceptanceCriteriaHeading: "13. Critérios de Aceite (MVP)",
         assumptionsRisksHeading: "14. Assunções, Dependências e Riscos",
         implementationGuidelinesHeading: "15. Diretrizes para Implementação por IA",
-        outOfScopeHeading: "16. Sugestões para Próximas Fases",
+        outOfScopeHeading:
+            "Anexo Opcional — Oportunidades de Evolução (Fora do Escopo do Projeto)",
         projectLanguageLabel: "Idioma do projeto",
         platformLabel: "Plataforma",
         deadlineLabel: "Prazo de entrega",
@@ -1036,21 +1037,64 @@ const PRD_UI_COPY = {
         acceptanceFallbackIntegrations:
             "SHOULD: integrações externas devem responder dentro do timeout definido e com retry controlado.",
         outOfScopeFallback:
-            "Evolução recomendada: organizar um roadmap pós-MVP por impacto e esforço para priorizar entregas de maior valor.",
-        futurePhaseSuggestionRealtime:
-            "Adicionar sincronização em tempo real para dashboards, status operacionais e colaboração entre usuários.",
-        futurePhaseSuggestionOffline:
-            "Implementar modo offline com fila de sincronização para operação em cenários de conectividade limitada.",
-        futurePhaseSuggestionAnalytics:
-            "Incluir camada analítica (eventos/KPIs/coortes) para orientar decisões de produto e crescimento.",
-        futurePhaseSuggestionCrm:
-            "Conectar CRM para gestão do ciclo de vida de clientes, segmentação e automações comerciais.",
-        futurePhaseSuggestionNotifications:
-            "Adicionar orquestração de notificações (e-mail, WhatsApp e push) com regras por evento e preferências do usuário.",
-        futurePhaseSuggestionPayments:
-            "Expandir automações financeiras com conciliação, regras antifraude e trilhas de auditoria de transações.",
-        futurePhaseSuggestionAi:
-            "Adicionar recursos de IA para apoio operacional, recomendações e ganho de produtividade em fluxos críticos.",
+            "Exemplos de oportunidades para próximas fases foram adicionados como referência.",
+        evolutionAnnexLead:
+            "As sugestões abaixo não fazem parte do escopo obrigatório do projeto e servem para planejamento de evolução.",
+        evolutionAnnexOptional:
+            "Este anexo é opcional: você pode remover esta seção do PRD ou mover itens para o backlog de futuras fases.",
+        evolutionExamplesIntro:
+            "Como não houve oportunidades específicas detectadas neste briefing, exibimos exemplos de referência:",
+        evolutionUseLabel: "Como o usuário usaria",
+        evolutionValueLabel: "Valor de negócio",
+        evolutionPhaseLabel: "Fase sugerida",
+        evolutionActionLabel: "Ação recomendada",
+        evolutionPhase2: "Fase 2 (após estabilização da primeira versão)",
+        evolutionPhase3: "Fase 3 (escala e otimização)",
+        evolutionActionBacklogFeature:
+            "Adicionar no backlog como novo épico funcional e estimar esforço técnico.",
+        evolutionActionBacklogIntegration:
+            "Adicionar no backlog de integrações com análise de fornecedor, custos e SLA.",
+        evolutionCustomUse:
+            "Atender um cenário complementar identificado no briefing para ampliar a jornada atual.",
+        evolutionCustomValue:
+            "Aumentar cobertura funcional e reduzir solicitações ad-hoc em etapas futuras.",
+        evolutionCustomAction:
+            "Registrar como oportunidade validável em discovery e priorizar por impacto x esforço.",
+        futurePhaseTitleRealtime: "Sincronização em tempo real",
+        futurePhaseUseRealtime:
+            "Visualizar atualizações operacionais instantâneas entre equipes e painéis.",
+        futurePhaseValueRealtime:
+            "Reduz atraso de informação e melhora tomada de decisão em operações críticas.",
+        futurePhaseTitleOffline: "Modo offline com sincronização",
+        futurePhaseUseOffline:
+            "Continuar usando fluxos principais sem internet e sincronizar ao reconectar.",
+        futurePhaseValueOffline:
+            "Evita interrupções operacionais em ambientes com conectividade instável.",
+        futurePhaseTitleAnalytics: "Camada analítica de produto",
+        futurePhaseUseAnalytics:
+            "Acompanhar eventos, funis e KPIs para entender uso real da plataforma.",
+        futurePhaseValueAnalytics:
+            "Aumenta previsibilidade de crescimento e priorização baseada em dados.",
+        futurePhaseTitleCrm: "Integração com CRM",
+        futurePhaseUseCrm:
+            "Gerenciar relacionamento com clientes e ciclo de vendas no fluxo operacional.",
+        futurePhaseValueCrm:
+            "Melhora retenção, segmentação e eficiência comercial.",
+        futurePhaseTitleNotifications: "Orquestração de notificações",
+        futurePhaseUseNotifications:
+            "Receber alertas e comunicações por e-mail, WhatsApp ou push por evento de negócio.",
+        futurePhaseValueNotifications:
+            "Aumenta engajamento e reduz falhas de acompanhamento de processos.",
+        futurePhaseTitlePayments: "Automações financeiras avançadas",
+        futurePhaseUsePayments:
+            "Acompanhar conciliação, antifraude e trilhas de auditoria em transações.",
+        futurePhaseValuePayments:
+            "Reduz risco financeiro e melhora governança operacional.",
+        futurePhaseTitleAi: "Recursos assistidos por IA",
+        futurePhaseUseAi:
+            "Acelerar atividades operacionais com recomendações e automações assistidas.",
+        futurePhaseValueAi:
+            "Gera ganho de produtividade e escala com menor esforço manual.",
         assumptionsRisksFallback:
             "Dependemos de APIs externas e disponibilidade do time no prazo previsto; atrasos de homologação podem impactar cronograma.",
         aiGuidelineTraceability:
@@ -1092,7 +1136,8 @@ const PRD_UI_COPY = {
         acceptanceCriteriaHeading: "13. Acceptance Criteria (MVP)",
         assumptionsRisksHeading: "14. Assumptions, Dependencies and Risks",
         implementationGuidelinesHeading: "15. AI Implementation Guidelines",
-        outOfScopeHeading: "16. Next-Phase Recommendations",
+        outOfScopeHeading:
+            "Optional Annex — Evolution Opportunities (Out of Project Scope)",
         projectLanguageLabel: "Project language",
         platformLabel: "Platform",
         deadlineLabel: "Delivery deadline",
@@ -1225,21 +1270,64 @@ const PRD_UI_COPY = {
         acceptanceFallbackIntegrations:
             "SHOULD: external integrations should respond within the defined timeout with controlled retries.",
         outOfScopeFallback:
-            "Recommended evolution: structure a post-MVP roadmap by impact and effort to prioritize high-value deliveries.",
-        futurePhaseSuggestionRealtime:
-            "Add real-time synchronization for dashboards, operational status, and multi-user collaboration.",
-        futurePhaseSuggestionOffline:
-            "Implement offline mode with sync queue support for low-connectivity operation scenarios.",
-        futurePhaseSuggestionAnalytics:
-            "Include an analytics layer (events/KPIs/cohorts) to support product and growth decisions.",
-        futurePhaseSuggestionCrm:
-            "Connect CRM workflows for lifecycle management, customer segmentation, and sales automations.",
-        futurePhaseSuggestionNotifications:
-            "Add notification orchestration (email, WhatsApp, and push) with event-based rules and user preferences.",
-        futurePhaseSuggestionPayments:
-            "Expand financial automations with reconciliation, anti-fraud rules, and transaction audit trails.",
-        futurePhaseSuggestionAi:
-            "Introduce AI-powered capabilities for operational assistance, recommendations, and productivity gains in critical flows.",
+            "Reference examples for future phases were added.",
+        evolutionAnnexLead:
+            "The suggestions below are not part of the mandatory project scope and are intended for evolution planning.",
+        evolutionAnnexOptional:
+            "This annex is optional: you can remove this section from the PRD or move items to a future-phase backlog.",
+        evolutionExamplesIntro:
+            "Since no specific opportunities were detected in this briefing, we are showing reference examples:",
+        evolutionUseLabel: "How users would use it",
+        evolutionValueLabel: "Business value",
+        evolutionPhaseLabel: "Suggested phase",
+        evolutionActionLabel: "Recommended action",
+        evolutionPhase2: "Phase 2 (after first-version stabilization)",
+        evolutionPhase3: "Phase 3 (scale and optimization)",
+        evolutionActionBacklogFeature:
+            "Add to backlog as a functional epic and estimate technical effort.",
+        evolutionActionBacklogIntegration:
+            "Add to integration backlog with vendor, cost, and SLA analysis.",
+        evolutionCustomUse:
+            "Address a complementary scenario identified in the briefing to expand the current journey.",
+        evolutionCustomValue:
+            "Increase functional coverage and reduce ad-hoc requests in future phases.",
+        evolutionCustomAction:
+            "Register as a discovery opportunity and prioritize by impact vs effort.",
+        futurePhaseTitleRealtime: "Real-time synchronization",
+        futurePhaseUseRealtime:
+            "View operational updates instantly across teams and dashboards.",
+        futurePhaseValueRealtime:
+            "Reduces information lag and improves decision-making in critical operations.",
+        futurePhaseTitleOffline: "Offline mode with sync",
+        futurePhaseUseOffline:
+            "Keep using core flows without internet and sync when back online.",
+        futurePhaseValueOffline:
+            "Prevents operational interruptions in low-connectivity environments.",
+        futurePhaseTitleAnalytics: "Product analytics layer",
+        futurePhaseUseAnalytics:
+            "Track events, funnels, and KPIs to understand real platform usage.",
+        futurePhaseValueAnalytics:
+            "Improves growth predictability and data-driven prioritization.",
+        futurePhaseTitleCrm: "CRM integration",
+        futurePhaseUseCrm:
+            "Manage customer lifecycle and sales workflows within operations.",
+        futurePhaseValueCrm:
+            "Improves retention, segmentation, and commercial efficiency.",
+        futurePhaseTitleNotifications: "Notification orchestration",
+        futurePhaseUseNotifications:
+            "Receive event-based alerts and communications via email, WhatsApp, or push.",
+        futurePhaseValueNotifications:
+            "Increases engagement and reduces process follow-up failures.",
+        futurePhaseTitlePayments: "Advanced financial automations",
+        futurePhaseUsePayments:
+            "Track reconciliation, anti-fraud controls, and transaction audit trails.",
+        futurePhaseValuePayments:
+            "Reduces financial risk and improves operational governance.",
+        futurePhaseTitleAi: "AI-assisted capabilities",
+        futurePhaseUseAi:
+            "Accelerate operations with assisted recommendations and automations.",
+        futurePhaseValueAi:
+            "Delivers productivity gains and scaling with less manual effort.",
         assumptionsRisksFallback:
             "We depend on external APIs and team availability within the planned timeline; certification/approval delays may impact delivery.",
         aiGuidelineTraceability:
@@ -1281,7 +1369,8 @@ const PRD_UI_COPY = {
         acceptanceCriteriaHeading: "13. Criterios de Aceptación (MVP)",
         assumptionsRisksHeading: "14. Supuestos, Dependencias y Riesgos",
         implementationGuidelinesHeading: "15. Directrices para Implementación con IA",
-        outOfScopeHeading: "16. Recomendaciones para Próximas Fases",
+        outOfScopeHeading:
+            "Anexo Opcional — Oportunidades de Evolución (Fuera del Alcance del Proyecto)",
         projectLanguageLabel: "Idioma del proyecto",
         platformLabel: "Plataforma",
         deadlineLabel: "Plazo de entrega",
@@ -1414,21 +1503,64 @@ const PRD_UI_COPY = {
         acceptanceFallbackIntegrations:
             "SHOULD: las integraciones externas deben responder dentro del timeout definido con reintentos controlados.",
         outOfScopeFallback:
-            "Evolución recomendada: estructurar un roadmap post-MVP por impacto y esfuerzo para priorizar entregas de mayor valor.",
-        futurePhaseSuggestionRealtime:
-            "Agregar sincronización en tiempo real para dashboards, estados operativos y colaboración entre usuarios.",
-        futurePhaseSuggestionOffline:
-            "Implementar modo offline con cola de sincronización para operar con conectividad limitada.",
-        futurePhaseSuggestionAnalytics:
-            "Incluir una capa analítica (eventos/KPIs/cohortes) para decisiones de producto y crecimiento.",
-        futurePhaseSuggestionCrm:
-            "Conectar CRM para gestión del ciclo de vida de clientes, segmentación y automatizaciones comerciales.",
-        futurePhaseSuggestionNotifications:
-            "Agregar orquestación de notificaciones (email, WhatsApp y push) con reglas por evento y preferencias del usuario.",
-        futurePhaseSuggestionPayments:
-            "Expandir automatizaciones financieras con conciliación, reglas antifraude y trazabilidad de transacciones.",
-        futurePhaseSuggestionAi:
-            "Incorporar capacidades de IA para apoyo operativo, recomendaciones y mayor productividad en flujos críticos.",
+            "Se agregaron ejemplos de referencia para próximas fases.",
+        evolutionAnnexLead:
+            "Las sugerencias abajo no forman parte del alcance obligatorio del proyecto y sirven para planificar evolución.",
+        evolutionAnnexOptional:
+            "Este anexo es opcional: puedes remover esta sección del PRD o mover los puntos al backlog de próximas fases.",
+        evolutionExamplesIntro:
+            "Como no se detectaron oportunidades específicas en este briefing, mostramos ejemplos de referencia:",
+        evolutionUseLabel: "Cómo lo usaría el usuario",
+        evolutionValueLabel: "Valor de negocio",
+        evolutionPhaseLabel: "Fase sugerida",
+        evolutionActionLabel: "Acción recomendada",
+        evolutionPhase2: "Fase 2 (tras estabilizar la primera versión)",
+        evolutionPhase3: "Fase 3 (escala y optimización)",
+        evolutionActionBacklogFeature:
+            "Agregar al backlog como épica funcional y estimar esfuerzo técnico.",
+        evolutionActionBacklogIntegration:
+            "Agregar al backlog de integraciones con análisis de proveedor, costo y SLA.",
+        evolutionCustomUse:
+            "Atender un escenario complementario identificado en el briefing para ampliar la jornada actual.",
+        evolutionCustomValue:
+            "Aumentar cobertura funcional y reducir solicitudes ad-hoc en fases futuras.",
+        evolutionCustomAction:
+            "Registrar como oportunidad validable en discovery y priorizar por impacto vs esfuerzo.",
+        futurePhaseTitleRealtime: "Sincronización en tiempo real",
+        futurePhaseUseRealtime:
+            "Ver actualizaciones operativas instantáneas entre equipos y dashboards.",
+        futurePhaseValueRealtime:
+            "Reduce retraso de información y mejora decisiones en operaciones críticas.",
+        futurePhaseTitleOffline: "Modo offline con sincronización",
+        futurePhaseUseOffline:
+            "Continuar flujos principales sin internet y sincronizar al reconectar.",
+        futurePhaseValueOffline:
+            "Evita interrupciones operativas en contextos de conectividad inestable.",
+        futurePhaseTitleAnalytics: "Capa analítica de producto",
+        futurePhaseUseAnalytics:
+            "Monitorear eventos, embudos y KPIs para entender uso real de la plataforma.",
+        futurePhaseValueAnalytics:
+            "Mejora previsibilidad de crecimiento y priorización basada en datos.",
+        futurePhaseTitleCrm: "Integración con CRM",
+        futurePhaseUseCrm:
+            "Gestionar ciclo de vida de clientes y flujo comercial dentro de la operación.",
+        futurePhaseValueCrm:
+            "Mejora retención, segmentación y eficiencia comercial.",
+        futurePhaseTitleNotifications: "Orquestación de notificaciones",
+        futurePhaseUseNotifications:
+            "Recibir alertas y comunicaciones por email, WhatsApp o push por eventos de negocio.",
+        futurePhaseValueNotifications:
+            "Aumenta engagement y reduce fallos de seguimiento de procesos.",
+        futurePhaseTitlePayments: "Automatizaciones financieras avanzadas",
+        futurePhaseUsePayments:
+            "Monitorear conciliación, antifraude y trazabilidad de transacciones.",
+        futurePhaseValuePayments:
+            "Reduce riesgo financiero y mejora gobernanza operativa.",
+        futurePhaseTitleAi: "Capacidades asistidas por IA",
+        futurePhaseUseAi:
+            "Acelerar tareas operativas con recomendaciones y automatizaciones asistidas.",
+        futurePhaseValueAi:
+            "Genera productividad y escala con menor esfuerzo manual.",
         assumptionsRisksFallback:
             "Dependemos de APIs externas y disponibilidad del equipo en el plazo previsto; retrasos de homologación pueden impactar la entrega.",
         aiGuidelineTraceability:
@@ -1762,20 +1894,135 @@ function buildPrdContentFromDraft(
                       : []),
               ]);
     const outOfScopeItems = toStructuredList(draft?.outOfScope);
-    const nextPhaseSuggestions = cleanList([
-        ...outOfScopeItems,
-        ...(!requiresRealtime ? [copy.futurePhaseSuggestionRealtime] : []),
-        ...(!requiresOffline ? [copy.futurePhaseSuggestionOffline] : []),
-        ...(!requiresAnalytics ? [copy.futurePhaseSuggestionAnalytics] : []),
-        ...(!requiresCrm ? [copy.futurePhaseSuggestionCrm] : []),
-        ...(!requiresMessaging ? [copy.futurePhaseSuggestionNotifications] : []),
-        ...(!requiresPayments ? [copy.futurePhaseSuggestionPayments] : []),
-        ...(!requiresAi ? [copy.futurePhaseSuggestionAi] : []),
-    ]).slice(0, 6);
-    const resolvedOutOfScope =
-        nextPhaseSuggestions.length > 0
-            ? nextPhaseSuggestions
-            : [copy.outOfScopeFallback];
+    const filteredOutOfScopeItems = outOfScopeItems.filter((item) => {
+        const normalized = normalizeForKeywordSearch(item);
+        return !(
+            normalized.includes("nenhuma oportunidade adicional") ||
+            normalized.includes("no additional opportunities") ||
+            normalized.includes("no se mapearon automaticamente oportunidades adicionales") ||
+            normalized.includes("se agregaron ejemplos de referencia")
+        );
+    });
+    type EvolutionOpportunity = {
+        title: string;
+        userUse: string;
+        businessValue: string;
+        suggestedPhase: string;
+        recommendedAction: string;
+    };
+    const evolutionOpportunities: EvolutionOpportunity[] = [
+        ...filteredOutOfScopeItems.map((item) => ({
+            title: item,
+            userUse: copy.evolutionCustomUse,
+            businessValue: copy.evolutionCustomValue,
+            suggestedPhase: copy.evolutionPhase3,
+            recommendedAction: copy.evolutionCustomAction,
+        })),
+        ...(!requiresRealtime
+            ? [
+                  {
+                      title: copy.futurePhaseTitleRealtime,
+                      userUse: copy.futurePhaseUseRealtime,
+                      businessValue: copy.futurePhaseValueRealtime,
+                      suggestedPhase: copy.evolutionPhase2,
+                      recommendedAction: copy.evolutionActionBacklogFeature,
+                  },
+              ]
+            : []),
+        ...(!requiresOffline
+            ? [
+                  {
+                      title: copy.futurePhaseTitleOffline,
+                      userUse: copy.futurePhaseUseOffline,
+                      businessValue: copy.futurePhaseValueOffline,
+                      suggestedPhase: copy.evolutionPhase2,
+                      recommendedAction: copy.evolutionActionBacklogFeature,
+                  },
+              ]
+            : []),
+        ...(!requiresAnalytics
+            ? [
+                  {
+                      title: copy.futurePhaseTitleAnalytics,
+                      userUse: copy.futurePhaseUseAnalytics,
+                      businessValue: copy.futurePhaseValueAnalytics,
+                      suggestedPhase: copy.evolutionPhase3,
+                      recommendedAction: copy.evolutionActionBacklogFeature,
+                  },
+              ]
+            : []),
+        ...(!requiresCrm
+            ? [
+                  {
+                      title: copy.futurePhaseTitleCrm,
+                      userUse: copy.futurePhaseUseCrm,
+                      businessValue: copy.futurePhaseValueCrm,
+                      suggestedPhase: copy.evolutionPhase3,
+                      recommendedAction: copy.evolutionActionBacklogIntegration,
+                  },
+              ]
+            : []),
+        ...(!requiresMessaging
+            ? [
+                  {
+                      title: copy.futurePhaseTitleNotifications,
+                      userUse: copy.futurePhaseUseNotifications,
+                      businessValue: copy.futurePhaseValueNotifications,
+                      suggestedPhase: copy.evolutionPhase2,
+                      recommendedAction: copy.evolutionActionBacklogIntegration,
+                  },
+              ]
+            : []),
+        ...(!requiresPayments
+            ? [
+                  {
+                      title: copy.futurePhaseTitlePayments,
+                      userUse: copy.futurePhaseUsePayments,
+                      businessValue: copy.futurePhaseValuePayments,
+                      suggestedPhase: copy.evolutionPhase2,
+                      recommendedAction: copy.evolutionActionBacklogIntegration,
+                  },
+              ]
+            : []),
+        ...(!requiresAi
+            ? [
+                  {
+                      title: copy.futurePhaseTitleAi,
+                      userUse: copy.futurePhaseUseAi,
+                      businessValue: copy.futurePhaseValueAi,
+                      suggestedPhase: copy.evolutionPhase3,
+                      recommendedAction: copy.evolutionActionBacklogFeature,
+                  },
+              ]
+            : []),
+    ].slice(0, 6);
+    const hasDetectedEvolutionOpportunities = evolutionOpportunities.length > 0;
+    const fallbackEvolutionExamples: EvolutionOpportunity[] = [
+        {
+            title: copy.futurePhaseTitleAnalytics,
+            userUse: copy.futurePhaseUseAnalytics,
+            businessValue: copy.futurePhaseValueAnalytics,
+            suggestedPhase: copy.evolutionPhase3,
+            recommendedAction: copy.evolutionActionBacklogFeature,
+        },
+        {
+            title: copy.futurePhaseTitleNotifications,
+            userUse: copy.futurePhaseUseNotifications,
+            businessValue: copy.futurePhaseValueNotifications,
+            suggestedPhase: copy.evolutionPhase2,
+            recommendedAction: copy.evolutionActionBacklogIntegration,
+        },
+        {
+            title: copy.futurePhaseTitleAi,
+            userUse: copy.futurePhaseUseAi,
+            businessValue: copy.futurePhaseValueAi,
+            suggestedPhase: copy.evolutionPhase3,
+            recommendedAction: copy.evolutionActionBacklogFeature,
+        },
+    ];
+    const resolvedEvolutionOpportunities = hasDetectedEvolutionOpportunities
+        ? evolutionOpportunities
+        : fallbackEvolutionExamples;
     const assumptionsRisksItems = toStructuredList(draft?.assumptionsAndRisks);
     const resolvedAssumptionsRisks =
         assumptionsRisksItems.length > 0
@@ -2006,11 +2253,39 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.outOfScopeHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                    {resolvedOutOfScope.map((item, index) => (
-                        <li key={`${item}-${index}`}>{item}</li>
+                <p>{copy.evolutionAnnexLead}</p>
+                <p>
+                    <em>{copy.evolutionAnnexOptional}</em>
+                </p>
+                {!hasDetectedEvolutionOpportunities && <p>{copy.evolutionExamplesIntro}</p>}
+                <div className="space-y-3">
+                    {resolvedEvolutionOpportunities.map((item, index) => (
+                        <div
+                            key={`${item.title}-${index}`}
+                            className="rounded-2xl border-[1.5px] border-stroke2 p-4 space-y-1"
+                        >
+                            <p>
+                                <strong>{index + 1}. {item.title}</strong>
+                            </p>
+                            <p>
+                                <strong>{copy.evolutionUseLabel}:</strong>{" "}
+                                {item.userUse}
+                            </p>
+                            <p>
+                                <strong>{copy.evolutionValueLabel}:</strong>{" "}
+                                {item.businessValue}
+                            </p>
+                            <p>
+                                <strong>{copy.evolutionPhaseLabel}:</strong>{" "}
+                                {item.suggestedPhase}
+                            </p>
+                            <p>
+                                <strong>{copy.evolutionActionLabel}:</strong>{" "}
+                                {item.recommendedAction}
+                            </p>
+                        </div>
                     ))}
-                </ul>
+                </div>
             </div>
         ),
     };
@@ -2448,7 +2723,7 @@ const BriefPage = () => {
             : t("documentTypeLabel", {
                   type: featureType === "contract" ? t("contract") : t("proposal"),
               });
-    const storageVersion = featureType === "prd" ? "v14" : "v13";
+    const storageVersion = featureType === "prd" ? "v15" : "v13";
     const storageKey = `briefberry:doc-edit:${featureType}:${docLocale}:${storageVersion}`;
 
     const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
