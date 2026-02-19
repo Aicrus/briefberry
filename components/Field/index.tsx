@@ -56,7 +56,11 @@ const Field = ({
             }
             e.target.value = next;
         }
-        onChange?.(e);
+        (
+            onChange as
+                | ((event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void)
+                | undefined
+        )?.(e);
     };
 
     const currentLength = typeof value === "string" ? value.length : 0;

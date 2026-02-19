@@ -866,7 +866,6 @@ type PrdWizardDraft = {
     acceptanceCriteria?: string;
     outOfScope?: string;
     assumptionsAndRisks?: string;
-    openQuestions?: string;
 };
 
 type PrdAuthSelection = {
@@ -903,10 +902,9 @@ const PRD_UI_COPY = {
         securityHeading: "11. Segurança e Conformidade",
         metricsHeading: "12. Métricas de Sucesso",
         acceptanceCriteriaHeading: "13. Critérios de Aceite (MVP)",
-        outOfScopeHeading: "14. Fora de Escopo",
-        assumptionsRisksHeading: "15. Assunções, Dependências e Riscos",
-        openQuestionsHeading: "16. Perguntas em Aberto",
-        implementationGuidelinesHeading: "17. Diretrizes para Implementação por IA",
+        assumptionsRisksHeading: "14. Assunções, Dependências e Riscos",
+        implementationGuidelinesHeading: "15. Diretrizes para Implementação por IA",
+        outOfScopeHeading: "16. Sugestões para Próximas Fases",
         projectLanguageLabel: "Idioma do projeto",
         platformLabel: "Plataforma",
         deadlineLabel: "Prazo de entrega",
@@ -974,6 +972,61 @@ const PRD_UI_COPY = {
             "Taxa de conversão e aprovação de pagamentos dentro do fluxo de compra.",
         metricReliability:
             "Estabilidade operacional (latência/erros) e satisfação do usuário final.",
+        dbRelationshipsHeading: "7.1 Relacionamentos, PK/FK e Integridade",
+        dbIndexesHeading: "7.2 Índices e Otimização de Consulta",
+        rlsHeading: "11.1 RLS e Permissões por Papel",
+        operationsHeading: "11.2 Migração, Backup e Observabilidade",
+        nfrHeading: "12.1 Requisitos Não Funcionais (Metas)",
+        dbPkFkRule:
+            "Todas as tabelas devem ter PK UUID e FKs explícitas com ON UPDATE CASCADE.",
+        dbDeletePolicyRule:
+            "ON DELETE deve seguir regra de negócio por entidade (RESTRICT para financeiro/auditoria; CASCADE ou SET NULL para anexos).",
+        dbAuditIntegrityRule:
+            "Registros de auditoria não devem ser apagados por operações comuns de aplicação.",
+        idxUsersRule:
+            "`usuarios(email)` UNIQUE para autenticação e deduplicação.",
+        idxAuditRule:
+            "`logs_auditoria(usuario_id, created_at DESC)` para rastreabilidade.",
+        idxPaymentsRule:
+            "`transacoes_pagamento(status, created_at DESC)` e `external_id` UNIQUE para idempotência.",
+        idxFilesRule:
+            "`arquivos(usuario_id, created_at DESC)` para listagens e paginação.",
+        idxIntegrationsRule:
+            "`integracoes_externas(provider, external_ref)` com índice composto para conciliação.",
+        relationUserRoles:
+            "`usuarios.id` -> `perfis_permissoes.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserAudit:
+            "`usuarios.id` -> `logs_auditoria.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserPayments:
+            "`usuarios.id` -> `transacoes_pagamento.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserFiles:
+            "`usuarios.id` -> `arquivos.usuario_id` (1:N), ON DELETE SET NULL.",
+        relationUserIntegrations:
+            "`usuarios.id` -> `integracoes_externas.usuario_id` (1:N), ON DELETE RESTRICT.",
+        rlsEnableRule:
+            "Habilitar RLS em tabelas sensíveis (`usuarios`, pagamentos, auditoria, integrações).",
+        rlsLeastPrivilegeRule:
+            "Aplicar menor privilégio por papel (admin, operação, leitura), com políticas separadas de SELECT/INSERT/UPDATE/DELETE.",
+        rlsOwnershipRule:
+            "Usuário final acessa apenas dados próprios; dados globais somente para papéis administrativos.",
+        opsMigrationsRule:
+            "Migrations versionadas, revisadas em PR e com plano de rollback para mudanças críticas.",
+        opsBackupRule:
+            "Backup diário com retenção; em produção, preferir PITR e testar restauração periodicamente.",
+        opsObservabilityRule:
+            "Logs estruturados, métricas (latência/erro/throughput) e tracing distribuído nos fluxos críticos.",
+        opsAlertsRule:
+            "Alertas para erro 5xx, degradação de latência e falhas de integração externa.",
+        nfrAvailability:
+            "Disponibilidade mensal mínima: 99,5%.",
+        nfrLatency:
+            "Latência alvo (P95): até 400ms em leitura e 800ms em escrita nas rotas críticas.",
+        nfrErrorRate:
+            "Taxa de erro 5xx nas rotas críticas: abaixo de 1%.",
+        nfrCapacityBase:
+            "Capacidade inicial do MVP: ao menos 150 usuários concorrentes.",
+        nfrCapacityRealtime:
+            "Capacidade inicial do MVP: ao menos 300 usuários concorrentes com sincronização em tempo real.",
         acceptanceFallbackCore:
             "MUST: o fluxo principal deve ser concluído sem bloqueio crítico e persistir dados corretamente.",
         acceptanceFallbackAuth:
@@ -983,11 +1036,23 @@ const PRD_UI_COPY = {
         acceptanceFallbackIntegrations:
             "SHOULD: integrações externas devem responder dentro do timeout definido e com retry controlado.",
         outOfScopeFallback:
-            "Itens não explicitados no escopo funcional atual serão tratados como fora da fase MVP.",
+            "Evolução recomendada: organizar um roadmap pós-MVP por impacto e esforço para priorizar entregas de maior valor.",
+        futurePhaseSuggestionRealtime:
+            "Adicionar sincronização em tempo real para dashboards, status operacionais e colaboração entre usuários.",
+        futurePhaseSuggestionOffline:
+            "Implementar modo offline com fila de sincronização para operação em cenários de conectividade limitada.",
+        futurePhaseSuggestionAnalytics:
+            "Incluir camada analítica (eventos/KPIs/coortes) para orientar decisões de produto e crescimento.",
+        futurePhaseSuggestionCrm:
+            "Conectar CRM para gestão do ciclo de vida de clientes, segmentação e automações comerciais.",
+        futurePhaseSuggestionNotifications:
+            "Adicionar orquestração de notificações (e-mail, WhatsApp e push) com regras por evento e preferências do usuário.",
+        futurePhaseSuggestionPayments:
+            "Expandir automações financeiras com conciliação, regras antifraude e trilhas de auditoria de transações.",
+        futurePhaseSuggestionAi:
+            "Adicionar recursos de IA para apoio operacional, recomendações e ganho de produtividade em fluxos críticos.",
         assumptionsRisksFallback:
             "Dependemos de APIs externas e disponibilidade do time no prazo previsto; atrasos de homologação podem impactar cronograma.",
-        openQuestionsFallback:
-            "Não há perguntas abertas registradas no momento. Revisar antes do início da implementação.",
         aiGuidelineTraceability:
             "MUST: cada requisito funcional deve ter rastreabilidade para user story, tarefa técnica e teste.",
         aiGuidelineTests:
@@ -1025,10 +1090,9 @@ const PRD_UI_COPY = {
         securityHeading: "11. Security and Compliance",
         metricsHeading: "12. Success Metrics",
         acceptanceCriteriaHeading: "13. Acceptance Criteria (MVP)",
-        outOfScopeHeading: "14. Out of Scope",
-        assumptionsRisksHeading: "15. Assumptions, Dependencies and Risks",
-        openQuestionsHeading: "16. Open Questions",
-        implementationGuidelinesHeading: "17. AI Implementation Guidelines",
+        assumptionsRisksHeading: "14. Assumptions, Dependencies and Risks",
+        implementationGuidelinesHeading: "15. AI Implementation Guidelines",
+        outOfScopeHeading: "16. Next-Phase Recommendations",
         projectLanguageLabel: "Project language",
         platformLabel: "Platform",
         deadlineLabel: "Delivery deadline",
@@ -1097,6 +1161,61 @@ const PRD_UI_COPY = {
             "Payment conversion and approval rate within the purchase flow.",
         metricReliability:
             "Operational stability (latency/errors) and end-user satisfaction.",
+        dbRelationshipsHeading: "7.1 Relationships, PK/FK and Integrity",
+        dbIndexesHeading: "7.2 Indexes and Query Optimization",
+        rlsHeading: "11.1 RLS and Role-Based Permissions",
+        operationsHeading: "11.2 Migration, Backup and Observability",
+        nfrHeading: "12.1 Non-Functional Requirements (Targets)",
+        dbPkFkRule:
+            "All tables must use UUID primary keys and explicit foreign keys with ON UPDATE CASCADE.",
+        dbDeletePolicyRule:
+            "ON DELETE must follow business rules per entity (RESTRICT for financial/audit data; CASCADE or SET NULL for attachments).",
+        dbAuditIntegrityRule:
+            "Audit records must not be deleted by standard application operations.",
+        idxUsersRule:
+            "`usuarios(email)` UNIQUE for authentication and deduplication.",
+        idxAuditRule:
+            "`logs_auditoria(usuario_id, created_at DESC)` for traceability.",
+        idxPaymentsRule:
+            "`transacoes_pagamento(status, created_at DESC)` plus `external_id` UNIQUE for idempotency.",
+        idxFilesRule:
+            "`arquivos(usuario_id, created_at DESC)` for listings and pagination.",
+        idxIntegrationsRule:
+            "`integracoes_externas(provider, external_ref)` composite index for reconciliation.",
+        relationUserRoles:
+            "`usuarios.id` -> `perfis_permissoes.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserAudit:
+            "`usuarios.id` -> `logs_auditoria.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserPayments:
+            "`usuarios.id` -> `transacoes_pagamento.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserFiles:
+            "`usuarios.id` -> `arquivos.usuario_id` (1:N), ON DELETE SET NULL.",
+        relationUserIntegrations:
+            "`usuarios.id` -> `integracoes_externas.usuario_id` (1:N), ON DELETE RESTRICT.",
+        rlsEnableRule:
+            "Enable RLS on sensitive tables (`usuarios`, payments, audit logs, integrations).",
+        rlsLeastPrivilegeRule:
+            "Apply least-privilege policies by role (admin, operator, read-only) with separate SELECT/INSERT/UPDATE/DELETE policies.",
+        rlsOwnershipRule:
+            "End users can only access their own data; global data is restricted to administrative roles.",
+        opsMigrationsRule:
+            "Use versioned migrations, reviewed in PRs, with rollback plans for critical changes.",
+        opsBackupRule:
+            "Daily backups with retention; in production, prefer PITR and periodic restore drills.",
+        opsObservabilityRule:
+            "Structured logs, metrics (latency/error/throughput), and distributed tracing on critical flows.",
+        opsAlertsRule:
+            "Alerts for 5xx spikes, latency degradation, and external integration failures.",
+        nfrAvailability:
+            "Minimum monthly availability: 99.5%.",
+        nfrLatency:
+            "Target latency (P95): up to 400ms for reads and 800ms for writes on critical routes.",
+        nfrErrorRate:
+            "5xx error rate on critical routes: below 1%.",
+        nfrCapacityBase:
+            "Initial MVP capacity: at least 150 concurrent users.",
+        nfrCapacityRealtime:
+            "Initial MVP capacity: at least 300 concurrent users with real-time sync.",
         acceptanceFallbackCore:
             "MUST: the main flow must complete without critical blockers and persist data correctly.",
         acceptanceFallbackAuth:
@@ -1106,11 +1225,23 @@ const PRD_UI_COPY = {
         acceptanceFallbackIntegrations:
             "SHOULD: external integrations should respond within the defined timeout with controlled retries.",
         outOfScopeFallback:
-            "Items not explicitly listed in the current functional scope are considered out of MVP scope.",
+            "Recommended evolution: structure a post-MVP roadmap by impact and effort to prioritize high-value deliveries.",
+        futurePhaseSuggestionRealtime:
+            "Add real-time synchronization for dashboards, operational status, and multi-user collaboration.",
+        futurePhaseSuggestionOffline:
+            "Implement offline mode with sync queue support for low-connectivity operation scenarios.",
+        futurePhaseSuggestionAnalytics:
+            "Include an analytics layer (events/KPIs/cohorts) to support product and growth decisions.",
+        futurePhaseSuggestionCrm:
+            "Connect CRM workflows for lifecycle management, customer segmentation, and sales automations.",
+        futurePhaseSuggestionNotifications:
+            "Add notification orchestration (email, WhatsApp, and push) with event-based rules and user preferences.",
+        futurePhaseSuggestionPayments:
+            "Expand financial automations with reconciliation, anti-fraud rules, and transaction audit trails.",
+        futurePhaseSuggestionAi:
+            "Introduce AI-powered capabilities for operational assistance, recommendations, and productivity gains in critical flows.",
         assumptionsRisksFallback:
             "We depend on external APIs and team availability within the planned timeline; certification/approval delays may impact delivery.",
-        openQuestionsFallback:
-            "No open questions are currently recorded. Review before implementation starts.",
         aiGuidelineTraceability:
             "MUST: every functional requirement must be traceable to a user story, technical task, and test.",
         aiGuidelineTests:
@@ -1148,10 +1279,9 @@ const PRD_UI_COPY = {
         securityHeading: "11. Seguridad y Cumplimiento",
         metricsHeading: "12. Métricas de Éxito",
         acceptanceCriteriaHeading: "13. Criterios de Aceptación (MVP)",
-        outOfScopeHeading: "14. Fuera de Alcance",
-        assumptionsRisksHeading: "15. Supuestos, Dependencias y Riesgos",
-        openQuestionsHeading: "16. Preguntas Abiertas",
-        implementationGuidelinesHeading: "17. Directrices para Implementación con IA",
+        assumptionsRisksHeading: "14. Supuestos, Dependencias y Riesgos",
+        implementationGuidelinesHeading: "15. Directrices para Implementación con IA",
+        outOfScopeHeading: "16. Recomendaciones para Próximas Fases",
         projectLanguageLabel: "Idioma del proyecto",
         platformLabel: "Plataforma",
         deadlineLabel: "Plazo de entrega",
@@ -1220,6 +1350,61 @@ const PRD_UI_COPY = {
             "Tasa de conversión y aprobación de pagos dentro del flujo de compra.",
         metricReliability:
             "Estabilidad operativa (latencia/errores) y satisfacción del usuario final.",
+        dbRelationshipsHeading: "7.1 Relaciones, PK/FK e Integridad",
+        dbIndexesHeading: "7.2 Índices y Optimización de Consultas",
+        rlsHeading: "11.1 RLS y Permisos por Rol",
+        operationsHeading: "11.2 Migraciones, Backup y Observabilidad",
+        nfrHeading: "12.1 Requisitos No Funcionales (Objetivos)",
+        dbPkFkRule:
+            "Todas las tablas deben usar PK UUID y FKs explícitas con ON UPDATE CASCADE.",
+        dbDeletePolicyRule:
+            "ON DELETE debe seguir reglas de negocio por entidad (RESTRICT para datos financieros/auditoría; CASCADE o SET NULL para adjuntos).",
+        dbAuditIntegrityRule:
+            "Los registros de auditoría no deben eliminarse por operaciones comunes de aplicación.",
+        idxUsersRule:
+            "`usuarios(email)` UNIQUE para autenticación y deduplicación.",
+        idxAuditRule:
+            "`logs_auditoria(usuario_id, created_at DESC)` para trazabilidad.",
+        idxPaymentsRule:
+            "`transacoes_pagamento(status, created_at DESC)` y `external_id` UNIQUE para idempotencia.",
+        idxFilesRule:
+            "`arquivos(usuario_id, created_at DESC)` para listados y paginación.",
+        idxIntegrationsRule:
+            "`integracoes_externas(provider, external_ref)` con índice compuesto para conciliación.",
+        relationUserRoles:
+            "`usuarios.id` -> `perfis_permissoes.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserAudit:
+            "`usuarios.id` -> `logs_auditoria.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserPayments:
+            "`usuarios.id` -> `transacoes_pagamento.usuario_id` (1:N), ON DELETE RESTRICT.",
+        relationUserFiles:
+            "`usuarios.id` -> `arquivos.usuario_id` (1:N), ON DELETE SET NULL.",
+        relationUserIntegrations:
+            "`usuarios.id` -> `integracoes_externas.usuario_id` (1:N), ON DELETE RESTRICT.",
+        rlsEnableRule:
+            "Habilitar RLS en tablas sensibles (`usuarios`, pagos, auditoría, integraciones).",
+        rlsLeastPrivilegeRule:
+            "Aplicar mínimo privilegio por rol (admin, operación, solo lectura), con políticas separadas de SELECT/INSERT/UPDATE/DELETE.",
+        rlsOwnershipRule:
+            "El usuario final accede solo a sus propios datos; datos globales solo para roles administrativos.",
+        opsMigrationsRule:
+            "Usar migraciones versionadas, revisadas en PR, con plan de rollback para cambios críticos.",
+        opsBackupRule:
+            "Backup diario con retención; en producción, preferir PITR y pruebas periódicas de restauración.",
+        opsObservabilityRule:
+            "Logs estructurados, métricas (latencia/error/throughput) y tracing distribuido en flujos críticos.",
+        opsAlertsRule:
+            "Alertas para picos de error 5xx, degradación de latencia y fallas de integraciones externas.",
+        nfrAvailability:
+            "Disponibilidad mínima mensual: 99,5%.",
+        nfrLatency:
+            "Latencia objetivo (P95): hasta 400ms en lectura y 800ms en escritura en rutas críticas.",
+        nfrErrorRate:
+            "Tasa de error 5xx en rutas críticas: por debajo de 1%.",
+        nfrCapacityBase:
+            "Capacidad inicial del MVP: al menos 150 usuarios concurrentes.",
+        nfrCapacityRealtime:
+            "Capacidad inicial del MVP: al menos 300 usuarios concurrentes con sincronización en tiempo real.",
         acceptanceFallbackCore:
             "MUST: el flujo principal debe completarse sin bloqueos críticos y persistir los datos correctamente.",
         acceptanceFallbackAuth:
@@ -1229,11 +1414,23 @@ const PRD_UI_COPY = {
         acceptanceFallbackIntegrations:
             "SHOULD: las integraciones externas deben responder dentro del timeout definido con reintentos controlados.",
         outOfScopeFallback:
-            "Los elementos no explícitos en el alcance funcional actual se consideran fuera del alcance del MVP.",
+            "Evolución recomendada: estructurar un roadmap post-MVP por impacto y esfuerzo para priorizar entregas de mayor valor.",
+        futurePhaseSuggestionRealtime:
+            "Agregar sincronización en tiempo real para dashboards, estados operativos y colaboración entre usuarios.",
+        futurePhaseSuggestionOffline:
+            "Implementar modo offline con cola de sincronización para operar con conectividad limitada.",
+        futurePhaseSuggestionAnalytics:
+            "Incluir una capa analítica (eventos/KPIs/cohortes) para decisiones de producto y crecimiento.",
+        futurePhaseSuggestionCrm:
+            "Conectar CRM para gestión del ciclo de vida de clientes, segmentación y automatizaciones comerciales.",
+        futurePhaseSuggestionNotifications:
+            "Agregar orquestación de notificaciones (email, WhatsApp y push) con reglas por evento y preferencias del usuario.",
+        futurePhaseSuggestionPayments:
+            "Expandir automatizaciones financieras con conciliación, reglas antifraude y trazabilidad de transacciones.",
+        futurePhaseSuggestionAi:
+            "Incorporar capacidades de IA para apoyo operativo, recomendaciones y mayor productividad en flujos críticos.",
         assumptionsRisksFallback:
             "Dependemos de APIs externas y disponibilidad del equipo en el plazo previsto; retrasos de homologación pueden impactar la entrega.",
-        openQuestionsFallback:
-            "No hay preguntas abiertas registradas por ahora. Revisar antes de iniciar la implementación.",
         aiGuidelineTraceability:
             "MUST: cada requisito funcional debe tener trazabilidad hacia historia de usuario, tarea técnica y prueba.",
         aiGuidelineTests:
@@ -1293,6 +1490,13 @@ function toStructuredList(value: string | null | undefined): string[] {
         )
         .filter(Boolean);
     return cleanList(normalized);
+}
+
+function normalizeForKeywordSearch(value: string): string {
+    return value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
 }
 
 function buildPrdContentFromDraft(
@@ -1388,19 +1592,72 @@ function buildPrdContentFromDraft(
     const selectedFeatureKeys = Object.entries(draft?.features ?? {})
         .filter(([, enabled]) => Boolean(enabled))
         .map(([key]) => key);
+    const selectedIntegrationKeys = Object.entries(draft?.integrations ?? {})
+        .filter(([, enabled]) => Boolean(enabled))
+        .map(([key]) => key);
     const selectedFeatureLabels = cleanList([
         ...selectedFeatureKeys.map((key) => tQuiz(key)),
         ...cleanList(draft?.otherFeaturesTags),
     ]);
     const selectedIntegrationLabels = cleanList([
-        ...Object.entries(draft?.integrations ?? {})
-            .filter(([, enabled]) => Boolean(enabled))
-            .map(([key]) => {
-                const labelKey = PRD_INTEGRATION_LABEL_KEY[key];
-                return labelKey ? tQuiz(labelKey) : key;
-            }),
+        ...selectedIntegrationKeys.map((key) => {
+            const labelKey = PRD_INTEGRATION_LABEL_KEY[key];
+            return labelKey ? tQuiz(labelKey) : key;
+        }),
         ...cleanList(draft?.otherIntegrationsTags),
     ]);
+    const keywordContext = normalizeForKeywordSearch(
+        [
+            draft?.projectName,
+            projectSummarySource,
+            draft?.projectGoals,
+            draft?.customRules,
+            ...selectedFeatureLabels,
+            ...selectedIntegrationLabels,
+        ]
+            .filter(Boolean)
+            .join(" ")
+    );
+    const mentionsRealtime = /real time|realtime|tempo real|sincron/.test(keywordContext);
+    const mentionsOffline =
+        /offline|sem internet|sin conexion|without internet|desconect/.test(
+            keywordContext
+        );
+    const mentionsAnalytics =
+        /analytic|kpi|metric|relatorio|dashboard|cohort|funil|funnel/.test(
+            keywordContext
+        );
+    const mentionsCrm = /\bcrm\b/.test(keywordContext);
+    const mentionsMessaging = /whatsapp|email|push|notific|sms/.test(keywordContext);
+    const mentionsPayments =
+        /pagament|payment|checkout|cobranc|billing|pix|cartao|card|tarjeta/.test(
+            keywordContext
+        );
+    const mentionsAi =
+        /\bia\b|\bai\b|inteligencia artificial|artificial intelligence|machine learning|\bml\b|copilot/.test(
+            keywordContext
+        );
+    const hasPaymentsCapability =
+        selectedFeatureKeys.includes("featPayments") ||
+        selectedIntegrationKeys.includes("payments");
+    const hasUploadCapability = selectedFeatureKeys.includes("featUpload");
+    const hasRealtimeCapability = selectedFeatureKeys.includes("featRealtime");
+    const hasIntegrationCapability =
+        selectedIntegrationKeys.length > 0 || selectedIntegrationLabels.length > 0;
+    const hasMessagingCapability =
+        selectedIntegrationKeys.includes("whatsapp") ||
+        selectedIntegrationKeys.includes("email") ||
+        selectedIntegrationKeys.includes("push");
+    const hasAnalyticsCapability = selectedIntegrationKeys.includes("analytics");
+    const hasCrmCapability = selectedIntegrationKeys.includes("crm");
+    const hasAiCapability = selectedIntegrationKeys.includes("ai");
+    const requiresRealtime = hasRealtimeCapability || mentionsRealtime;
+    const requiresOffline = selectedFeatureKeys.includes("featOffline") || mentionsOffline;
+    const requiresAnalytics = hasAnalyticsCapability || mentionsAnalytics;
+    const requiresCrm = hasCrmCapability || mentionsCrm;
+    const requiresMessaging = hasMessagingCapability || mentionsMessaging;
+    const requiresPayments = hasPaymentsCapability || mentionsPayments;
+    const requiresAi = hasAiCapability || mentionsAi;
 
     const stories =
         selectedFeatureLabels.length > 0
@@ -1417,41 +1674,58 @@ function buildPrdContentFromDraft(
         ...(auth.emailPassword || auth.socialLogin
             ? [copy.journeyAuthentication]
             : []),
-        ...(selectedFeatureKeys.includes("featPayments")
-            ? [copy.journeyPayments]
-            : []),
-        ...(selectedFeatureKeys.includes("featUpload") ? [copy.journeyUploads] : []),
-        ...(selectedFeatureKeys.includes("featRealtime")
-            ? [copy.journeyRealtime]
-            : []),
+        ...(hasPaymentsCapability ? [copy.journeyPayments] : []),
+        ...(hasUploadCapability ? [copy.journeyUploads] : []),
+        ...(hasRealtimeCapability ? [copy.journeyRealtime] : []),
         ...(selectedFeatureKeys.includes("featOffline") ? [copy.journeyOffline] : []),
-        ...(selectedIntegrationLabels.length > 0 ? [copy.journeyIntegrations] : []),
+        ...(hasIntegrationCapability ? [copy.journeyIntegrations] : []),
     ];
     const entities = [
         "usuarios",
         "perfis_permissoes",
         "logs_auditoria",
-        ...(selectedFeatureKeys.includes("featPayments") ||
-        selectedIntegrationLabels.some((item) => /pagamento|payment/i.test(item))
-            ? ["transacoes_pagamento"]
-            : []),
-        ...(selectedFeatureKeys.includes("featUpload") ? ["arquivos"] : []),
-        ...(selectedFeatureKeys.includes("featRealtime")
-            ? ["eventos_tempo_real"]
-            : []),
-        ...(selectedIntegrationLabels.some((item) => /api|integra/i.test(item))
-            ? ["integracoes_externas"]
-            : []),
-        ...(selectedIntegrationLabels.some((item) => /whatsapp/i.test(item))
+        ...(hasPaymentsCapability ? ["transacoes_pagamento"] : []),
+        ...(hasUploadCapability ? ["arquivos"] : []),
+        ...(hasRealtimeCapability ? ["eventos_tempo_real"] : []),
+        ...(hasIntegrationCapability ? ["integracoes_externas"] : []),
+        ...(selectedIntegrationKeys.includes("whatsapp")
             ? ["mensagens_whatsapp"]
             : []),
     ];
+    const relationshipRules = cleanList([
+        copy.dbPkFkRule,
+        copy.dbDeletePolicyRule,
+        copy.dbAuditIntegrityRule,
+        copy.relationUserRoles,
+        copy.relationUserAudit,
+        ...(hasPaymentsCapability ? [copy.relationUserPayments] : []),
+        ...(hasUploadCapability ? [copy.relationUserFiles] : []),
+        ...(hasIntegrationCapability ? [copy.relationUserIntegrations] : []),
+    ]);
+    const indexRules = cleanList([
+        copy.idxUsersRule,
+        copy.idxAuditRule,
+        ...(hasPaymentsCapability ? [copy.idxPaymentsRule] : []),
+        ...(hasUploadCapability ? [copy.idxFilesRule] : []),
+        ...(hasIntegrationCapability ? [copy.idxIntegrationsRule] : []),
+    ]);
     const businessRules = [
         copy.ruleAccess,
         copy.ruleAudit,
-        ...(selectedFeatureKeys.includes("featPayments") ? [copy.rulePayments] : []),
-        ...(selectedFeatureKeys.includes("featUpload") ? [copy.ruleUploads] : []),
-        ...(selectedIntegrationLabels.length > 0 ? [copy.ruleIntegrations] : []),
+        ...(hasPaymentsCapability ? [copy.rulePayments] : []),
+        ...(hasUploadCapability ? [copy.ruleUploads] : []),
+        ...(hasIntegrationCapability ? [copy.ruleIntegrations] : []),
+    ];
+    const rlsRules = [
+        copy.rlsEnableRule,
+        copy.rlsLeastPrivilegeRule,
+        copy.rlsOwnershipRule,
+    ];
+    const operationsRules = [
+        copy.opsMigrationsRule,
+        copy.opsBackupRule,
+        copy.opsObservabilityRule,
+        copy.opsAlertsRule,
     ];
     const screens = [
         copy.screenLogin,
@@ -1462,10 +1736,14 @@ function buildPrdContentFromDraft(
     const successMetrics = [
         copy.metricAdoption,
         copy.metricDelivery.replace("{deadline}", deadline),
-        ...(selectedFeatureKeys.includes("featPayments")
-            ? [copy.metricPayments]
-            : []),
+        ...(hasPaymentsCapability ? [copy.metricPayments] : []),
         copy.metricReliability,
+    ];
+    const nfrTargets = [
+        copy.nfrAvailability,
+        copy.nfrLatency,
+        copy.nfrErrorRate,
+        hasRealtimeCapability ? copy.nfrCapacityRealtime : copy.nfrCapacityBase,
     ];
     const acceptanceCriteriaItems = toStructuredList(draft?.acceptanceCriteria);
     const resolvedAcceptanceCriteria =
@@ -1476,28 +1754,33 @@ function buildPrdContentFromDraft(
                   ...(auth.emailPassword || auth.socialLogin
                       ? [copy.acceptanceFallbackAuth]
                       : []),
-                  ...(selectedFeatureKeys.includes("featPayments")
+                  ...(hasPaymentsCapability
                       ? [copy.acceptanceFallbackPayments]
                       : []),
-                  ...(selectedIntegrationLabels.length > 0
+                  ...(hasIntegrationCapability
                       ? [copy.acceptanceFallbackIntegrations]
                       : []),
               ]);
     const outOfScopeItems = toStructuredList(draft?.outOfScope);
+    const nextPhaseSuggestions = cleanList([
+        ...outOfScopeItems,
+        ...(!requiresRealtime ? [copy.futurePhaseSuggestionRealtime] : []),
+        ...(!requiresOffline ? [copy.futurePhaseSuggestionOffline] : []),
+        ...(!requiresAnalytics ? [copy.futurePhaseSuggestionAnalytics] : []),
+        ...(!requiresCrm ? [copy.futurePhaseSuggestionCrm] : []),
+        ...(!requiresMessaging ? [copy.futurePhaseSuggestionNotifications] : []),
+        ...(!requiresPayments ? [copy.futurePhaseSuggestionPayments] : []),
+        ...(!requiresAi ? [copy.futurePhaseSuggestionAi] : []),
+    ]).slice(0, 6);
     const resolvedOutOfScope =
-        outOfScopeItems.length > 0
-            ? outOfScopeItems
+        nextPhaseSuggestions.length > 0
+            ? nextPhaseSuggestions
             : [copy.outOfScopeFallback];
     const assumptionsRisksItems = toStructuredList(draft?.assumptionsAndRisks);
     const resolvedAssumptionsRisks =
         assumptionsRisksItems.length > 0
             ? assumptionsRisksItems
             : [copy.assumptionsRisksFallback];
-    const openQuestionsItems = toStructuredList(draft?.openQuestions);
-    const resolvedOpenQuestions =
-        openQuestionsItems.length > 0
-            ? openQuestionsItems
-            : [copy.openQuestionsFallback];
     const aiImplementationGuidelines = [
         copy.aiGuidelineTraceability,
         copy.aiGuidelineTests,
@@ -1604,6 +1887,22 @@ function buildPrdContentFromDraft(
                     ))}
                 </ul>
                 <p>
+                    <strong>{copy.dbRelationshipsHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {relationshipRules.map((rule, index) => (
+                        <li key={`${rule}-${index}`}>{rule}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.dbIndexesHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {indexRules.map((rule, index) => (
+                        <li key={`${rule}-${index}`}>{rule}</li>
+                    ))}
+                </ul>
+                <p>
                     <strong>{copy.flowsHeading}</strong>
                 </p>
                 <ol className="list-decimal pl-8 space-y-1 [&>li]:leading-7">
@@ -1628,22 +1927,6 @@ function buildPrdContentFromDraft(
                     <strong>{copy.additionalDetailsLabel}:</strong> {additionalDetailsSummary}
                 </p>
                 <p>
-                    <strong>{copy.outOfScopeHeading}</strong>
-                </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                    {resolvedOutOfScope.map((item, index) => (
-                        <li key={`${item}-${index}`}>{item}</li>
-                    ))}
-                </ul>
-                <p>
-                    <strong>{copy.openQuestionsHeading}</strong>
-                </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                    {resolvedOpenQuestions.map((item, index) => (
-                        <li key={`${item}-${index}`}>{item}</li>
-                    ))}
-                </ul>
-                <p>
                     <strong>{copy.screensHeading}</strong>
                 </p>
                 <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
@@ -1665,10 +1948,34 @@ function buildPrdContentFromDraft(
                     <li>{copy.security4}</li>
                 </ul>
                 <p>
+                    <strong>{copy.rlsHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {rlsRules.map((rule, index) => (
+                        <li key={`${rule}-${index}`}>{rule}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.operationsHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {operationsRules.map((rule, index) => (
+                        <li key={`${rule}-${index}`}>{rule}</li>
+                    ))}
+                </ul>
+                <p>
                     <strong>{copy.metricsHeading}</strong>
                 </p>
                 <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
                     {successMetrics.map((metric, index) => (
+                        <li key={`${metric}-${index}`}>{metric}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.nfrHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {nfrTargets.map((metric, index) => (
                         <li key={`${metric}-${index}`}>{metric}</li>
                     ))}
                 </ul>
@@ -1693,6 +2000,14 @@ function buildPrdContentFromDraft(
                 </p>
                 <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
                     {aiImplementationGuidelines.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.outOfScopeHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                    {resolvedOutOfScope.map((item, index) => (
                         <li key={`${item}-${index}`}>{item}</li>
                     ))}
                 </ul>
