@@ -408,7 +408,7 @@ const contractContent = {
                 configurar novos ambientes.
             </p>
             <p>
-                <strong>PARÁGRAFO TERCEIRO</strong> — Os custos associados a
+                <strong>PARÁGRAFO TERCEIRO</strong> - Os custos associados a
                 servidores, serviços de e-mail, SMS, bem como outras ferramentas
                 e softwares essenciais para a operacionalização do sistema ficarão
                 sob a responsabilidade do CONTRATANTE.
@@ -571,7 +571,7 @@ const contractContent = {
 function buildContractContentFromDraft(
     draft: ContractWizardDraft | null,
     docLocale: DocLocale
-): Omit<ProposalContentShape, "images"> {
+): CoreDocumentContent {
     const copy = CONTRACT_UI_COPY[docLocale];
     const isPt = docLocale === "pt";
 
@@ -881,8 +881,12 @@ const PRD_UI_COPY = {
         sectionGoals: "Escopo Funcional e User Stories",
         sectionTimeline: "Jornadas e Requisitos Técnicos",
         sectionBudget: "Dados e Fluxos Principais",
-        sectionReferences: "Regras de Negócio e Interface",
-        sectionConclusion: "Segurança e Métricas",
+        sectionRules: "Regras de Negócio",
+        sectionInterface: "Interface e Experiência",
+        sectionGovernance: "Governança de Entrega",
+        sectionSecurity: "Segurança e Conformidade",
+        sectionMetrics: "Métricas e Qualidade",
+        sectionSuggestions: "Sugestões para Próximas Fases",
         toDefine: "A definir",
         notApplicable: "Não se aplica",
         notInformed: "não informado",
@@ -899,13 +903,13 @@ const PRD_UI_COPY = {
         flowsHeading: "8. Fluxos Principais de Uso",
         rulesHeading: "9. Regras de Negócio",
         screensHeading: "10. Telas e Interface (Design System)",
-        securityHeading: "11. Segurança e Conformidade",
-        metricsHeading: "12. Métricas de Sucesso",
-        acceptanceCriteriaHeading: "13. Critérios de Aceite (MVP)",
-        assumptionsRisksHeading: "14. Assunções, Dependências e Riscos",
-        implementationGuidelinesHeading: "15. Diretrizes para Implementação por IA",
-        outOfScopeHeading:
-            "Anexo Opcional — Oportunidades de Evolução (Fora do Escopo do Projeto)",
+        securityHeading: "12. Segurança e Conformidade",
+        metricsHeading: "13. Métricas de Sucesso",
+        governanceHeading: "11. Governança de Entrega",
+        acceptanceCriteriaHeading: "11.1 Critérios de Aceite (Projeto)",
+        assumptionsRisksHeading: "11.2 Assunções, Dependências e Riscos",
+        implementationGuidelinesHeading: "11.3 Diretrizes para Implementação por IA",
+        outOfScopeHeading: "14. Sugestões para Próximas Fases",
         projectLanguageLabel: "Idioma do projeto",
         platformLabel: "Plataforma",
         deadlineLabel: "Prazo de entrega",
@@ -975,9 +979,9 @@ const PRD_UI_COPY = {
             "Estabilidade operacional (latência/erros) e satisfação do usuário final.",
         dbRelationshipsHeading: "7.1 Relacionamentos, PK/FK e Integridade",
         dbIndexesHeading: "7.2 Índices e Otimização de Consulta",
-        rlsHeading: "11.1 RLS e Permissões por Papel",
-        operationsHeading: "11.2 Migração, Backup e Observabilidade",
-        nfrHeading: "12.1 Requisitos Não Funcionais (Metas)",
+        rlsHeading: "12.1 RLS e Permissões por Papel",
+        operationsHeading: "12.2 Migração, Backup e Observabilidade",
+        nfrHeading: "13.1 Requisitos Não Funcionais (Metas)",
         dbPkFkRule:
             "Todas as tabelas devem ter PK UUID e FKs explícitas com ON UPDATE CASCADE.",
         dbDeletePolicyRule:
@@ -1039,62 +1043,51 @@ const PRD_UI_COPY = {
         outOfScopeFallback:
             "Exemplos de oportunidades para próximas fases foram adicionados como referência.",
         evolutionAnnexLead:
-            "As sugestões abaixo não fazem parte do escopo obrigatório do projeto e servem para planejamento de evolução.",
+            "Sugestões geradas pela IA com base no formulário para evoluções fora do escopo atual.",
         evolutionAnnexOptional:
-            "Este anexo é opcional: você pode remover esta seção do PRD ou mover itens para o backlog de futuras fases.",
+            "Anexo opcional: use como referência rápida para próximas fases.",
         evolutionExamplesIntro:
             "Como não houve oportunidades específicas detectadas neste briefing, exibimos exemplos de referência:",
-        evolutionUseLabel: "Como o usuário usaria",
-        evolutionValueLabel: "Valor de negócio",
+        evolutionIncludeHint:
+            "Para incluir no próximo PRD, copie/edite os pontos que fizerem sentido no campo \"Me conte mais do seu projeto\".",
         evolutionPhaseLabel: "Fase sugerida",
-        evolutionActionLabel: "Ação recomendada",
         evolutionPhase2: "Fase 2 (após estabilização da primeira versão)",
         evolutionPhase3: "Fase 3 (escala e otimização)",
-        evolutionActionBacklogFeature:
-            "Adicionar no backlog como novo épico funcional e estimar esforço técnico.",
-        evolutionActionBacklogIntegration:
-            "Adicionar no backlog de integrações com análise de fornecedor, custos e SLA.",
-        evolutionCustomUse:
-            "Atender um cenário complementar identificado no briefing para ampliar a jornada atual.",
-        evolutionCustomValue:
-            "Aumentar cobertura funcional e reduzir solicitações ad-hoc em etapas futuras.",
-        evolutionCustomAction:
-            "Registrar como oportunidade validável em discovery e priorizar por impacto x esforço.",
+        evolutionCustomRationale:
+            "Ponto complementar identificado no briefing para ampliar o projeto com impacto.",
         futurePhaseTitleRealtime: "Sincronização em tempo real",
-        futurePhaseUseRealtime:
-            "Visualizar atualizações operacionais instantâneas entre equipes e painéis.",
-        futurePhaseValueRealtime:
-            "Reduz atraso de informação e melhora tomada de decisão em operações críticas.",
-        futurePhaseTitleOffline: "Modo offline com sincronização",
-        futurePhaseUseOffline:
-            "Continuar usando fluxos principais sem internet e sincronizar ao reconectar.",
-        futurePhaseValueOffline:
-            "Evita interrupções operacionais em ambientes com conectividade instável.",
-        futurePhaseTitleAnalytics: "Camada analítica de produto",
-        futurePhaseUseAnalytics:
-            "Acompanhar eventos, funis e KPIs para entender uso real da plataforma.",
-        futurePhaseValueAnalytics:
-            "Aumenta previsibilidade de crescimento e priorização baseada em dados.",
+        futurePhaseRationaleRealtime:
+            "Atualizações instantâneas entre usuários e painéis para reduzir atraso operacional.",
+        futurePhaseTitleOffline: "Modo offline",
+        futurePhaseRationaleOffline:
+            "Continuidade dos fluxos principais sem internet com sincronização posterior.",
+        futurePhaseTitleAnalytics: "Analytics de produto",
+        futurePhaseRationaleAnalytics:
+            "Medição de eventos e KPIs para priorização guiada por dados.",
         futurePhaseTitleCrm: "Integração com CRM",
-        futurePhaseUseCrm:
-            "Gerenciar relacionamento com clientes e ciclo de vendas no fluxo operacional.",
-        futurePhaseValueCrm:
-            "Melhora retenção, segmentação e eficiência comercial.",
-        futurePhaseTitleNotifications: "Orquestração de notificações",
-        futurePhaseUseNotifications:
-            "Receber alertas e comunicações por e-mail, WhatsApp ou push por evento de negócio.",
-        futurePhaseValueNotifications:
-            "Aumenta engajamento e reduz falhas de acompanhamento de processos.",
-        futurePhaseTitlePayments: "Automações financeiras avançadas",
-        futurePhaseUsePayments:
-            "Acompanhar conciliação, antifraude e trilhas de auditoria em transações.",
-        futurePhaseValuePayments:
-            "Reduz risco financeiro e melhora governança operacional.",
-        futurePhaseTitleAi: "Recursos assistidos por IA",
-        futurePhaseUseAi:
-            "Acelerar atividades operacionais com recomendações e automações assistidas.",
-        futurePhaseValueAi:
-            "Gera ganho de produtividade e escala com menor esforço manual.",
+        futurePhaseRationaleCrm:
+            "Evoluir ciclo de relacionamento e operações comerciais com integração dedicada.",
+        futurePhaseTitleNotifications: "Notificações automatizadas",
+        futurePhaseRationaleNotifications:
+            "Alertas por evento para reduzir falhas de acompanhamento e elevar engajamento.",
+        futurePhaseTitlePayments: "Automações financeiras",
+        futurePhaseRationalePayments:
+            "Fortalecer conciliação, antifraude e rastreabilidade de transações.",
+        futurePhaseTitleAi: "Recursos com IA",
+        futurePhaseRationaleAi:
+            "Apoiar operação com automações e recomendações para ganho de produtividade.",
+        futurePhaseTitleMonetization: "Modelo de negócio e monetização",
+        futurePhaseRationaleMonetization:
+            "Definir planos, pricing e regras de cobrança para crescimento sustentável.",
+        futurePhaseTitleCompliance: "Governança de dados e compliance",
+        futurePhaseRationaleCompliance:
+            "Formalizar privacidade, retenção e auditoria para reduzir riscos regulatórios.",
+        futurePhaseTitleSupport: "Suporte operacional e SLA",
+        futurePhaseRationaleSupport:
+            "Padronizar níveis de suporte, tempos de resposta e gestão de incidentes.",
+        futurePhaseTitleGrowth: "Aquisição e retenção",
+        futurePhaseRationaleGrowth:
+            "Estruturar funil e retenção para tracionar crescimento do produto.",
         assumptionsRisksFallback:
             "Dependemos de APIs externas e disponibilidade do time no prazo previsto; atrasos de homologação podem impactar cronograma.",
         aiGuidelineTraceability:
@@ -1113,8 +1106,12 @@ const PRD_UI_COPY = {
         sectionGoals: "Functional Scope and User Stories",
         sectionTimeline: "Journeys and Technical Requirements",
         sectionBudget: "Data Model and Main Flows",
-        sectionReferences: "Business Rules and Interface",
-        sectionConclusion: "Security and Success Metrics",
+        sectionRules: "Business Rules",
+        sectionInterface: "Interface and Experience",
+        sectionGovernance: "Delivery Governance",
+        sectionSecurity: "Security and Compliance",
+        sectionMetrics: "Metrics and Quality",
+        sectionSuggestions: "Suggestions for Next Phases",
         toDefine: "To be defined",
         notApplicable: "Not applicable",
         notInformed: "not informed",
@@ -1131,13 +1128,13 @@ const PRD_UI_COPY = {
         flowsHeading: "8. Main Usage Flows",
         rulesHeading: "9. Business Rules",
         screensHeading: "10. Screens and Interface (Design System)",
-        securityHeading: "11. Security and Compliance",
-        metricsHeading: "12. Success Metrics",
-        acceptanceCriteriaHeading: "13. Acceptance Criteria (MVP)",
-        assumptionsRisksHeading: "14. Assumptions, Dependencies and Risks",
-        implementationGuidelinesHeading: "15. AI Implementation Guidelines",
-        outOfScopeHeading:
-            "Optional Annex — Evolution Opportunities (Out of Project Scope)",
+        securityHeading: "12. Security and Compliance",
+        metricsHeading: "13. Success Metrics",
+        governanceHeading: "11. Delivery Governance",
+        acceptanceCriteriaHeading: "11.1 Acceptance Criteria (Project)",
+        assumptionsRisksHeading: "11.2 Assumptions, Dependencies and Risks",
+        implementationGuidelinesHeading: "11.3 AI Implementation Guidelines",
+        outOfScopeHeading: "14. Suggestions for Next Phases",
         projectLanguageLabel: "Project language",
         platformLabel: "Platform",
         deadlineLabel: "Delivery deadline",
@@ -1208,9 +1205,9 @@ const PRD_UI_COPY = {
             "Operational stability (latency/errors) and end-user satisfaction.",
         dbRelationshipsHeading: "7.1 Relationships, PK/FK and Integrity",
         dbIndexesHeading: "7.2 Indexes and Query Optimization",
-        rlsHeading: "11.1 RLS and Role-Based Permissions",
-        operationsHeading: "11.2 Migration, Backup and Observability",
-        nfrHeading: "12.1 Non-Functional Requirements (Targets)",
+        rlsHeading: "12.1 RLS and Role-Based Permissions",
+        operationsHeading: "12.2 Migration, Backup and Observability",
+        nfrHeading: "13.1 Non-Functional Requirements (Targets)",
         dbPkFkRule:
             "All tables must use UUID primary keys and explicit foreign keys with ON UPDATE CASCADE.",
         dbDeletePolicyRule:
@@ -1272,62 +1269,51 @@ const PRD_UI_COPY = {
         outOfScopeFallback:
             "Reference examples for future phases were added.",
         evolutionAnnexLead:
-            "The suggestions below are not part of the mandatory project scope and are intended for evolution planning.",
+            "AI-generated suggestions based on form inputs for evolutions outside the current scope.",
         evolutionAnnexOptional:
-            "This annex is optional: you can remove this section from the PRD or move items to a future-phase backlog.",
+            "Optional annex: use it as a quick reference for future phases.",
         evolutionExamplesIntro:
             "Since no specific opportunities were detected in this briefing, we are showing reference examples:",
-        evolutionUseLabel: "How users would use it",
-        evolutionValueLabel: "Business value",
+        evolutionIncludeHint:
+            "To include any item in the next PRD, copy/edit it in the \"Tell me more about your project\" field.",
         evolutionPhaseLabel: "Suggested phase",
-        evolutionActionLabel: "Recommended action",
         evolutionPhase2: "Phase 2 (after first-version stabilization)",
         evolutionPhase3: "Phase 3 (scale and optimization)",
-        evolutionActionBacklogFeature:
-            "Add to backlog as a functional epic and estimate technical effort.",
-        evolutionActionBacklogIntegration:
-            "Add to integration backlog with vendor, cost, and SLA analysis.",
-        evolutionCustomUse:
-            "Address a complementary scenario identified in the briefing to expand the current journey.",
-        evolutionCustomValue:
-            "Increase functional coverage and reduce ad-hoc requests in future phases.",
-        evolutionCustomAction:
-            "Register as a discovery opportunity and prioritize by impact vs effort.",
+        evolutionCustomRationale:
+            "Complementary point detected in the briefing to expand project scope with impact.",
         futurePhaseTitleRealtime: "Real-time synchronization",
-        futurePhaseUseRealtime:
-            "View operational updates instantly across teams and dashboards.",
-        futurePhaseValueRealtime:
-            "Reduces information lag and improves decision-making in critical operations.",
-        futurePhaseTitleOffline: "Offline mode with sync",
-        futurePhaseUseOffline:
-            "Keep using core flows without internet and sync when back online.",
-        futurePhaseValueOffline:
-            "Prevents operational interruptions in low-connectivity environments.",
-        futurePhaseTitleAnalytics: "Product analytics layer",
-        futurePhaseUseAnalytics:
-            "Track events, funnels, and KPIs to understand real platform usage.",
-        futurePhaseValueAnalytics:
-            "Improves growth predictability and data-driven prioritization.",
+        futurePhaseRationaleRealtime:
+            "Instant updates across users and dashboards to reduce operational delay.",
+        futurePhaseTitleOffline: "Offline mode",
+        futurePhaseRationaleOffline:
+            "Keep core flows available without internet and sync once online.",
+        futurePhaseTitleAnalytics: "Product analytics",
+        futurePhaseRationaleAnalytics:
+            "Track events and KPIs for data-driven prioritization.",
         futurePhaseTitleCrm: "CRM integration",
-        futurePhaseUseCrm:
-            "Manage customer lifecycle and sales workflows within operations.",
-        futurePhaseValueCrm:
-            "Improves retention, segmentation, and commercial efficiency.",
-        futurePhaseTitleNotifications: "Notification orchestration",
-        futurePhaseUseNotifications:
-            "Receive event-based alerts and communications via email, WhatsApp, or push.",
-        futurePhaseValueNotifications:
-            "Increases engagement and reduces process follow-up failures.",
-        futurePhaseTitlePayments: "Advanced financial automations",
-        futurePhaseUsePayments:
-            "Track reconciliation, anti-fraud controls, and transaction audit trails.",
-        futurePhaseValuePayments:
-            "Reduces financial risk and improves operational governance.",
-        futurePhaseTitleAi: "AI-assisted capabilities",
-        futurePhaseUseAi:
-            "Accelerate operations with assisted recommendations and automations.",
-        futurePhaseValueAi:
-            "Delivers productivity gains and scaling with less manual effort.",
+        futurePhaseRationaleCrm:
+            "Improve lifecycle management and sales operations with dedicated integration.",
+        futurePhaseTitleNotifications: "Automated notifications",
+        futurePhaseRationaleNotifications:
+            "Event-driven alerts to reduce follow-up gaps and improve engagement.",
+        futurePhaseTitlePayments: "Financial automations",
+        futurePhaseRationalePayments:
+            "Strengthen reconciliation, anti-fraud controls, and transaction traceability.",
+        futurePhaseTitleAi: "AI capabilities",
+        futurePhaseRationaleAi:
+            "Support operations with automation and recommendations for higher productivity.",
+        futurePhaseTitleMonetization: "Business model and monetization",
+        futurePhaseRationaleMonetization:
+            "Define plans, pricing, and charging rules for sustainable growth.",
+        futurePhaseTitleCompliance: "Data governance and compliance",
+        futurePhaseRationaleCompliance:
+            "Formalize privacy, retention, and audit policies to reduce regulatory risk.",
+        futurePhaseTitleSupport: "Support operations and SLA",
+        futurePhaseRationaleSupport:
+            "Standardize support levels, response times, and incident workflows.",
+        futurePhaseTitleGrowth: "Acquisition and retention",
+        futurePhaseRationaleGrowth:
+            "Structure funnel and retention loops to scale product growth.",
         assumptionsRisksFallback:
             "We depend on external APIs and team availability within the planned timeline; certification/approval delays may impact delivery.",
         aiGuidelineTraceability:
@@ -1346,8 +1332,12 @@ const PRD_UI_COPY = {
         sectionGoals: "Alcance Funcional e Historias de Usuario",
         sectionTimeline: "Jornadas y Requisitos Técnicos",
         sectionBudget: "Modelo de Datos y Flujos Principales",
-        sectionReferences: "Reglas de Negocio e Interfaz",
-        sectionConclusion: "Seguridad y Métricas de Éxito",
+        sectionRules: "Reglas de Negocio",
+        sectionInterface: "Interfaz y Experiencia",
+        sectionGovernance: "Gobernanza de Entrega",
+        sectionSecurity: "Seguridad y Cumplimiento",
+        sectionMetrics: "Métricas y Calidad",
+        sectionSuggestions: "Sugerencias para Próximas Fases",
         toDefine: "Por definir",
         notApplicable: "No aplica",
         notInformed: "no informado",
@@ -1364,13 +1354,13 @@ const PRD_UI_COPY = {
         flowsHeading: "8. Flujos Principales de Uso",
         rulesHeading: "9. Reglas de Negocio",
         screensHeading: "10. Pantallas e Interfaz (Design System)",
-        securityHeading: "11. Seguridad y Cumplimiento",
-        metricsHeading: "12. Métricas de Éxito",
-        acceptanceCriteriaHeading: "13. Criterios de Aceptación (MVP)",
-        assumptionsRisksHeading: "14. Supuestos, Dependencias y Riesgos",
-        implementationGuidelinesHeading: "15. Directrices para Implementación con IA",
-        outOfScopeHeading:
-            "Anexo Opcional — Oportunidades de Evolución (Fuera del Alcance del Proyecto)",
+        securityHeading: "12. Seguridad y Cumplimiento",
+        metricsHeading: "13. Métricas de Éxito",
+        governanceHeading: "11. Gobernanza de Entrega",
+        acceptanceCriteriaHeading: "11.1 Criterios de Aceptación (Proyecto)",
+        assumptionsRisksHeading: "11.2 Supuestos, Dependencias y Riesgos",
+        implementationGuidelinesHeading: "11.3 Directrices para Implementación con IA",
+        outOfScopeHeading: "14. Sugerencias para Próximas Fases",
         projectLanguageLabel: "Idioma del proyecto",
         platformLabel: "Plataforma",
         deadlineLabel: "Plazo de entrega",
@@ -1441,9 +1431,9 @@ const PRD_UI_COPY = {
             "Estabilidad operativa (latencia/errores) y satisfacción del usuario final.",
         dbRelationshipsHeading: "7.1 Relaciones, PK/FK e Integridad",
         dbIndexesHeading: "7.2 Índices y Optimización de Consultas",
-        rlsHeading: "11.1 RLS y Permisos por Rol",
-        operationsHeading: "11.2 Migraciones, Backup y Observabilidad",
-        nfrHeading: "12.1 Requisitos No Funcionales (Objetivos)",
+        rlsHeading: "12.1 RLS y Permisos por Rol",
+        operationsHeading: "12.2 Migraciones, Backup y Observabilidad",
+        nfrHeading: "13.1 Requisitos No Funcionales (Objetivos)",
         dbPkFkRule:
             "Todas las tablas deben usar PK UUID y FKs explícitas con ON UPDATE CASCADE.",
         dbDeletePolicyRule:
@@ -1505,62 +1495,51 @@ const PRD_UI_COPY = {
         outOfScopeFallback:
             "Se agregaron ejemplos de referencia para próximas fases.",
         evolutionAnnexLead:
-            "Las sugerencias abajo no forman parte del alcance obligatorio del proyecto y sirven para planificar evolución.",
+            "Sugerencias generadas por IA a partir del formulario para evoluciones fuera del alcance actual.",
         evolutionAnnexOptional:
-            "Este anexo es opcional: puedes remover esta sección del PRD o mover los puntos al backlog de próximas fases.",
+            "Anexo opcional: úsalo como referencia rápida para próximas fases.",
         evolutionExamplesIntro:
             "Como no se detectaron oportunidades específicas en este briefing, mostramos ejemplos de referencia:",
-        evolutionUseLabel: "Cómo lo usaría el usuario",
-        evolutionValueLabel: "Valor de negocio",
+        evolutionIncludeHint:
+            "Para incluir un punto en el próximo PRD, cópialo/edítalo en el campo \"Cuéntame más sobre tu proyecto\".",
         evolutionPhaseLabel: "Fase sugerida",
-        evolutionActionLabel: "Acción recomendada",
         evolutionPhase2: "Fase 2 (tras estabilizar la primera versión)",
         evolutionPhase3: "Fase 3 (escala y optimización)",
-        evolutionActionBacklogFeature:
-            "Agregar al backlog como épica funcional y estimar esfuerzo técnico.",
-        evolutionActionBacklogIntegration:
-            "Agregar al backlog de integraciones con análisis de proveedor, costo y SLA.",
-        evolutionCustomUse:
-            "Atender un escenario complementario identificado en el briefing para ampliar la jornada actual.",
-        evolutionCustomValue:
-            "Aumentar cobertura funcional y reducir solicitudes ad-hoc en fases futuras.",
-        evolutionCustomAction:
-            "Registrar como oportunidad validable en discovery y priorizar por impacto vs esfuerzo.",
+        evolutionCustomRationale:
+            "Punto complementario detectado en el briefing para ampliar el alcance con impacto.",
         futurePhaseTitleRealtime: "Sincronización en tiempo real",
-        futurePhaseUseRealtime:
-            "Ver actualizaciones operativas instantáneas entre equipos y dashboards.",
-        futurePhaseValueRealtime:
-            "Reduce retraso de información y mejora decisiones en operaciones críticas.",
-        futurePhaseTitleOffline: "Modo offline con sincronización",
-        futurePhaseUseOffline:
-            "Continuar flujos principales sin internet y sincronizar al reconectar.",
-        futurePhaseValueOffline:
-            "Evita interrupciones operativas en contextos de conectividad inestable.",
-        futurePhaseTitleAnalytics: "Capa analítica de producto",
-        futurePhaseUseAnalytics:
-            "Monitorear eventos, embudos y KPIs para entender uso real de la plataforma.",
-        futurePhaseValueAnalytics:
-            "Mejora previsibilidad de crecimiento y priorización basada en datos.",
+        futurePhaseRationaleRealtime:
+            "Actualizaciones instantáneas entre usuarios y dashboards para reducir retrasos operativos.",
+        futurePhaseTitleOffline: "Modo offline",
+        futurePhaseRationaleOffline:
+            "Mantener flujos principales sin internet y sincronizar al reconectar.",
+        futurePhaseTitleAnalytics: "Analytics de producto",
+        futurePhaseRationaleAnalytics:
+            "Medir eventos y KPIs para priorización basada en datos.",
         futurePhaseTitleCrm: "Integración con CRM",
-        futurePhaseUseCrm:
-            "Gestionar ciclo de vida de clientes y flujo comercial dentro de la operación.",
-        futurePhaseValueCrm:
-            "Mejora retención, segmentación y eficiencia comercial.",
-        futurePhaseTitleNotifications: "Orquestación de notificaciones",
-        futurePhaseUseNotifications:
-            "Recibir alertas y comunicaciones por email, WhatsApp o push por eventos de negocio.",
-        futurePhaseValueNotifications:
-            "Aumenta engagement y reduce fallos de seguimiento de procesos.",
-        futurePhaseTitlePayments: "Automatizaciones financieras avanzadas",
-        futurePhaseUsePayments:
-            "Monitorear conciliación, antifraude y trazabilidad de transacciones.",
-        futurePhaseValuePayments:
-            "Reduce riesgo financiero y mejora gobernanza operativa.",
-        futurePhaseTitleAi: "Capacidades asistidas por IA",
-        futurePhaseUseAi:
-            "Acelerar tareas operativas con recomendaciones y automatizaciones asistidas.",
-        futurePhaseValueAi:
-            "Genera productividad y escala con menor esfuerzo manual.",
+        futurePhaseRationaleCrm:
+            "Mejorar ciclo de vida de clientes y operación comercial con integración dedicada.",
+        futurePhaseTitleNotifications: "Notificaciones automatizadas",
+        futurePhaseRationaleNotifications:
+            "Alertas por evento para reducir fallas de seguimiento y mejorar engagement.",
+        futurePhaseTitlePayments: "Automatizaciones financieras",
+        futurePhaseRationalePayments:
+            "Fortalecer conciliación, antifraude y trazabilidad de transacciones.",
+        futurePhaseTitleAi: "Capacidades con IA",
+        futurePhaseRationaleAi:
+            "Apoyar la operación con automatizaciones y recomendaciones para más productividad.",
+        futurePhaseTitleMonetization: "Modelo de negocio y monetización",
+        futurePhaseRationaleMonetization:
+            "Definir planes, pricing y reglas de cobro para crecimiento sostenible.",
+        futurePhaseTitleCompliance: "Gobernanza de datos y compliance",
+        futurePhaseRationaleCompliance:
+            "Formalizar privacidad, retención y auditoría para reducir riesgo regulatorio.",
+        futurePhaseTitleSupport: "Soporte operativo y SLA",
+        futurePhaseRationaleSupport:
+            "Estandarizar niveles de soporte, tiempos de respuesta y flujo de incidentes.",
+        futurePhaseTitleGrowth: "Adquisición y retención",
+        futurePhaseRationaleGrowth:
+            "Estructurar funnel y retención para escalar el crecimiento del producto.",
         assumptionsRisksFallback:
             "Dependemos de APIs externas y disponibilidad del equipo en el plazo previsto; retrasos de homologación pueden impactar la entrega.",
         aiGuidelineTraceability:
@@ -1635,7 +1614,7 @@ function buildPrdContentFromDraft(
     draft: PrdWizardDraft | null,
     docLocale: DocLocale,
     tQuiz: TranslateFn
-) {
+): FullDocumentContent {
     const copy = PRD_UI_COPY[docLocale];
     const projectName = draft?.projectName?.trim() || copy.projectNameFallback;
     const projectSummarySource =
@@ -1769,6 +1748,22 @@ function buildPrdContentFromDraft(
         /\bia\b|\bai\b|inteligencia artificial|artificial intelligence|machine learning|\bml\b|copilot/.test(
             keywordContext
         );
+    const mentionsMonetization =
+        /monetiz|assinatura|subscription|pricing|precific|revenue|receita|modelo de negocio|modelo de negocio/.test(
+            keywordContext
+        );
+    const mentionsCompliance =
+        /lgpd|gdpr|compliance|privacidade|privacidad|privacy|governanc|governanza|soc2|iso ?27001|retencao|retencion/.test(
+            keywordContext
+        );
+    const mentionsSupport =
+        /suporte|support|sla|help ?desk|atendimento|incidente|incident|treinament|training/.test(
+            keywordContext
+        );
+    const mentionsGrowth =
+        /aquisic|acquisition|retenc|retention|growth|marketing|funil|funnel/.test(
+            keywordContext
+        );
     const hasPaymentsCapability =
         selectedFeatureKeys.includes("featPayments") ||
         selectedIntegrationKeys.includes("payments");
@@ -1790,6 +1785,10 @@ function buildPrdContentFromDraft(
     const requiresMessaging = hasMessagingCapability || mentionsMessaging;
     const requiresPayments = hasPaymentsCapability || mentionsPayments;
     const requiresAi = hasAiCapability || mentionsAi;
+    const requiresMonetization = mentionsMonetization;
+    const requiresCompliance = mentionsCompliance;
+    const requiresSupport = mentionsSupport;
+    const requiresGrowth = mentionsGrowth;
 
     const stories =
         selectedFeatureLabels.length > 0
@@ -1905,27 +1904,21 @@ function buildPrdContentFromDraft(
     });
     type EvolutionOpportunity = {
         title: string;
-        userUse: string;
-        businessValue: string;
+        rationale: string;
         suggestedPhase: string;
-        recommendedAction: string;
     };
     const evolutionOpportunities: EvolutionOpportunity[] = [
         ...filteredOutOfScopeItems.map((item) => ({
             title: item,
-            userUse: copy.evolutionCustomUse,
-            businessValue: copy.evolutionCustomValue,
+            rationale: copy.evolutionCustomRationale,
             suggestedPhase: copy.evolutionPhase3,
-            recommendedAction: copy.evolutionCustomAction,
         })),
         ...(!requiresRealtime
             ? [
                   {
                       title: copy.futurePhaseTitleRealtime,
-                      userUse: copy.futurePhaseUseRealtime,
-                      businessValue: copy.futurePhaseValueRealtime,
+                      rationale: copy.futurePhaseRationaleRealtime,
                       suggestedPhase: copy.evolutionPhase2,
-                      recommendedAction: copy.evolutionActionBacklogFeature,
                   },
               ]
             : []),
@@ -1933,10 +1926,8 @@ function buildPrdContentFromDraft(
             ? [
                   {
                       title: copy.futurePhaseTitleOffline,
-                      userUse: copy.futurePhaseUseOffline,
-                      businessValue: copy.futurePhaseValueOffline,
+                      rationale: copy.futurePhaseRationaleOffline,
                       suggestedPhase: copy.evolutionPhase2,
-                      recommendedAction: copy.evolutionActionBacklogFeature,
                   },
               ]
             : []),
@@ -1944,10 +1935,8 @@ function buildPrdContentFromDraft(
             ? [
                   {
                       title: copy.futurePhaseTitleAnalytics,
-                      userUse: copy.futurePhaseUseAnalytics,
-                      businessValue: copy.futurePhaseValueAnalytics,
+                      rationale: copy.futurePhaseRationaleAnalytics,
                       suggestedPhase: copy.evolutionPhase3,
-                      recommendedAction: copy.evolutionActionBacklogFeature,
                   },
               ]
             : []),
@@ -1955,10 +1944,8 @@ function buildPrdContentFromDraft(
             ? [
                   {
                       title: copy.futurePhaseTitleCrm,
-                      userUse: copy.futurePhaseUseCrm,
-                      businessValue: copy.futurePhaseValueCrm,
+                      rationale: copy.futurePhaseRationaleCrm,
                       suggestedPhase: copy.evolutionPhase3,
-                      recommendedAction: copy.evolutionActionBacklogIntegration,
                   },
               ]
             : []),
@@ -1966,10 +1953,8 @@ function buildPrdContentFromDraft(
             ? [
                   {
                       title: copy.futurePhaseTitleNotifications,
-                      userUse: copy.futurePhaseUseNotifications,
-                      businessValue: copy.futurePhaseValueNotifications,
+                      rationale: copy.futurePhaseRationaleNotifications,
                       suggestedPhase: copy.evolutionPhase2,
-                      recommendedAction: copy.evolutionActionBacklogIntegration,
                   },
               ]
             : []),
@@ -1977,10 +1962,8 @@ function buildPrdContentFromDraft(
             ? [
                   {
                       title: copy.futurePhaseTitlePayments,
-                      userUse: copy.futurePhaseUsePayments,
-                      businessValue: copy.futurePhaseValuePayments,
+                      rationale: copy.futurePhaseRationalePayments,
                       suggestedPhase: copy.evolutionPhase2,
-                      recommendedAction: copy.evolutionActionBacklogIntegration,
                   },
               ]
             : []),
@@ -1988,10 +1971,44 @@ function buildPrdContentFromDraft(
             ? [
                   {
                       title: copy.futurePhaseTitleAi,
-                      userUse: copy.futurePhaseUseAi,
-                      businessValue: copy.futurePhaseValueAi,
+                      rationale: copy.futurePhaseRationaleAi,
                       suggestedPhase: copy.evolutionPhase3,
-                      recommendedAction: copy.evolutionActionBacklogFeature,
+                  },
+              ]
+            : []),
+        ...(!requiresMonetization
+            ? [
+                  {
+                      title: copy.futurePhaseTitleMonetization,
+                      rationale: copy.futurePhaseRationaleMonetization,
+                      suggestedPhase: copy.evolutionPhase2,
+                  },
+              ]
+            : []),
+        ...(!requiresCompliance
+            ? [
+                  {
+                      title: copy.futurePhaseTitleCompliance,
+                      rationale: copy.futurePhaseRationaleCompliance,
+                      suggestedPhase: copy.evolutionPhase2,
+                  },
+              ]
+            : []),
+        ...(!requiresSupport
+            ? [
+                  {
+                      title: copy.futurePhaseTitleSupport,
+                      rationale: copy.futurePhaseRationaleSupport,
+                      suggestedPhase: copy.evolutionPhase2,
+                  },
+              ]
+            : []),
+        ...(!requiresGrowth
+            ? [
+                  {
+                      title: copy.futurePhaseTitleGrowth,
+                      rationale: copy.futurePhaseRationaleGrowth,
+                      suggestedPhase: copy.evolutionPhase3,
                   },
               ]
             : []),
@@ -2000,24 +2017,18 @@ function buildPrdContentFromDraft(
     const fallbackEvolutionExamples: EvolutionOpportunity[] = [
         {
             title: copy.futurePhaseTitleAnalytics,
-            userUse: copy.futurePhaseUseAnalytics,
-            businessValue: copy.futurePhaseValueAnalytics,
+            rationale: copy.futurePhaseRationaleAnalytics,
             suggestedPhase: copy.evolutionPhase3,
-            recommendedAction: copy.evolutionActionBacklogFeature,
         },
         {
-            title: copy.futurePhaseTitleNotifications,
-            userUse: copy.futurePhaseUseNotifications,
-            businessValue: copy.futurePhaseValueNotifications,
+            title: copy.futurePhaseTitleMonetization,
+            rationale: copy.futurePhaseRationaleMonetization,
             suggestedPhase: copy.evolutionPhase2,
-            recommendedAction: copy.evolutionActionBacklogIntegration,
         },
         {
-            title: copy.futurePhaseTitleAi,
-            userUse: copy.futurePhaseUseAi,
-            businessValue: copy.futurePhaseValueAi,
-            suggestedPhase: copy.evolutionPhase3,
-            recommendedAction: copy.evolutionActionBacklogFeature,
+            title: copy.futurePhaseTitleCompliance,
+            rationale: copy.futurePhaseRationaleCompliance,
+            suggestedPhase: copy.evolutionPhase2,
         },
     ];
     const resolvedEvolutionOpportunities = hasDetectedEvolutionOpportunities
@@ -2067,7 +2078,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.mainFeaturesHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {(selectedFeatureLabels.length > 0
                         ? selectedFeatureLabels
                         : [copy.toDefine]
@@ -2078,7 +2089,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.userStoriesHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {stories.map((story, index) => (
                         <li key={`${story}-${index}`}>{story}</li>
                     ))}
@@ -2090,7 +2101,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.journeysHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {journeys.map((journey, index) => (
                         <li key={`${journey}-${index}`}>{journey}</li>
                     ))}
@@ -2098,7 +2109,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.technicalHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     <li>
                         {copy.webLabel}: {webFrameworkLabel} ({webDesignLibraryLabel})
                     </li>
@@ -2128,7 +2139,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.entitiesHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {entities.map((entity, index) => (
                         <li key={`${entity}-${index}`}>{entity}</li>
                     ))}
@@ -2136,7 +2147,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.dbRelationshipsHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {relationshipRules.map((rule, index) => (
                         <li key={`${rule}-${index}`}>{rule}</li>
                     ))}
@@ -2144,7 +2155,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.dbIndexesHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {indexRules.map((rule, index) => (
                         <li key={`${rule}-${index}`}>{rule}</li>
                     ))}
@@ -2152,7 +2163,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.flowsHeading}</strong>
                 </p>
-                <ol className="list-decimal pl-8 space-y-1 [&>li]:leading-7">
+                <ol className="list-decimal pl-8 text-left space-y-1 [&>li]:leading-7">
                     <li>{copy.flowOnboarding}</li>
                     <li>{copy.flowCore}</li>
                     <li>{copy.flowOperations}</li>
@@ -2160,12 +2171,14 @@ function buildPrdContentFromDraft(
                 </ol>
             </div>
         ),
-        references: (
+        references: null,
+        conclusion: null,
+        prdRules: (
             <div className="space-y-3">
                 <p>
                     <strong>{copy.rulesHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {businessRules.map((rule, index) => (
                         <li key={`${rule}-${index}`}>{rule}</li>
                     ))}
@@ -2173,22 +2186,57 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.additionalDetailsLabel}:</strong> {additionalDetailsSummary}
                 </p>
+            </div>
+        ),
+        prdInterface: (
+            <div className="space-y-3">
                 <p>
                     <strong>{copy.screensHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {screens.map((screen, index) => (
                         <li key={`${screen}-${index}`}>{screen}</li>
                     ))}
                 </ul>
             </div>
         ),
-        conclusion: (
+        prdGovernance: (
+            <div className="space-y-3">
+                <p>
+                    <strong>{copy.governanceHeading}</strong>
+                </p>
+                <p>
+                    <strong>{copy.acceptanceCriteriaHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                    {resolvedAcceptanceCriteria.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.assumptionsRisksHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                    {resolvedAssumptionsRisks.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                    ))}
+                </ul>
+                <p>
+                    <strong>{copy.implementationGuidelinesHeading}</strong>
+                </p>
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
+                    {aiImplementationGuidelines.map((item, index) => (
+                        <li key={`${item}-${index}`}>{item}</li>
+                    ))}
+                </ul>
+            </div>
+        ),
+        prdSecurity: (
             <div className="space-y-3">
                 <p>
                     <strong>{copy.securityHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     <li>{copy.security1}</li>
                     <li>{copy.security2}</li>
                     <li>{copy.security3}</li>
@@ -2197,7 +2245,7 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.rlsHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {rlsRules.map((rule, index) => (
                         <li key={`${rule}-${index}`}>{rule}</li>
                     ))}
@@ -2205,15 +2253,19 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.operationsHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {operationsRules.map((rule, index) => (
                         <li key={`${rule}-${index}`}>{rule}</li>
                     ))}
                 </ul>
+            </div>
+        ),
+        prdMetrics: (
+            <div className="space-y-3">
                 <p>
                     <strong>{copy.metricsHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {successMetrics.map((metric, index) => (
                         <li key={`${metric}-${index}`}>{metric}</li>
                     ))}
@@ -2221,84 +2273,118 @@ function buildPrdContentFromDraft(
                 <p>
                     <strong>{copy.nfrHeading}</strong>
                 </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
+                <ul className="list-disc pl-8 text-left space-y-1 [&>li]:leading-7">
                     {nfrTargets.map((metric, index) => (
                         <li key={`${metric}-${index}`}>{metric}</li>
                     ))}
                 </ul>
-                <p>
-                    <strong>{copy.acceptanceCriteriaHeading}</strong>
-                </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                    {resolvedAcceptanceCriteria.map((item, index) => (
-                        <li key={`${item}-${index}`}>{item}</li>
-                    ))}
-                </ul>
-                <p>
-                    <strong>{copy.assumptionsRisksHeading}</strong>
-                </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                    {resolvedAssumptionsRisks.map((item, index) => (
-                        <li key={`${item}-${index}`}>{item}</li>
-                    ))}
-                </ul>
-                <p>
-                    <strong>{copy.implementationGuidelinesHeading}</strong>
-                </p>
-                <ul className="list-disc pl-8 space-y-1 [&>li]:leading-7">
-                    {aiImplementationGuidelines.map((item, index) => (
-                        <li key={`${item}-${index}`}>{item}</li>
-                    ))}
-                </ul>
+            </div>
+        ),
+        prdSuggestions: (
+            <div className="space-y-3">
                 <p>
                     <strong>{copy.outOfScopeHeading}</strong>
                 </p>
                 <p>{copy.evolutionAnnexLead}</p>
-                <p>
-                    <em>{copy.evolutionAnnexOptional}</em>
-                </p>
+                <p>{copy.evolutionIncludeHint}</p>
                 {!hasDetectedEvolutionOpportunities && <p>{copy.evolutionExamplesIntro}</p>}
-                <div className="space-y-3">
+                <ol className="list-decimal pl-8 text-left space-y-1 [&>li]:leading-6">
                     {resolvedEvolutionOpportunities.map((item, index) => (
-                        <div
-                            key={`${item.title}-${index}`}
-                            className="rounded-2xl border-[1.5px] border-stroke2 p-4 space-y-1"
-                        >
-                            <p>
-                                <strong>{index + 1}. {item.title}</strong>
-                            </p>
-                            <p>
-                                <strong>{copy.evolutionUseLabel}:</strong>{" "}
-                                {item.userUse}
-                            </p>
-                            <p>
-                                <strong>{copy.evolutionValueLabel}:</strong>{" "}
-                                {item.businessValue}
-                            </p>
-                            <p>
-                                <strong>{copy.evolutionPhaseLabel}:</strong>{" "}
-                                {item.suggestedPhase}
-                            </p>
-                            <p>
-                                <strong>{copy.evolutionActionLabel}:</strong>{" "}
-                                {item.recommendedAction}
-                            </p>
-                        </div>
+                        <li key={`${item.title}-${index}`}>
+                            <strong>{item.title}</strong> - {item.rationale} (
+                            {copy.evolutionPhaseLabel}: {item.suggestedPhase}).
+                        </li>
                     ))}
-                </div>
+                </ol>
             </div>
         ),
     };
 }
 
 const DOC_DRAFT_TTL_MS = 1000 * 60 * 60 * 24;
-type SectionKey =
+type CoreSectionKey =
     | "introduction"
     | "goals"
     | "timeline"
     | "budget"
     | "references"
     | "conclusion";
+type PrdExtraSectionKey =
+    | "prdRules"
+    | "prdInterface"
+    | "prdGovernance"
+    | "prdSecurity"
+    | "prdMetrics"
+    | "prdSuggestions";
+type SectionKey = CoreSectionKey | PrdExtraSectionKey;
+type SectionTitlesMap = Record<SectionKey, string>;
+type EditableSectionContentsMap = Record<SectionKey, string | null>;
+type CoreDocumentContent = Record<CoreSectionKey, React.ReactNode>;
+type FullDocumentContent = Record<SectionKey, React.ReactNode>;
+
+const CORE_SECTION_ORDER: CoreSectionKey[] = [
+    "introduction",
+    "goals",
+    "timeline",
+    "budget",
+    "references",
+    "conclusion",
+];
+const PRD_SECTION_ORDER: SectionKey[] = [
+    "introduction",
+    "goals",
+    "timeline",
+    "budget",
+    "prdRules",
+    "prdInterface",
+    "prdGovernance",
+    "prdSecurity",
+    "prdMetrics",
+    "prdSuggestions",
+];
+const EMPTY_SECTION_TITLES: SectionTitlesMap = {
+    introduction: "",
+    goals: "",
+    timeline: "",
+    budget: "",
+    references: "",
+    conclusion: "",
+    prdRules: "",
+    prdInterface: "",
+    prdGovernance: "",
+    prdSecurity: "",
+    prdMetrics: "",
+    prdSuggestions: "",
+};
+const EMPTY_SECTION_CONTENTS: EditableSectionContentsMap = {
+    introduction: null,
+    goals: null,
+    timeline: null,
+    budget: null,
+    references: null,
+    conclusion: null,
+    prdRules: null,
+    prdInterface: null,
+    prdGovernance: null,
+    prdSecurity: null,
+    prdMetrics: null,
+    prdSuggestions: null,
+};
+const EMPTY_PRD_EXTRA_CONTENT: Record<PrdExtraSectionKey, React.ReactNode> = {
+    prdRules: null,
+    prdInterface: null,
+    prdGovernance: null,
+    prdSecurity: null,
+    prdMetrics: null,
+    prdSuggestions: null,
+};
+
+function withEmptyPrdSections(content: CoreDocumentContent): FullDocumentContent {
+    return {
+        ...content,
+        ...EMPTY_PRD_EXTRA_CONTENT,
+    };
+}
 type SignatureParticipant = {
     id: string;
     role: string;
@@ -2327,12 +2413,12 @@ type ProposalWizardDraft = {
 };
 type ProposalBudgetItem = { id: number; scope: string; budget: string };
 type ProposalContentShape = {
-    introduction: React.ReactNode;
-    goals: React.ReactNode;
-    timeline: React.ReactNode;
-    budget: React.ReactNode;
-    references: React.ReactNode;
-    conclusion: React.ReactNode;
+    introduction: CoreDocumentContent["introduction"];
+    goals: CoreDocumentContent["goals"];
+    timeline: CoreDocumentContent["timeline"];
+    budget: CoreDocumentContent["budget"];
+    references: CoreDocumentContent["references"];
+    conclusion: CoreDocumentContent["conclusion"];
     images: string[];
 };
 
@@ -2675,70 +2761,78 @@ const BriefPage = () => {
     );
     const [contractDraftState, setContractDraftState] =
         useState<ContractWizardDraft | null>(null);
-    const [contractContentState, setContractContentState] = useState<
-        Omit<ProposalContentShape, "images">
-    >(buildContractContentFromDraft(null, docLocale));
-    const [prdContentState, setPrdContentState] = useState<
-        Omit<ProposalContentShape, "images">
-    >(defaultPrdContent);
-    const displayedContent =
+    const [contractContentState, setContractContentState] = useState<FullDocumentContent>(
+        withEmptyPrdSections(buildContractContentFromDraft(null, docLocale))
+    );
+    const [prdContentState, setPrdContentState] = useState<FullDocumentContent>(
+        defaultPrdContent
+    );
+    const proposalSectionContent = useMemo<FullDocumentContent>(
+        () =>
+            withEmptyPrdSections({
+                introduction: proposalContentState.introduction,
+                goals: proposalContentState.goals,
+                timeline: proposalContentState.timeline,
+                budget: proposalContentState.budget,
+                references: proposalContentState.references,
+                conclusion: proposalContentState.conclusion,
+            }),
+        [proposalContentState]
+    );
+    const displayedContent: FullDocumentContent =
         featureType === "contract"
             ? contractContentState
             : featureType === "prd"
             ? prdContentState
-            : proposalContentState;
-    const sectionTitles = useMemo(
-        () =>
-            featureType === "contract"
-                ? {
-                      introduction: contractCopy.sectionIntroduction,
-                      goals: contractCopy.sectionGoals,
-                      timeline: contractCopy.sectionTimeline,
-                      budget: contractCopy.sectionBudget,
-                      references: contractCopy.sectionReferences,
-                      conclusion: contractCopy.sectionConclusion,
-                  }
-                : featureType === "prd"
-                ? {
-                      introduction: prdCopy.sectionIntroduction,
-                      goals: prdCopy.sectionGoals,
-                      timeline: prdCopy.sectionTimeline,
-                      budget: prdCopy.sectionBudget,
-                      references: prdCopy.sectionReferences,
-                      conclusion: prdCopy.sectionConclusion,
-                  }
-                : {
-                      introduction: t("proposalSectionSummary"),
-                      goals: t("proposalSectionGoals"),
-                      timeline: t("proposalSectionScope"),
-                      budget: t("proposalSectionInvestment"),
-                      references: t("proposalSectionReferences"),
-                      conclusion: t("proposalSectionConditions"),
-                  },
-        [contractCopy, featureType, prdCopy, t]
-    );
+            : proposalSectionContent;
+    const activeSectionOrder = featureType === "prd" ? PRD_SECTION_ORDER : CORE_SECTION_ORDER;
+    const sectionTitles = useMemo<SectionTitlesMap>(() => {
+        const defaultTitles: SectionTitlesMap = { ...EMPTY_SECTION_TITLES };
+        if (featureType === "contract") {
+            defaultTitles.introduction = contractCopy.sectionIntroduction;
+            defaultTitles.goals = contractCopy.sectionGoals;
+            defaultTitles.timeline = contractCopy.sectionTimeline;
+            defaultTitles.budget = contractCopy.sectionBudget;
+            defaultTitles.references = contractCopy.sectionReferences;
+            defaultTitles.conclusion = contractCopy.sectionConclusion;
+            return defaultTitles;
+        }
+        if (featureType === "prd") {
+            defaultTitles.introduction = prdCopy.sectionIntroduction;
+            defaultTitles.goals = prdCopy.sectionGoals;
+            defaultTitles.timeline = prdCopy.sectionTimeline;
+            defaultTitles.budget = prdCopy.sectionBudget;
+            defaultTitles.prdRules = prdCopy.sectionRules;
+            defaultTitles.prdInterface = prdCopy.sectionInterface;
+            defaultTitles.prdGovernance = prdCopy.sectionGovernance;
+            defaultTitles.prdSecurity = prdCopy.sectionSecurity;
+            defaultTitles.prdMetrics = prdCopy.sectionMetrics;
+            defaultTitles.prdSuggestions = prdCopy.sectionSuggestions;
+            return defaultTitles;
+        }
+        defaultTitles.introduction = t("proposalSectionSummary");
+        defaultTitles.goals = t("proposalSectionGoals");
+        defaultTitles.timeline = t("proposalSectionScope");
+        defaultTitles.budget = t("proposalSectionInvestment");
+        defaultTitles.references = t("proposalSectionReferences");
+        defaultTitles.conclusion = t("proposalSectionConditions");
+        return defaultTitles;
+    }, [contractCopy, featureType, prdCopy, t]);
     const subtitleDefault =
         featureType === "prd"
             ? prdCopy.subtitle
             : t("documentTypeLabel", {
                   type: featureType === "contract" ? t("contract") : t("proposal"),
               });
-    const storageVersion = featureType === "prd" ? "v15" : "v13";
+    const storageVersion = featureType === "prd" ? "v19" : "v13";
     const storageKey = `briefberry:doc-edit:${featureType}:${docLocale}:${storageVersion}`;
 
     const [editableDocumentTitle, setEditableDocumentTitle] = useState(documentTitle);
     const [editableSubtitle, setEditableSubtitle] = useState(subtitleDefault);
-    const [editableSectionTitles, setEditableSectionTitles] = useState(sectionTitles);
-    const [editableSectionContents, setEditableSectionContents] = useState<
-        Record<SectionKey, string | null>
-    >({
-        introduction: null,
-        goals: null,
-        timeline: null,
-        budget: null,
-        references: null,
-        conclusion: null,
-    });
+    const [editableSectionTitles, setEditableSectionTitles] =
+        useState<SectionTitlesMap>(sectionTitles);
+    const [editableSectionContents, setEditableSectionContents] =
+        useState<EditableSectionContentsMap>({ ...EMPTY_SECTION_CONTENTS });
     const [editableReferenceImages, setEditableReferenceImages] = useState<string[]>(
         featureType === "proposal" ? proposalContentState.images : []
     );
@@ -2752,6 +2846,11 @@ const BriefPage = () => {
     const [signatureNames, setSignatureNames] = useState<Record<string, string>>({});
     const [isEditingDocumentTitle, setIsEditingDocumentTitle] = useState(false);
     const [isEditingSubtitle, setIsEditingSubtitle] = useState(false);
+
+    useEffect(() => {
+        setEditableSectionTitles(sectionTitles);
+        setEditableSectionContents({ ...EMPTY_SECTION_CONTENTS });
+    }, [sectionTitles]);
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -2770,8 +2869,8 @@ const BriefPage = () => {
                 expiresAt: number;
                 documentTitle?: string;
                 subtitle?: string;
-                sectionTitles?: Record<SectionKey, string>;
-                sectionContents?: Record<SectionKey, string | null>;
+                sectionTitles?: Partial<SectionTitlesMap>;
+                sectionContents?: Partial<EditableSectionContentsMap>;
                 referenceImages?: string[];
             };
             if (!parsed.expiresAt || parsed.expiresAt < Date.now()) {
@@ -2789,9 +2888,17 @@ const BriefPage = () => {
                 hasPersistedSubtitle = true;
                 persistedSubtitleValue = parsed.subtitle;
             }
-            if (parsed.sectionTitles) setEditableSectionTitles(parsed.sectionTitles);
+            if (parsed.sectionTitles) {
+                setEditableSectionTitles((prev) => ({
+                    ...prev,
+                    ...parsed.sectionTitles,
+                }));
+            }
             if (parsed.sectionContents) {
-                const nextContents = { ...parsed.sectionContents };
+                const nextContents: EditableSectionContentsMap = {
+                    ...EMPTY_SECTION_CONTENTS,
+                    ...parsed.sectionContents,
+                };
                 if (featureType === "contract") {
                     // Keep legal template formatting in the first two contract sections.
                     nextContents.introduction = null;
@@ -2894,7 +3001,9 @@ const BriefPage = () => {
                 );
                 setContractDraftState(contractDraft);
                 setContractContentState(
-                    buildContractContentFromDraft(contractDraft, docLocale)
+                    withEmptyPrdSections(
+                        buildContractContentFromDraft(contractDraft, docLocale)
+                    )
                 );
                 const isProposalTitle = /^(Proposta Comercial de|Commercial Proposal for|Propuesta Comercial de)\s/i.test(
                     persistedTitleValue
@@ -3172,134 +3281,42 @@ const BriefPage = () => {
                             </button>
                         )}
                     </div>
-                    <BriefSection
-                        title={editableSectionTitles.introduction}
-                        onTitleChange={(nextTitle) =>
-                            setEditableSectionTitles((prev) => ({
-                                ...prev,
-                                introduction: nextTitle,
-                            }))
-                        }
-                        content={
-                            editableSectionContents.introduction ??
-                            displayedContent.introduction
-                        }
-                        editedContent={
-                            editableSectionContents.introduction ?? undefined
-                        }
-                        onContentChange={(nextContent) =>
-                            setEditableSectionContents((prev) => ({
-                                ...prev,
-                                introduction: nextContent || null,
-                            }))
-                        }
-                        isOnlyView={isReadOnlyView}
-                    />
-                    <BriefSection
-                        title={editableSectionTitles.goals}
-                        onTitleChange={(nextTitle) =>
-                            setEditableSectionTitles((prev) => ({
-                                ...prev,
-                                goals: nextTitle,
-                            }))
-                        }
-                        content={editableSectionContents.goals ?? displayedContent.goals}
-                        editedContent={editableSectionContents.goals ?? undefined}
-                        onContentChange={(nextContent) =>
-                            setEditableSectionContents((prev) => ({
-                                ...prev,
-                                goals: nextContent || null,
-                            }))
-                        }
-                        isOnlyView={isReadOnlyView}
-                    />
-                    <BriefSection
-                        title={editableSectionTitles.timeline}
-                        onTitleChange={(nextTitle) =>
-                            setEditableSectionTitles((prev) => ({
-                                ...prev,
-                                timeline: nextTitle,
-                            }))
-                        }
-                        content={
-                            editableSectionContents.timeline ??
-                            displayedContent.timeline
-                        }
-                        editedContent={editableSectionContents.timeline ?? undefined}
-                        onContentChange={(nextContent) =>
-                            setEditableSectionContents((prev) => ({
-                                ...prev,
-                                timeline: nextContent || null,
-                            }))
-                        }
-                        isOnlyView={isReadOnlyView}
-                    />
-                    <BriefSection
-                        title={editableSectionTitles.budget}
-                        onTitleChange={(nextTitle) =>
-                            setEditableSectionTitles((prev) => ({
-                                ...prev,
-                                budget: nextTitle,
-                            }))
-                        }
-                        content={editableSectionContents.budget ?? displayedContent.budget}
-                        editedContent={editableSectionContents.budget ?? undefined}
-                        onContentChange={(nextContent) =>
-                            setEditableSectionContents((prev) => ({
-                                ...prev,
-                                budget: nextContent || null,
-                            }))
-                        }
-                        isOnlyView={isReadOnlyView}
-                    />
-                    <BriefSection
-                        title={editableSectionTitles.references}
-                        onTitleChange={(nextTitle) =>
-                            setEditableSectionTitles((prev) => ({
-                                ...prev,
-                                references: nextTitle,
-                            }))
-                        }
-                        content={
-                            editableSectionContents.references ??
-                            displayedContent.references
-                        }
-                        editedContent={editableSectionContents.references ?? undefined}
-                        onContentChange={(nextContent) =>
-                            setEditableSectionContents((prev) => ({
-                                ...prev,
-                                references: nextContent || null,
-                            }))
-                        }
-                        images={
-                            featureType === "proposal"
-                                ? editableReferenceImages
-                                : undefined
-                        }
-                        onImagesChange={setEditableReferenceImages}
-                        isOnlyView={isReadOnlyView}
-                    />
-                    <BriefSection
-                        title={editableSectionTitles.conclusion}
-                        onTitleChange={(nextTitle) =>
-                            setEditableSectionTitles((prev) => ({
-                                ...prev,
-                                conclusion: nextTitle,
-                            }))
-                        }
-                        content={
-                            editableSectionContents.conclusion ??
-                            displayedContent.conclusion
-                        }
-                        editedContent={editableSectionContents.conclusion ?? undefined}
-                        onContentChange={(nextContent) =>
-                            setEditableSectionContents((prev) => ({
-                                ...prev,
-                                conclusion: nextContent || null,
-                            }))
-                        }
-                        isOnlyView={isReadOnlyView}
-                    />
+                    {activeSectionOrder.map((sectionKey) => (
+                        <BriefSection
+                            key={sectionKey}
+                            title={editableSectionTitles[sectionKey]}
+                            onTitleChange={(nextTitle) =>
+                                setEditableSectionTitles((prev) => ({
+                                    ...prev,
+                                    [sectionKey]: nextTitle,
+                                }))
+                            }
+                            content={
+                                editableSectionContents[sectionKey] ??
+                                displayedContent[sectionKey]
+                            }
+                            editedContent={
+                                editableSectionContents[sectionKey] ?? undefined
+                            }
+                            onContentChange={(nextContent) =>
+                                setEditableSectionContents((prev) => ({
+                                    ...prev,
+                                    [sectionKey]: nextContent || null,
+                                }))
+                            }
+                            images={
+                                featureType === "proposal" && sectionKey === "references"
+                                    ? editableReferenceImages
+                                    : undefined
+                            }
+                            onImagesChange={
+                                featureType === "proposal" && sectionKey === "references"
+                                    ? setEditableReferenceImages
+                                    : undefined
+                            }
+                            isOnlyView={isReadOnlyView}
+                        />
+                    ))}
                     {featureType === "contract" && (
                         <div className="mt-10 border-t border-stroke2 pt-8">
                         <div className="mb-4 text-h5">{contractCopy.signaturesTitle}</div>
