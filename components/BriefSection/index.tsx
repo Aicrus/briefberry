@@ -172,7 +172,7 @@ const BriefSection = ({
                 </div>
                 <div className="group relative">
                     <div
-                        className={`relative -mx-4 p-4 border-[1.5px] border-transparent rounded-2xl text-[15.5px] leading-7 text-t-primary [&_p]:not-last:mb-6 [text-align:justify] transition-colors ${
+                        className={`relative -mx-4 p-4 border-[1.5px] border-transparent rounded-2xl text-[15.5px] leading-7 text-t-primary [&_p]:not-last:mb-6 [text-align:justify] [&_li]:text-left transition-colors ${
                             isOnlyView
                                 ? ""
                                 : "group-hover:border-stroke2 overflow-hidden"
@@ -200,13 +200,13 @@ const BriefSection = ({
                             />
                         ) : editedContent !== null ? (
                             <div
-                                className="whitespace-normal [text-align:justify] [&_p]:not-last:mb-6"
+                                className="whitespace-normal [text-align:justify] [&_li]:text-left [&_p]:not-last:mb-6"
                                 dangerouslySetInnerHTML={{ __html: editedContent }}
                             />
                         ) : (
                             <div
                                 ref={contentRef}
-                                className="whitespace-normal [text-align:justify]"
+                                className="whitespace-normal [text-align:justify] [&_li]:text-left"
                             >
                                 {content}
                             </div>
