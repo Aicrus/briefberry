@@ -4,7 +4,11 @@
         "newBrief": "New brief",
         "newProposal": "New proposal",
         "newContract": "New contract",
-        "newPrd": "New PRD"
+        "newPrd": "New PRD",
+        "planTitleDefault": "Studio Modelo 2026",
+        "premiumTitle": "Go premium!",
+        "premiumDescription": "Unlock all premium features for just $4.99/month. Enjoy section regeneration, PDF export, and email sharing.",
+        "premiumCta": "Upgrade"
     },
     "menu": {
         "myBriefs": "My briefs",
@@ -248,7 +252,7 @@
         "integrationsSuggestedEmpty": "All suggestions have already been added.",
         "featureSearchPlaceholder": "Search or type features (Enter or comma to add)",
         "integrationSearchPlaceholder": "Search or type integrations (Enter or comma to add)",
-        "langPtBr": "Português (Brasil)",
+        "langPtBr": "Português",
         "langEn": "English (US)",
         "langEs": "Español",
         "langMulti": "Multi-language",

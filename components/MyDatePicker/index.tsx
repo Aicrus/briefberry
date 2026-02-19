@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import { enGB } from "date-fns/locale/en-GB";
-import { ptBR } from "date-fns/locale/pt-BR";
+import { pt } from "date-fns/locale/pt";
 import { es } from "date-fns/locale/es";
 import { useLocale, useTranslations } from "next-intl";
 import Field from "@/components/Field";
@@ -12,13 +12,13 @@ const DATE_OPTION_KEYS = ["today", "tomorrow", "1week", "2weeks", "1month", "3mo
 
 const localeToDateLocale: Record<string, string> = {
     en: "en-GB",
-    pt: "pt-BR",
+    pt: "pt",
     es: "es",
 };
 
 // Registrar locales do date-fns para o calendário exibir meses/dias no idioma correto
 registerLocale("en-GB", enGB);
-registerLocale("pt-BR", ptBR);
+registerLocale("pt", pt);
 registerLocale("es", es);
 
 type MyDatePickerProps = {

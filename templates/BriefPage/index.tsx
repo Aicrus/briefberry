@@ -2742,7 +2742,7 @@ function formatProposalBudget(
     const currencyId = ((currency ?? 1) as CurrencyId) || 1;
     const symbol = CURRENCY_SYMBOL_BY_ID[currencyId] ?? "US$";
     const amount = digitsToNumber(digits);
-    const formatted = amount.toLocaleString("pt-BR", {
+    const formatted = amount.toLocaleString("pt", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
@@ -2755,7 +2755,7 @@ function formatProposalBudgetFromAmount(
 ): string {
     const currencyId = ((currency ?? 1) as CurrencyId) || 1;
     const symbol = CURRENCY_SYMBOL_BY_ID[currencyId] ?? "US$";
-    const formatted = amount.toLocaleString("pt-BR", {
+    const formatted = amount.toLocaleString("pt", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
     });
@@ -3032,6 +3032,8 @@ const BriefPage = () => {
     const [proposalContentState, setProposalContentState] = useState<ProposalContentShape>(
         defaultProposalContent
     );
+    const [proposalProjectName, setProposalProjectName] = useState("");
+    const [prdProjectName, setPrdProjectName] = useState("");
     const [contractDraftState, setContractDraftState] =
         useState<ContractWizardDraft | null>(null);
     const [contractContentState, setContractContentState] = useState<FullDocumentContent>(
@@ -3222,6 +3224,8 @@ const BriefPage = () => {
                     tQuizText
                 );
                 setProposalContentState(dynamicProposalContent);
+                setProposalProjectName(proposalWizardDraft?.projectName?.trim() || "");
+                setPrdProjectName("");
                 if (!hasPersistedReferenceImages) {
                     setEditableReferenceImages(dynamicProposalContent.images);
                 }
@@ -3271,6 +3275,8 @@ const BriefPage = () => {
                     DRAFT_KEYS.contractWizard
                 );
                 setContractDraftState(contractDraft);
+                setProposalProjectName("");
+                setPrdProjectName("");
                 setContractContentState(
                     buildContractContentFromDraft(contractDraft, docLocale)
                 );
@@ -3296,6 +3302,8 @@ const BriefPage = () => {
             }
             if (featureType === "prd") {
                 const prdDraft = loadDraft<PrdWizardDraft>(DRAFT_KEYS.prdWizard);
+                setPrdProjectName(prdDraft?.projectName?.trim() || "");
+                setProposalProjectName("");
                 setPrdContentState(
                     buildPrdContentFromDraft(prdDraft, docLocale, tQuizText)
                 );
@@ -3375,6 +3383,26 @@ const BriefPage = () => {
             : featureType === "prd"
             ? "prd"
             : "proposal";
+    const planLabel = useMemo(() => {
+        if (featureType === "proposal") {
+            return proposalProjectName || editableDocumentTitle;
+        }
+        if (featureType === "prd") {
+            return prdProjectName || editableDocumentTitle;
+        }
+        const contractProjectSnippet = contractDraftState?.projectDescription
+            ?.split(/\n|\./)[0]
+            ?.trim();
+        return contractProjectSnippet
+            ? truncateText(contractProjectSnippet, 72)
+            : editableDocumentTitle;
+    }, [
+        contractDraftState?.projectDescription,
+        editableDocumentTitle,
+        featureType,
+        prdProjectName,
+        proposalProjectName,
+    ]);
     const signatureParticipants: SignatureParticipant[] = useMemo(
         () =>
             featureType === "contract"
@@ -3465,7 +3493,13 @@ const BriefPage = () => {
     ]);
 
     return (
-        <Layout isFixedHeader isHiddenFooter isVisiblePlan isLoggedIn>
+        <Layout
+            isFixedHeader
+            isHiddenFooter
+            isVisiblePlan
+            isLoggedIn
+            planLabel={planLabel}
+        >
             <div className="pt-34 px-6 pb-38 max-2xl:pt-32 max-2xl:px-11 max-2xl:pb-33 max-xl:pt-30 max-lg:pt-28 max-md:pt-22 max-md:px-4 max-md:pb-24">
                 <div
                     key={featureType}

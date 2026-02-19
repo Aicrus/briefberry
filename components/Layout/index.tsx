@@ -10,6 +10,7 @@ type Props = {
     isFixedHeader?: boolean;
     isLoggedIn?: boolean;
     isVisiblePlan?: boolean;
+    planLabel?: string;
     isHiddenFooter?: boolean;
     children: React.ReactNode;
 };
@@ -20,6 +21,7 @@ const Layout = ({
     isFixedHeader,
     isLoggedIn,
     isVisiblePlan,
+    planLabel,
     isHiddenFooter,
     children,
 }: Props) => {
@@ -41,6 +43,7 @@ const Layout = ({
                 isFixed={isFixedHeader}
                 login={loginOpen}
                 isVisiblePlan={isVisiblePlan}
+                planLabel={planLabel}
                 onLogin={() => setLoginOpen(true)}
                 onLogout={() => setLoginOpen(false)}
             />

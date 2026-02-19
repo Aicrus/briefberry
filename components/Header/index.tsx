@@ -22,6 +22,7 @@ type HeaderProps = {
     isFixed?: boolean;
     login?: boolean;
     isVisiblePlan?: boolean;
+    planLabel?: string;
     onLogin: () => void;
     onLogout: () => void;
 };
@@ -30,6 +31,7 @@ const Header = ({
     isFixed,
     login,
     isVisiblePlan,
+    planLabel,
     onLogin,
     onLogout,
 }: HeaderProps) => {
@@ -79,7 +81,7 @@ const Header = ({
                 </Link>
                 <div className="flex items-center gap-2 max-md:gap-1.5">
                     <LanguageSwitcher />
-                    {isVisiblePlan && <Plan />}
+                    {isVisiblePlan && <Plan label={planLabel} />}
                     {login ? (
                         <>
                             {pathname !== "/quiz" &&

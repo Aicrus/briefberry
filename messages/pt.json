@@ -4,7 +4,11 @@
         "newBrief": "Novo brief",
         "newProposal": "Nova proposta",
         "newContract": "Novo contrato",
-        "newPrd": "Novo PRD"
+        "newPrd": "Novo PRD",
+        "planTitleDefault": "Studio Modelo 2026",
+        "premiumTitle": "Seja Premium!",
+        "premiumDescription": "Desbloqueie todos os recursos premium por apenas US$ 4,99/mês. Aproveite regeneração de seções, exportação em PDF e compartilhamento por e-mail.",
+        "premiumCta": "Atualizar"
     },
     "menu": {
         "myBriefs": "Meus briefs",
@@ -248,7 +252,7 @@
         "integrationsSuggestedEmpty": "Todas as sugestões já foram adicionadas.",
         "featureSearchPlaceholder": "Busque ou digite funcionalidades (Enter ou vírgula para adicionar)",
         "integrationSearchPlaceholder": "Busque ou digite integrações (Enter ou vírgula para adicionar)",
-        "langPtBr": "Português (Brasil)",
+        "langPtBr": "Português",
         "langEn": "English (US)",
         "langEs": "Español",
         "langMulti": "Multi-idioma",
