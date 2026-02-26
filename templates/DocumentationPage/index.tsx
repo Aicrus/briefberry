@@ -1330,13 +1330,13 @@ const DocumentationPage = () => {
             </div>
 
             <Modal
-                classWrapper="max-w-[68rem] rounded-3xl border border-stroke1 bg-b-surface2 p-4 max-md:p-3"
+                classWrapper="max-w-[68rem] border-0 !bg-transparent !p-0 !shadow-none"
                 open={Boolean(expandedImage)}
                 onClose={() => setExpandedImage(null)}
             >
                 {expandedImage && (
                     <figure>
-                        <div className="relative h-[72vh] max-h-[42rem] w-full overflow-hidden rounded-2xl bg-b-surface1">
+                        <div className="relative h-[72vh] max-h-[42rem] w-full overflow-hidden rounded-2xl">
                             <Image
                                 alt={expandedImage.alt}
                                 className="h-full w-full object-contain"
@@ -1345,7 +1345,7 @@ const DocumentationPage = () => {
                                 sizes="(max-width: 767px) 100vw, 1100px"
                             />
                         </div>
-                        <figcaption className="mt-3 px-1 text-heading-thin text-t-secondary">
+                        <figcaption className="mt-3 px-1 text-center text-heading-thin text-white/80">
                             {expandedImage.caption}
                         </figcaption>
                     </figure>
