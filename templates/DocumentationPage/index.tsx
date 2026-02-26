@@ -5672,6 +5672,16 @@ const buildSearchableText = (topic: Topic, parentLabel?: string) =>
 const URL_PATTERN = /(https?:\/\/[^\s)]+)(?=[\s)]|$)/g;
 const MARKDOWN_LINK_PATTERN = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const TOPIC_LINK_PATTERN = /^topic:(?:\/\/)?(.+)$/;
+const INFO_CALLOUT_PREFIX_PATTERN = /^(?:nota(?: importante)?|info)\b[:\s-]*/i;
+const NOTE_CALLOUT_PREFIX_PATTERN = /^(?:aviso(?: importante)?|importante|please note)\b[:\s-]*/i;
+
+type CalloutTone = "info" | "note";
+
+type ParsedCallout = {
+    label: string;
+    message: string;
+    tone: CalloutTone;
+};
 
 const renderTextWithLinks = (text: string, onTopicSelect?: (topicId: string) => void) => {
     const markdownMatches = Array.from(text.matchAll(MARKDOWN_LINK_PATTERN));
@@ -5774,6 +5784,122 @@ const renderTextWithLinks = (text: string, onTopicSelect?: (topicId: string) => 
     return nodes;
 };
 
+const parseCalloutText = (text: string): ParsedCallout | null => {
+    const trimmedText = text.trim();
+
+    if (!trimmedText) {
+        return null;
+    }
+
+    if (trimmedText.startsWith("💡")) {
+        const message = trimmedText.replace(/^💡\s*/, "");
+        return {
+            label: "Dica",
+            message: message || trimmedText,
+            tone: "info",
+        };
+    }
+
+    if (trimmedText.startsWith("🧐") || trimmedText.startsWith("ℹ")) {
+        const message = trimmedText.replace(/^(?:🧐|ℹ️?)\s*/, "");
+        return {
+            label: "Info",
+            message: message || trimmedText,
+            tone: "info",
+        };
+    }
+
+    if (trimmedText.startsWith("🔥") || trimmedText.startsWith("⚠") || trimmedText.startsWith("🚨")) {
+        const message = trimmedText.replace(/^(?:🔥|⚠️?|🚨)\s*/, "");
+        return {
+            label: "Atenção",
+            message: message || trimmedText,
+            tone: "note",
+        };
+    }
+
+    if (INFO_CALLOUT_PREFIX_PATTERN.test(trimmedText)) {
+        const message = trimmedText.replace(INFO_CALLOUT_PREFIX_PATTERN, "");
+        return {
+            label: "Info",
+            message: message || trimmedText,
+            tone: "info",
+        };
+    }
+
+    if (NOTE_CALLOUT_PREFIX_PATTERN.test(trimmedText)) {
+        const message = trimmedText.replace(NOTE_CALLOUT_PREFIX_PATTERN, "");
+        return {
+            label: "Atenção",
+            message: message || trimmedText,
+            tone: "note",
+        };
+    }
+
+    return null;
+};
+
+const CALLOUT_THEME: Record<
+    CalloutTone,
+    {
+        wrapperClassName: string;
+        accentClassName: string;
+        iconName: string;
+        iconClassName: string;
+        iconSizeClassName: string;
+        labelClassName: string;
+    }
+> = {
+    info: {
+        wrapperClassName: "border-primary1/20 bg-primary1/5 text-t-primary",
+        accentClassName: "bg-primary1/50",
+        iconName: "info-outline",
+        iconClassName: "fill-t-blue",
+        iconSizeClassName: "size-6",
+        labelClassName: "text-t-blue",
+    },
+    note: {
+        wrapperClassName: "border-primary3/25 bg-primary3/5 text-t-primary",
+        accentClassName: "bg-primary3/55",
+        iconName: "warning-triangle",
+        iconClassName: "fill-primary3",
+        iconSizeClassName: "size-4",
+        labelClassName: "text-primary3",
+    },
+};
+
+const SectionCallout = ({
+    callout,
+    className,
+    onTopicSelect,
+}: {
+    callout: ParsedCallout;
+    className?: string;
+    onTopicSelect?: (topicId: string) => void;
+}) => {
+    const tone = CALLOUT_THEME[callout.tone];
+
+    return (
+        <div
+            className={`relative overflow-hidden rounded-2xl border px-4 py-4 ${tone.wrapperClassName} ${className ?? ""}`}
+        >
+            <span className={`absolute inset-y-0 left-0 w-1 ${tone.accentClassName}`}></span>
+            <div
+                className={`mb-2 flex items-center gap-2 text-heading-thin font-medium tracking-[0.08em] uppercase ${tone.labelClassName}`}
+            >
+                <Icon
+                    className={`${tone.iconSizeClassName} ${tone.iconClassName}`}
+                    name={tone.iconName}
+                />
+                <span>{callout.label}</span>
+            </div>
+            <p className="text-body text-t-secondary">
+                {renderTextWithLinks(callout.message, onTopicSelect)}
+            </p>
+        </div>
+    );
+};
+
 const DocumentationPage = () => {
     const [query, setQuery] = useState("");
     const [activeFilter, setActiveFilter] = useState("all");
@@ -5791,16 +5917,24 @@ const DocumentationPage = () => {
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            if (event.key !== "/") {
-                return;
-            }
-
             const target = event.target as HTMLElement | null;
             const isTypingElement =
                 target?.tagName === "INPUT" ||
                 target?.tagName === "TEXTAREA" ||
                 target?.tagName === "SELECT" ||
                 Boolean(target?.isContentEditable);
+            const isCommandPaletteShortcut =
+                (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k";
+
+            if (isCommandPaletteShortcut) {
+                event.preventDefault();
+                setIsSearchOpen(true);
+                return;
+            }
+
+            if (event.key !== "/") {
+                return;
+            }
 
             if (isTypingElement || event.metaKey || event.ctrlKey || event.altKey) {
                 return;
@@ -5967,6 +6101,15 @@ const DocumentationPage = () => {
     const selectedFlutterCategory = selectedTopic
         ? FLUTTER_CATEGORY_BY_TOPIC_ID[selectedTopic.id]
         : null;
+    const selectedFlutterTopicIndex = selectedTopic
+        ? FLUTTER_TOPICS.findIndex((topic) => topic.id === selectedTopic.id)
+        : -1;
+    const previousFlutterTopic =
+        selectedFlutterTopicIndex > 0 ? FLUTTER_TOPICS[selectedFlutterTopicIndex - 1] : null;
+    const nextFlutterTopic =
+        selectedFlutterTopicIndex >= 0 && selectedFlutterTopicIndex < FLUTTER_TOPICS.length - 1
+            ? FLUTTER_TOPICS[selectedFlutterTopicIndex + 1]
+            : null;
     const handleToggleAllFlutterCategories = () => {
         const nextOpenState = !allVisibleFlutterCategoriesOpen;
 
@@ -6014,6 +6157,10 @@ const DocumentationPage = () => {
                                 >
                                     <Icon className="size-4 fill-current" name="search" />
                                     Buscar
+                                    <span className="inline-flex items-center gap-1 rounded-md border border-stroke1 px-1.5 py-0.5 text-small text-t-tertiary max-md:hidden">
+                                        <span>⌘/Ctrl</span>
+                                        <span>K</span>
+                                    </span>
                                 </button>
                             </div>
 
@@ -6247,6 +6394,22 @@ const DocumentationPage = () => {
                                             {selectedTopic.sections.map((section, sectionIndex) => {
                                                 const anchorId = `${selectedTopic.id}-${section.id}`;
                                                 const sectionImage = section.image;
+                                                const introCallout = parseCalloutText(section.intro);
+                                                const bulletEntries = section.bullets.map((bullet) => ({
+                                                    bullet,
+                                                    callout: parseCalloutText(bullet),
+                                                }));
+                                                const regularBulletEntries = bulletEntries.filter(
+                                                    (entry) => !entry.callout
+                                                );
+                                                const calloutBulletEntries = bulletEntries.filter(
+                                                    (
+                                                        entry
+                                                    ): entry is {
+                                                        bullet: string;
+                                                        callout: ParsedCallout;
+                                                    } => Boolean(entry.callout)
+                                                );
 
                                                 return (
                                                     <section
@@ -6262,26 +6425,49 @@ const DocumentationPage = () => {
                                                                 {section.title}
                                                             </h2>
                                                         </div>
-                                                        <p className="text-body text-t-secondary">
-                                                            {renderTextWithLinks(section.intro, handleTopicSelect)}
-                                                        </p>
+                                                        {introCallout ? (
+                                                            <SectionCallout
+                                                                callout={introCallout}
+                                                                onTopicSelect={handleTopicSelect}
+                                                            />
+                                                        ) : (
+                                                            <p className="text-body text-t-secondary">
+                                                                {renderTextWithLinks(
+                                                                    section.intro,
+                                                                    handleTopicSelect
+                                                                )}
+                                                            </p>
+                                                        )}
 
-                                                        <ul className="mt-4 space-y-2">
-                                                            {section.bullets.map((bullet, bulletIndex) => (
-                                                                <li
-                                                                    className="flex items-start gap-2 text-body text-t-secondary"
-                                                                    key={`${anchorId}-bullet-${bulletIndex}`}
-                                                                >
-                                                                    <span className="mt-1.5 inline-flex size-1.5 shrink-0 rounded-full bg-primary1"></span>
-                                                                    <span>
-                                                                        {renderTextWithLinks(
-                                                                            bullet,
-                                                                            handleTopicSelect
-                                                                        )}
-                                                                    </span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
+                                                        {regularBulletEntries.length > 0 && (
+                                                            <ul className="mt-4 space-y-2">
+                                                                {regularBulletEntries.map(
+                                                                    ({ bullet }, bulletIndex) => (
+                                                                        <li
+                                                                            className="flex items-start gap-2 text-body text-t-secondary"
+                                                                            key={`${anchorId}-bullet-${bulletIndex}`}
+                                                                        >
+                                                                            <span className="mt-1.5 inline-flex size-1.5 shrink-0 rounded-full bg-primary1"></span>
+                                                                            <span>
+                                                                                {renderTextWithLinks(
+                                                                                    bullet,
+                                                                                    handleTopicSelect
+                                                                                )}
+                                                                            </span>
+                                                                        </li>
+                                                                    )
+                                                                )}
+                                                            </ul>
+                                                        )}
+
+                                                        {calloutBulletEntries.map((entry, calloutIndex) => (
+                                                            <SectionCallout
+                                                                callout={entry.callout}
+                                                                className="mt-4"
+                                                                key={`${anchorId}-callout-${calloutIndex}`}
+                                                                onTopicSelect={handleTopicSelect}
+                                                            />
+                                                        ))}
 
                                                         {section.code && (
                                                             <CodeSnippet code={section.code} blockId={anchorId} />
@@ -6321,6 +6507,61 @@ const DocumentationPage = () => {
                                                 );
                                             })}
                                         </div>
+                                        {isSelectedTopicFromFlutter &&
+                                            (previousFlutterTopic || nextFlutterTopic) && (
+                                                <nav
+                                                    aria-label="Navegação entre tópicos Flutter"
+                                                    className="mt-7 rounded-3xl border border-stroke-subtle bg-linear-to-br from-primary1/7 via-b-surface1 to-b-surface1 p-4"
+                                                >
+                                                    <div className="mb-3 text-heading-thin text-t-secondary">
+                                                        Continue no módulo Flutter
+                                                    </div>
+                                                    <div className="grid gap-3 sm:grid-cols-2">
+                                                        {previousFlutterTopic && (
+                                                            <button
+                                                                className="group rounded-2xl border border-stroke1 bg-b-surface1 px-4 py-3 text-left transition-colors hover:border-stroke-highlight hover:bg-b-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2"
+                                                                onClick={() =>
+                                                                    handleTopicSelect(
+                                                                        previousFlutterTopic.id
+                                                                    )
+                                                                }
+                                                                type="button"
+                                                            >
+                                                                <div className="mb-1 flex items-center gap-1 text-small text-t-tertiary">
+                                                                    <Icon
+                                                                        className="size-4 rotate-180 fill-current transition-transform group-hover:-translate-x-0.5"
+                                                                        name="arrow"
+                                                                    />
+                                                                    Anterior
+                                                                </div>
+                                                                <div className="text-heading-thin text-t-primary">
+                                                                    {previousFlutterTopic.title}
+                                                                </div>
+                                                            </button>
+                                                        )}
+                                                        {nextFlutterTopic && (
+                                                            <button
+                                                                className="group rounded-2xl border border-stroke1 bg-b-surface1 px-4 py-3 text-left transition-colors hover:border-stroke-highlight hover:bg-b-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2"
+                                                                onClick={() =>
+                                                                    handleTopicSelect(nextFlutterTopic.id)
+                                                                }
+                                                                type="button"
+                                                            >
+                                                                <div className="mb-1 flex items-center gap-1 text-small text-t-tertiary">
+                                                                    Próximo
+                                                                    <Icon
+                                                                        className="size-4 fill-current transition-transform group-hover:translate-x-0.5"
+                                                                        name="arrow"
+                                                                    />
+                                                                </div>
+                                                                <div className="text-heading-thin text-t-primary">
+                                                                    {nextFlutterTopic.title}
+                                                                </div>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                </nav>
+                                            )}
 
                                     </>
                                 )}
