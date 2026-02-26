@@ -11,6 +11,7 @@ const navigation = [
     { titleKey: "myBriefs" as const, icon: "documents", url: "/my-briefs" },
     { titleKey: "manageYourPlan" as const, icon: "star-stroke", url: "/manage-plan" },
     { titleKey: "accountSettings" as const, icon: "profile", url: "/settings" },
+    { titleKey: "documentation" as const, icon: "post", url: "/documentation" },
 ];
 
 type Props = {

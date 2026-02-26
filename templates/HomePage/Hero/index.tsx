@@ -11,6 +11,7 @@ import type { FeatureKey } from "@/config/projectFlow";
 
 const Hero = () => {
     const t = useTranslations("hero");
+    const tHeader = useTranslations("header");
     const router = useRouter();
     const [isMounted, setIsMounted] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -48,13 +49,22 @@ const Hero = () => {
                     </div>
                 </div>
             </div>
-            <Button
-                className="mb-12 max-lg:mb-10 max-md:ml-6"
-                isSecondary
-                onClick={() => setIsModalOpen(true)}
-            >
-                {t("getStarted")}
-            </Button>
+            <div className="mb-12 flex items-center justify-center gap-3 max-lg:mb-10 max-md:ml-6 max-md:justify-start">
+                <Button
+                    isSecondary
+                    onClick={() => setIsModalOpen(true)}
+                >
+                    {t("getStarted")}
+                </Button>
+                <Button
+                    as="link"
+                    href="/documentation"
+                    isSecondary
+                    className="border-transparent bg-b-surface2/80 text-t-primary fill-t-primary shadow-none hover:border-transparent hover:bg-white hover:text-t-primary hover:fill-t-primary hover:shadow-none!"
+                >
+                    {tHeader("documentation")}
+                </Button>
+            </div>
             <div className="relative mb-12 before:absolute before:top-0 before:left-0 before:right-0 before:h-[1.5px] before:bg-linear-(--gradient-horizontal) after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[1.5px] after:bg-linear-(--gradient-horizontal)">
                 <div className="center">
                     <div className="relative p-1.5 border-[1.5px] border-stroke-subtle rounded-5xl">
