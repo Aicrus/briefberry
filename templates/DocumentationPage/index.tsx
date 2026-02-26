@@ -5273,6 +5273,15 @@ const FLUTTER_CATEGORY_BY_TOPIC_ID = FLUTTER_CATEGORY_TOPICS.reduce<Record<strin
     },
     {}
 );
+const FLUTTER_CATEGORY_ID_BY_TOPIC_ID = FLUTTER_CATEGORY_TOPICS.reduce<Record<string, string>>(
+    (acc, category) => {
+        category.topics.forEach((topic) => {
+            acc[topic.id] = category.id;
+        });
+        return acc;
+    },
+    {}
+);
 
 const TERMINAL_KEYWORDS = [
     "flutter",
@@ -5823,6 +5832,14 @@ const DocumentationPage = () => {
     }, [isSearchOpen]);
 
     const handleTopicSelect = (topicId: string) => {
+        const topicCategoryId = FLUTTER_CATEGORY_ID_BY_TOPIC_ID[topicId];
+        if (topicCategoryId) {
+            setOpenFlutterCategories((prev) => ({
+                ...prev,
+                [topicCategoryId]: true,
+            }));
+        }
+
         setActiveTopicId(topicId);
 
         if (typeof window === "undefined") {
@@ -5922,6 +5939,14 @@ const DocumentationPage = () => {
             })).filter((category) => category.topics.length > 0),
         [visibleFlutterTopicIds]
     );
+    const allVisibleFlutterCategoriesOpen = useMemo(
+        () =>
+            visibleFlutterCategories.length > 0 &&
+            visibleFlutterCategories.every(
+                (category) => openFlutterCategories[category.id] !== false
+            ),
+        [openFlutterCategories, visibleFlutterCategories]
+    );
 
     const visibleTopics = useMemo(
         () => [...visibleFlutterTopics, ...visibleBaseTopics],
@@ -5942,6 +5967,19 @@ const DocumentationPage = () => {
     const selectedFlutterCategory = selectedTopic
         ? FLUTTER_CATEGORY_BY_TOPIC_ID[selectedTopic.id]
         : null;
+    const handleToggleAllFlutterCategories = () => {
+        const nextOpenState = !allVisibleFlutterCategoriesOpen;
+
+        setOpenFlutterCategories((prev) => {
+            const next = { ...prev };
+
+            visibleFlutterCategories.forEach((category) => {
+                next[category.id] = nextOpenState;
+            });
+
+            return next;
+        });
+    };
 
     return (
         <Layout>
@@ -6032,8 +6070,27 @@ const DocumentationPage = () => {
                                     <div className="space-y-1.5">
                                         {visibleFlutterCategories.length > 0 && (
                                             <div className="rounded-xl border border-stroke1/70 bg-b-surface1/70">
-                                                <div className="border-b border-stroke-subtle px-3 py-2.5">
+                                                <div className="flex items-center justify-between border-b border-stroke-subtle px-3 py-2.5">
                                                     <div className="text-body-bold">Configuração Flutter</div>
+                                                    <button
+                                                        aria-label={
+                                                            allVisibleFlutterCategoriesOpen
+                                                                ? "Fechar todas as categorias de Configuração Flutter"
+                                                                : "Abrir todas as categorias de Configuração Flutter"
+                                                        }
+                                                        className="inline-flex size-7 items-center justify-center rounded-md border border-stroke1 text-t-secondary transition-colors hover:border-stroke-highlight hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset"
+                                                        onClick={handleToggleAllFlutterCategories}
+                                                        type="button"
+                                                    >
+                                                        <Icon
+                                                            className={`size-4 fill-current transition-transform ${
+                                                                allVisibleFlutterCategoriesOpen
+                                                                    ? "rotate-180"
+                                                                    : ""
+                                                            }`}
+                                                            name="chevron"
+                                                        />
+                                                    </button>
                                                 </div>
 
                                                 <div className="space-y-2 px-2 py-2">
