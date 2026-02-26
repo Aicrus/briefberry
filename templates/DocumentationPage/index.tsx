@@ -5825,12 +5825,20 @@ const DocumentationPage = () => {
     const handleTopicSelect = (topicId: string) => {
         setActiveTopicId(topicId);
 
+        if (typeof window === "undefined") {
+            return;
+        }
+
         const prefersReducedMotion =
-            typeof window !== "undefined" &&
             window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+        const docsContentElement = document.getElementById("documentation-layout");
+        const contentTop = docsContentElement
+            ? window.scrollY + docsContentElement.getBoundingClientRect().top - 96
+            : 0;
+
         window.scrollTo({
-            top: 0,
+            top: Math.max(0, contentTop),
             behavior: prefersReducedMotion ? "auto" : "smooth",
         });
     };
@@ -6008,9 +6016,15 @@ const DocumentationPage = () => {
                             </div>
                         </header>
 
-                        <div className="grid grid-cols-[18rem_minmax(0,1fr)_14rem] max-2xl:grid-cols-[16.5rem_minmax(0,1fr)] max-md:grid-cols-1">
+                        <div
+                            className="grid grid-cols-[18rem_minmax(0,1fr)_14rem] max-2xl:grid-cols-[16.5rem_minmax(0,1fr)] max-md:grid-cols-1"
+                            id="documentation-layout"
+                        >
                             <aside className="border-r border-stroke-subtle px-4 py-5 max-md:border-r-0 max-md:border-b max-md:px-4">
-                                <nav aria-label="Tópicos principais" className="sticky top-24">
+                                <nav
+                                    aria-label="Tópicos principais"
+                                    className="sticky top-24 max-h-[calc(100dvh-8rem)] overflow-y-auto pr-1 max-md:static max-md:max-h-none max-md:overflow-visible max-md:pr-0"
+                                >
                                     <div className="mb-4 text-heading-thin text-t-secondary">
                                         Tópicos principais
                                     </div>
