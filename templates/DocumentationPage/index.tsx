@@ -863,6 +863,7 @@ const DocumentationPage = () => {
     const [activeFilter, setActiveFilter] = useState("all");
     const [activeTopicId, setActiveTopicId] = useState(FLUTTER_TOPICS[0]?.id ?? "");
     const [isFlutterOpen, setIsFlutterOpen] = useState(true);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [expandedImage, setExpandedImage] = useState<TopicSection["image"] | null>(null);
     const searchInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -884,7 +885,7 @@ const DocumentationPage = () => {
             }
 
             event.preventDefault();
-            searchInputRef.current?.focus();
+            setIsSearchOpen(true);
         };
 
         window.addEventListener("keydown", handleKeyDown);
@@ -893,6 +894,20 @@ const DocumentationPage = () => {
             window.removeEventListener("keydown", handleKeyDown);
         };
     }, []);
+
+    useEffect(() => {
+        if (!isSearchOpen) {
+            return;
+        }
+
+        const focusTimeoutId = window.setTimeout(() => {
+            searchInputRef.current?.focus();
+        }, 0);
+
+        return () => {
+            window.clearTimeout(focusTimeoutId);
+        };
+    }, [isSearchOpen]);
 
     const handleTopicSelect = (topicId: string) => {
         setActiveTopicId(topicId);
@@ -1004,7 +1019,7 @@ const DocumentationPage = () => {
                         </a>
 
                         <header className="border-b border-stroke-subtle bg-linear-to-r from-primary1/10 to-transparent px-6 py-5 max-md:px-4">
-                            <div className="flex items-start gap-4">
+                            <div className="flex items-start justify-between gap-4">
                                 <div className="flex items-center gap-3">
                                     <div className="flex size-9 items-center justify-center rounded-xl bg-primary1/15">
                                         <Icon className="size-5 fill-primary1" name="post" />
@@ -1016,6 +1031,15 @@ const DocumentationPage = () => {
                                         </div>
                                     </div>
                                 </div>
+                                <button
+                                    aria-label="Abrir busca na documentacao"
+                                    className="inline-flex items-center gap-2 rounded-full border-[1.5px] border-stroke1 bg-b-surface1 px-3 py-1.5 text-hairline text-t-secondary transition-colors hover:border-stroke-highlight hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2"
+                                    onClick={() => setIsSearchOpen(true)}
+                                    type="button"
+                                >
+                                    <Icon className="size-4 fill-current" name="documents" />
+                                    Buscar
+                                </button>
                             </div>
 
                             <div
@@ -1054,43 +1078,6 @@ const DocumentationPage = () => {
                                 })}
                             </div>
                         </header>
-
-                        <div className="border-b border-stroke-subtle px-6 py-4 max-md:px-4">
-                            <label
-                                className="mb-2 block text-heading-thin text-t-secondary"
-                                htmlFor="docs-search"
-                            >
-                                Buscar na documentacao
-                            </label>
-                            <div className="flex items-center gap-3 rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1 px-4 py-3">
-                                <Icon className="size-5 fill-t-secondary" name="post" />
-                                <input
-                                    aria-describedby="docs-search-hint docs-search-status"
-                                    className="w-full bg-transparent text-heading-thin text-t-primary outline-0 placeholder:text-t-tertiary"
-                                    id="docs-search"
-                                    placeholder="Buscar em proposta, contrato, PRD + tasks ou configuracao Flutter..."
-                                    ref={searchInputRef}
-                                    type="search"
-                                    value={query}
-                                    onChange={(event) => setQuery(event.target.value)}
-                                />
-                                {query && (
-                                    <button
-                                        className="rounded-full px-2.5 py-1 text-small text-t-secondary transition-colors hover:bg-b-subtle hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface1"
-                                        onClick={() => setQuery("")}
-                                        type="button"
-                                    >
-                                        Limpar
-                                    </button>
-                                )}
-                            </div>
-                            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-small text-t-secondary">
-                                <p id="docs-search-hint">Atalho: pressione / para focar a busca.</p>
-                                <p aria-live="polite" id="docs-search-status" role="status">
-                                    {resultsLabel}
-                                </p>
-                            </div>
-                        </div>
 
                         <div className="grid grid-cols-[18rem_minmax(0,1fr)_14rem] max-2xl:grid-cols-[16.5rem_minmax(0,1fr)] max-md:grid-cols-1">
                             <aside className="border-r border-stroke-subtle px-4 py-5 max-md:border-r-0 max-md:border-b max-md:px-4">
@@ -1390,6 +1377,49 @@ const DocumentationPage = () => {
                         </figcaption>
                     </figure>
                 )}
+            </Modal>
+
+            <Modal
+                classWrapper="max-w-160 rounded-3xl border border-stroke1 bg-b-surface2 p-6 max-md:p-4"
+                open={isSearchOpen}
+                onClose={() => setIsSearchOpen(false)}
+            >
+                <div>
+                    <label
+                        className="mb-2 block text-heading-thin text-t-secondary"
+                        htmlFor="docs-search-modal"
+                    >
+                        Buscar na documentacao
+                    </label>
+                    <div className="flex items-center gap-3 rounded-2xl border-[1.5px] border-stroke1 bg-transparent px-4 py-3">
+                        <Icon className="size-5 fill-t-secondary" name="post" />
+                        <input
+                            aria-describedby="docs-search-modal-hint docs-search-modal-status"
+                            className="w-full bg-transparent text-heading-thin text-t-primary outline-0 placeholder:text-t-tertiary"
+                            id="docs-search-modal"
+                            placeholder="Buscar em proposta, contrato, PRD + tasks ou configuracao Flutter..."
+                            ref={searchInputRef}
+                            type="search"
+                            value={query}
+                            onChange={(event) => setQuery(event.target.value)}
+                        />
+                        {query && (
+                            <button
+                                className="rounded-full px-2.5 py-1 text-small text-t-secondary transition-colors hover:bg-b-subtle hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2"
+                                onClick={() => setQuery("")}
+                                type="button"
+                            >
+                                Limpar
+                            </button>
+                        )}
+                    </div>
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-small text-t-secondary">
+                        <p id="docs-search-modal-hint">Atalho: pressione / para focar a busca.</p>
+                        <p aria-live="polite" id="docs-search-modal-status" role="status">
+                            {resultsLabel}
+                        </p>
+                    </div>
+                </div>
             </Modal>
         </Layout>
     );
