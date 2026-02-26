@@ -2,6 +2,7 @@
     "header": {
         "signIn": "Iniciar sesión",
         "newBrief": "Nuevo brief",
+        "newDocument": "Nuevo documento",
         "newProposal": "Nueva propuesta",
         "newContract": "Nuevo contrato",
         "newPrd": "Nuevo PRD",

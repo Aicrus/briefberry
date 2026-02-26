@@ -1,13 +1,15 @@
 import { useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Button from "@/components/Button";
 import Image from "@/components/Image";
 import Icon from "@/components/Icon";
 import Modal from "@/components/Modal";
 import Login from "@/components/Login";
+import FeatureSelector from "@/components/FeatureSelector";
+import type { FeatureKey } from "@/config/projectFlow";
 import {
     clearFeatureDrafts,
     FEATURE_ROUTES,
@@ -36,25 +38,23 @@ const Header = ({
     onLogout,
 }: HeaderProps) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isFeatureModalOpen, setIsFeatureModalOpen] = useState(false);
     const pathname = usePathname();
-    const searchParams = useSearchParams();
     const router = useRouter();
     const t = useTranslations("header");
 
-    const queryFeature = searchParams.get("feature");
-    const currentFeature: FeatureType =
-        pathname === "/quiz/contract" || queryFeature === "contract"
-            ? "contract"
-            : pathname === "/quiz/prd" || queryFeature === "prd"
-            ? "prd"
-            : "proposal";
+    const handleFeatureSelect = (feature: FeatureKey) => {
+        const featureType: FeatureType =
+            feature === "create_contract"
+                ? "contract"
+                : feature === "create_prd"
+                ? "prd"
+                : "proposal";
 
-    const newLabelKey =
-        currentFeature === "contract"
-            ? "newContract"
-            : currentFeature === "prd"
-            ? "newPrd"
-            : "newProposal";
+        setIsFeatureModalOpen(false);
+        clearFeatureDrafts(featureType);
+        router.push(FEATURE_ROUTES[featureType]);
+    };
 
     return (
         <>
@@ -89,12 +89,9 @@ const Header = ({
                                     <Button
                                         className="max-md:w-12! max-md:gap-0! max-md:p-0! max-md:text-0!"
                                         isSecondary
-                                        onClick={() => {
-                                            clearFeatureDrafts(currentFeature);
-                                            router.push(FEATURE_ROUTES[currentFeature]);
-                                        }}
+                                        onClick={() => setIsFeatureModalOpen(true)}
                                     >
-                                        {t(newLabelKey)}
+                                        {t("newDocument")}
                                         <Icon
                                             className="hidden! ml-2 max-md:ml-0 max-md:inline-block!"
                                             name="plus"
@@ -120,6 +117,13 @@ const Header = ({
                         setIsMenuOpen(false);
                     }}
                 />
+            </Modal>
+            <Modal
+                classWrapper="!max-w-5xl max-md:!max-w-full"
+                open={isFeatureModalOpen}
+                onClose={() => setIsFeatureModalOpen(false)}
+            >
+                <FeatureSelector onSelect={handleFeatureSelect} />
             </Modal>
         </>
     );

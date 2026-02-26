@@ -2,6 +2,7 @@
     "header": {
         "signIn": "Entrar",
         "newBrief": "Novo brief",
+        "newDocument": "Novo documento",
         "newProposal": "Nova proposta",
         "newContract": "Novo contrato",
         "newPrd": "Novo PRD",
@@ -12,7 +13,7 @@
         "premiumCta": "Atualizar"
     },
     "menu": {
-        "myBriefs": "Meus briefs",
+        "myBriefs": "Meus Projetos",
         "manageYourPlan": "Gerenciar seu plano",
         "accountSettings": "Configurações da conta",
         "documentation": "Documentação",
