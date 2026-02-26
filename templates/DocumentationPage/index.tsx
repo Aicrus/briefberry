@@ -3,7 +3,6 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Layout from "@/components/Layout";
 import Icon from "@/components/Icon";
-import Button from "@/components/Button";
 import Image from "@/components/Image";
 import Modal from "@/components/Modal";
 
@@ -1296,33 +1295,6 @@ const DocumentationPage = () => {
                                             })}
                                         </div>
 
-                                        <div className="mt-6 rounded-3xl border border-stroke-subtle bg-b-surface1 px-5 py-5">
-                                            <div className="text-body-bold">Topicos para pesquisar</div>
-                                            <div className="mt-3 flex flex-wrap gap-2">
-                                                {selectedTopic.research.map((term) => (
-                                                    <button
-                                                        className="rounded-full border border-stroke1 px-3 py-1.5 text-hairline text-t-secondary transition-colors hover:border-stroke-highlight hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface1"
-                                                        key={term}
-                                                        onClick={() => setQuery(term)}
-                                                        type="button"
-                                                    >
-                                                        {term}
-                                                    </button>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="mt-6 flex gap-2 max-md:flex-col">
-                                            <Button as="link" href="/quiz" isSecondary>
-                                                Criar proposta
-                                            </Button>
-                                            <Button as="link" href="/quiz/contract" isStroke>
-                                                Criar contrato
-                                            </Button>
-                                            <Button as="link" href="/quiz/prd" isStroke>
-                                                Criar PRD
-                                            </Button>
-                                        </div>
                                     </>
                                 )}
                             </main>
