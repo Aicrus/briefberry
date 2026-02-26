@@ -922,6 +922,11 @@ const DocumentationPage = () => {
         });
     };
 
+    const handleSearchTopicSelect = (topicId: string) => {
+        handleTopicSelect(topicId);
+        setIsSearchOpen(false);
+    };
+
     const normalizedQuery = normalizeText(query.trim());
 
     const queryBaseTopics = useMemo(() => {
@@ -1001,10 +1006,6 @@ const DocumentationPage = () => {
     const isSelectedTopicFromFlutter = selectedTopic
         ? FLUTTER_TOPICS.some((topic) => topic.id === selectedTopic.id)
         : false;
-    const resultsLabel =
-        visibleTopics.length === 1
-            ? "1 topico encontrado"
-            : `${visibleTopics.length} topicos encontrados`;
 
     return (
         <Layout>
@@ -1037,7 +1038,7 @@ const DocumentationPage = () => {
                                     onClick={() => setIsSearchOpen(true)}
                                     type="button"
                                 >
-                                    <Icon className="size-4 fill-current" name="documents" />
+                                    <Icon className="size-4 fill-current" name="search" />
                                     Buscar
                                 </button>
                             </div>
@@ -1380,32 +1381,29 @@ const DocumentationPage = () => {
             </Modal>
 
             <Modal
-                classWrapper="max-w-160 rounded-3xl border border-stroke1 bg-b-surface2 p-6 max-md:p-4"
+                classWrapper="max-w-160 rounded-3xl border border-stroke1 bg-b-surface2 p-4 max-md:p-3"
                 open={isSearchOpen}
                 onClose={() => setIsSearchOpen(false)}
             >
-                <div>
-                    <label
-                        className="mb-2 block text-heading-thin text-t-secondary"
-                        htmlFor="docs-search-modal"
-                    >
-                        Buscar na documentacao
+                <div className="space-y-3">
+                    <label className="sr-only" htmlFor="docs-search-modal">
+                        Buscar topicos da documentacao
                     </label>
-                    <div className="flex items-center gap-3 rounded-2xl border-[1.5px] border-stroke1 bg-transparent px-4 py-3">
-                        <Icon className="size-5 fill-t-secondary" name="post" />
+                    <div className="flex items-center gap-2 rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1/70 px-3 py-2.5 transition-colors focus-within:border-primary1/30">
+                        <Icon className="size-5 fill-t-secondary" name="search" />
                         <input
-                            aria-describedby="docs-search-modal-hint docs-search-modal-status"
+                            aria-label="Buscar topicos da documentacao"
                             className="w-full bg-transparent text-heading-thin text-t-primary outline-0 placeholder:text-t-tertiary"
                             id="docs-search-modal"
-                            placeholder="Buscar em proposta, contrato, PRD + tasks ou configuracao Flutter..."
+                            placeholder="Buscar topico ou secao..."
                             ref={searchInputRef}
-                            type="search"
+                            type="text"
                             value={query}
                             onChange={(event) => setQuery(event.target.value)}
                         />
                         {query && (
                             <button
-                                className="rounded-full px-2.5 py-1 text-small text-t-secondary transition-colors hover:bg-b-subtle hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2"
+                                className="inline-flex items-center rounded-full px-2 py-1 text-small text-t-secondary transition-colors hover:bg-b-subtle hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2"
                                 onClick={() => setQuery("")}
                                 type="button"
                             >
@@ -1413,11 +1411,30 @@ const DocumentationPage = () => {
                             </button>
                         )}
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-small text-t-secondary">
-                        <p id="docs-search-modal-hint">Atalho: pressione / para focar a busca.</p>
-                        <p aria-live="polite" id="docs-search-modal-status" role="status">
-                            {resultsLabel}
-                        </p>
+
+                    <div className="max-h-90 overflow-y-auto pr-1">
+                        <div className="space-y-1">
+                            {visibleTopics.slice(0, 10).map((topic) => (
+                                <button
+                                    className={`flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2 ${
+                                        selectedTopic?.id === topic.id
+                                            ? "bg-primary1/10 text-t-blue"
+                                            : "text-t-secondary hover:bg-b-surface1 hover:text-t-primary"
+                                    }`}
+                                    key={topic.id}
+                                    onClick={() => handleSearchTopicSelect(topic.id)}
+                                    type="button"
+                                >
+                                    <span className="text-heading-thin">{topic.title}</span>
+                                    <span className="text-small text-t-tertiary">{topic.tag}</span>
+                                </button>
+                            ))}
+                        </div>
+                        {visibleTopics.length === 0 && (
+                            <div className="rounded-xl border border-dashed border-stroke1 px-3 py-4 text-center text-hairline text-t-secondary">
+                                Nenhum topico encontrado.
+                            </div>
+                        )}
                     </div>
                 </div>
             </Modal>
