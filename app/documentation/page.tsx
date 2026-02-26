@@ -1,11 +1,5 @@
-"use client";
+import DocumentationPage from "@/templates/DocumentationPage";
 
-import Layout from "@/components/Layout";
-
-export default function DocumentationPage() {
-    return (
-        <Layout>
-            <div className="section min-h-[50vh]" />
-        </Layout>
-    );
+export default function Page() {
+    return <DocumentationPage />;
 }
