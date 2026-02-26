@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Layout from "@/components/Layout";
 import Icon from "@/components/Icon";
 import Button from "@/components/Button";
 import Image from "@/components/Image";
+import Modal from "@/components/Modal";
 
 type TopicSection = {
     id: string;
@@ -32,8 +33,6 @@ type Topic = {
     sections: TopicSection[];
     research: string[];
 };
-
-const DOC_TABS = ["Guias", "Modelos", "Referencia", "FAQ"];
 
 const BASE_TOPICS: Topic[] = [
     {
@@ -474,11 +473,372 @@ const FLUTTER_GROUP = {
         "Modulo separado com submenu: introducao, setup tecnico e padrao de arquitetura.",
 };
 
+const TERMINAL_KEYWORDS = [
+    "flutter",
+    "run",
+    "create",
+    "cd",
+    "git",
+    "pub",
+    "get",
+    "analyze",
+    "test",
+];
+
+const TERMINAL_LANGUAGES = new Set(["bash", "shell", "sh", "zsh"]);
+
+const KEYWORDS_BY_LANGUAGE: Record<string, string[]> = {
+    bash: TERMINAL_KEYWORDS,
+    shell: TERMINAL_KEYWORDS,
+    sh: TERMINAL_KEYWORDS,
+    zsh: TERMINAL_KEYWORDS,
+    dart: [
+        "class",
+        "final",
+        "const",
+        "var",
+        "import",
+        "return",
+        "if",
+        "else",
+        "for",
+        "while",
+        "extends",
+        "with",
+        "void",
+        "int",
+        "double",
+        "bool",
+        "String",
+        "Widget",
+        "build",
+        "override",
+        "new",
+        "null",
+        "true",
+        "false",
+    ],
+    yaml: [
+        "name",
+        "on",
+        "jobs",
+        "runs-on",
+        "steps",
+        "uses",
+        "run",
+        "dependencies",
+        "sdk",
+        "flutter",
+        "true",
+        "false",
+    ],
+    markdown: [],
+    text: [],
+};
+
 const normalizeText = (value: string) =>
     value
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
+
+const escapeRegExp = (value: string) =>
+    value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const buildTokenRegex = (keywords: string[]) => {
+    const keywordPattern =
+        keywords.length > 0
+            ? `\\b(?:${keywords.map((keyword) => escapeRegExp(keyword)).join("|")})\\b`
+            : "";
+
+    const parts = ["\"(?:\\\\.|[^\"])*\"|'(?:\\\\.|[^'])*'", "\\b\\d+(?:\\.\\d+)?\\b"];
+
+    if (keywordPattern) {
+        parts.push(keywordPattern);
+    }
+
+    return new RegExp(parts.join("|"), "g");
+};
+
+const resolveCommentToken = (language: string) => {
+    if (language === "dart") {
+        return "//";
+    }
+
+    if (language === "yaml" || TERMINAL_LANGUAGES.has(language)) {
+        return "#";
+    }
+
+    return "";
+};
+
+const TOPIC_FILTERS = [
+    { id: "all", label: "Todos" },
+    { id: "flutter", label: "Flutter" },
+    ...Array.from(new Set(BASE_TOPICS.map((topic) => topic.tag))).map((tag) => ({
+        id: normalizeText(tag),
+        label: tag,
+    })),
+];
+
+type CodeSnippetProps = {
+    code: NonNullable<TopicSection["code"]>;
+    blockId: string;
+};
+
+const CodeSnippet = ({ code, blockId }: CodeSnippetProps) => {
+    const [copyState, setCopyState] = useState<"idle" | "success" | "error">("idle");
+    const resetTimerRef = useRef<number | null>(null);
+
+    const language = normalizeText(code.language || "text");
+    const isTerminal = TERMINAL_LANGUAGES.has(language);
+    const keywords = KEYWORDS_BY_LANGUAGE[language] ?? KEYWORDS_BY_LANGUAGE.text;
+    const keywordSet = useMemo(
+        () => new Set(keywords.map((keyword) => normalizeText(keyword))),
+        [keywords]
+    );
+    const tokenRegex = useMemo(() => buildTokenRegex(keywords), [keywords]);
+    const commentToken = resolveCommentToken(language);
+
+    useEffect(() => {
+        return () => {
+            if (resetTimerRef.current) {
+                window.clearTimeout(resetTimerRef.current);
+            }
+        };
+    }, []);
+
+    const scheduleReset = () => {
+        if (resetTimerRef.current) {
+            window.clearTimeout(resetTimerRef.current);
+        }
+
+        resetTimerRef.current = window.setTimeout(() => {
+            setCopyState("idle");
+        }, 2200);
+    };
+
+    const handleCopy = async () => {
+        let copied = false;
+
+        if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+            try {
+                await navigator.clipboard.writeText(code.content);
+                copied = true;
+            } catch {
+                copied = false;
+            }
+        }
+
+        if (!copied && typeof document !== "undefined") {
+            const textarea = document.createElement("textarea");
+            textarea.value = code.content;
+            textarea.setAttribute("readonly", "true");
+            textarea.style.position = "fixed";
+            textarea.style.opacity = "0";
+            document.body.appendChild(textarea);
+            textarea.select();
+
+            try {
+                copied = document.execCommand("copy");
+            } catch {
+                copied = false;
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        setCopyState(copied ? "success" : "error");
+        scheduleReset();
+    };
+
+    const resolveTokenClass = (token: string) => {
+        const normalizedToken = normalizeText(token);
+
+        if (/^["']/.test(token)) {
+            return isTerminal ? "text-[#ffd089]" : "text-primary2";
+        }
+
+        if (/^\d/.test(token)) {
+            return isTerminal ? "text-[#7dd3fc]" : "text-primary3";
+        }
+
+        if (keywordSet.has(normalizedToken)) {
+            return isTerminal ? "text-[#8ce97a]" : "font-medium text-primary1";
+        }
+
+        if (/^[A-Z_]{2,}$/.test(token)) {
+            return isTerminal ? "text-[#b5c8ff]" : "text-t-primary";
+        }
+
+        return isTerminal ? "text-[#d7e3ff]" : "text-t-primary";
+    };
+
+    const highlightLine = (line: string): ReactNode => {
+        if (language === "markdown") {
+            if (/^\s*#{1,6}\s/.test(line)) {
+                return <span className={isTerminal ? "text-[#8ce97a]" : "text-primary1"}>{line}</span>;
+            }
+
+            if (/^\s*-\s\[[xX ]\]/.test(line)) {
+                return (
+                    <span className={isTerminal ? "text-[#d7e3ff]" : "font-medium text-t-primary"}>
+                        {line}
+                    </span>
+                );
+            }
+
+            if (/^\s*-\s/.test(line)) {
+                return <span className={isTerminal ? "text-[#d7e3ff]" : "text-t-secondary"}>{line}</span>;
+            }
+        }
+
+        let source = line;
+        let commentPart = "";
+
+        if (commentToken) {
+            const commentIndex = source.indexOf(commentToken);
+
+            if (commentIndex >= 0) {
+                commentPart = source.slice(commentIndex);
+                source = source.slice(0, commentIndex);
+            }
+        }
+
+        const nodes: ReactNode[] = [];
+        tokenRegex.lastIndex = 0;
+        let cursor = 0;
+        let match: RegExpExecArray | null;
+
+        while ((match = tokenRegex.exec(source)) !== null) {
+            const token = match[0];
+            const start = match.index;
+
+            if (start > cursor) {
+                const plainChunk = source.slice(cursor, start);
+                nodes.push(
+                    <span className={isTerminal ? "text-[#d7e3ff]" : "text-t-secondary"} key={`${start}-plain`}>
+                        {plainChunk}
+                    </span>
+                );
+            }
+
+            nodes.push(
+                <span className={resolveTokenClass(token)} key={`${start}-token`}>
+                    {token}
+                </span>
+            );
+
+            cursor = start + token.length;
+        }
+
+        if (cursor < source.length) {
+            nodes.push(
+                <span className={isTerminal ? "text-[#d7e3ff]" : "text-t-secondary"} key="tail">
+                    {source.slice(cursor)}
+                </span>
+            );
+        }
+
+        if (commentPart) {
+            nodes.push(
+                <span className={isTerminal ? "text-[#6d7ca8]" : "text-t-tertiary"} key="comment">
+                    {commentPart}
+                </span>
+            );
+        }
+
+        if (nodes.length === 0) {
+            return line || " ";
+        }
+
+        return nodes;
+    };
+
+    const lines = code.content.split("\n");
+    const copyLabel =
+        copyState === "success" ? "Copiado" : copyState === "error" ? "Falhou" : "Copiar";
+
+    return (
+        <div
+            className={`mt-5 overflow-hidden rounded-2xl border ${
+                isTerminal ? "border-[#1f2f57] bg-[#050a18]" : "border-stroke-subtle bg-b-surface1"
+            }`}
+        >
+            <div
+                className={`flex items-center justify-between gap-3 border-b px-3 py-2 ${
+                    isTerminal ? "border-[#1f2f57] bg-[#0a1022]" : "border-stroke-subtle bg-b-surface1"
+                }`}
+            >
+                <div className="flex min-w-0 items-center gap-2">
+                    <span className={`truncate text-hairline ${isTerminal ? "text-[#d7e3ff]" : "text-t-secondary"}`}>
+                        {code.label}
+                    </span>
+                    <span
+                        className={`shrink-0 rounded-full border px-2 py-0.5 text-small ${
+                            isTerminal
+                                ? "border-[#2b4170] text-[#9fb6e6]"
+                                : "border-stroke1 text-t-secondary"
+                        }`}
+                    >
+                        {isTerminal ? "terminal" : language}
+                    </span>
+                </div>
+                <button
+                    aria-label={`Copiar codigo: ${code.label}`}
+                    className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-small transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 ${
+                        isTerminal
+                            ? "border-[#2b4170] text-[#d7e3ff] hover:border-[#4a6ab0] hover:text-white focus-visible:ring-offset-[#0a1022]"
+                            : "border-stroke1 text-t-secondary hover:border-stroke-highlight hover:text-t-primary focus-visible:ring-offset-b-surface1"
+                    }`}
+                    onClick={handleCopy}
+                    type="button"
+                >
+                    <Icon className="size-3.5 fill-current" name="copy" />
+                    {copyLabel}
+                </button>
+            </div>
+            <pre className="overflow-x-auto">
+                <code className="block min-w-full px-4 py-4 text-[0.8125rem] leading-6">
+                    {lines.map((line, lineIndex) => (
+                        <div
+                            className={`grid items-start ${
+                                isTerminal
+                                    ? "grid-cols-[2.5rem_1.25rem_minmax(0,1fr)]"
+                                    : "grid-cols-[2.5rem_minmax(0,1fr)]"
+                            }`}
+                            key={`${blockId}-line-${lineIndex}`}
+                        >
+                            <span
+                                aria-hidden
+                                className={`select-none text-small leading-6 ${
+                                    isTerminal ? "text-[#6a83ba]" : "text-t-tertiary"
+                                }`}
+                            >
+                                {String(lineIndex + 1).padStart(2, "0")}
+                            </span>
+                            {isTerminal && (
+                                <span aria-hidden className="select-none text-small leading-6 text-[#8ce97a]">
+                                    {line.trim() ? "$" : ""}
+                                </span>
+                            )}
+                            <span className={isTerminal ? "text-[#d7e3ff]" : "text-t-secondary"}>
+                                {line ? highlightLine(line) : " "}
+                            </span>
+                        </div>
+                    ))}
+                </code>
+            </pre>
+            <span aria-live="polite" className="sr-only" role="status">
+                {copyState === "success"
+                    ? `${code.label} copiado com sucesso`
+                    : copyState === "error"
+                    ? "Nao foi possivel copiar o codigo"
+                    : ""}
+            </span>
+        </div>
+    );
+};
 
 const buildSearchableText = (topic: Topic, parentLabel?: string) =>
     normalizeText(
@@ -500,8 +860,39 @@ const buildSearchableText = (topic: Topic, parentLabel?: string) =>
 
 const DocumentationPage = () => {
     const [query, setQuery] = useState("");
+    const [activeFilter, setActiveFilter] = useState("all");
     const [activeTopicId, setActiveTopicId] = useState(FLUTTER_TOPICS[0]?.id ?? "");
     const [isFlutterOpen, setIsFlutterOpen] = useState(true);
+    const [expandedImage, setExpandedImage] = useState<TopicSection["image"] | null>(null);
+    const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key !== "/") {
+                return;
+            }
+
+            const target = event.target as HTMLElement | null;
+            const isTypingElement =
+                target?.tagName === "INPUT" ||
+                target?.tagName === "TEXTAREA" ||
+                target?.tagName === "SELECT" ||
+                Boolean(target?.isContentEditable);
+
+            if (isTypingElement || event.metaKey || event.ctrlKey || event.altKey) {
+                return;
+            }
+
+            event.preventDefault();
+            searchInputRef.current?.focus();
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
 
     const handleTopicSelect = (topicId: string) => {
         setActiveTopicId(topicId);
@@ -518,7 +909,7 @@ const DocumentationPage = () => {
 
     const normalizedQuery = normalizeText(query.trim());
 
-    const visibleBaseTopics = useMemo(() => {
+    const queryBaseTopics = useMemo(() => {
         if (!normalizedQuery) {
             return BASE_TOPICS;
         }
@@ -528,7 +919,7 @@ const DocumentationPage = () => {
         );
     }, [normalizedQuery]);
 
-    const visibleFlutterTopics = useMemo(() => {
+    const queryFlutterTopics = useMemo(() => {
         if (!normalizedQuery) {
             return FLUTTER_TOPICS;
         }
@@ -537,6 +928,42 @@ const DocumentationPage = () => {
             buildSearchableText(topic, FLUTTER_GROUP.title).includes(normalizedQuery)
         );
     }, [normalizedQuery]);
+
+    const filterCountById = useMemo(() => {
+        const counts: Record<string, number> = {
+            all: queryBaseTopics.length + queryFlutterTopics.length,
+            flutter: queryFlutterTopics.length,
+        };
+
+        queryBaseTopics.forEach((topic) => {
+            const tagId = normalizeText(topic.tag);
+            counts[tagId] = (counts[tagId] ?? 0) + 1;
+        });
+
+        return counts;
+    }, [queryBaseTopics, queryFlutterTopics]);
+
+    const visibleBaseTopics = useMemo(() => {
+        if (activeFilter === "flutter") {
+            return [];
+        }
+
+        if (activeFilter === "all") {
+            return queryBaseTopics;
+        }
+
+        return queryBaseTopics.filter(
+            (topic) => normalizeText(topic.tag) === activeFilter
+        );
+    }, [activeFilter, queryBaseTopics]);
+
+    const visibleFlutterTopics = useMemo(() => {
+        if (activeFilter !== "all" && activeFilter !== "flutter") {
+            return [];
+        }
+
+        return queryFlutterTopics;
+    }, [activeFilter, queryFlutterTopics]);
 
     const visibleTopics = useMemo(
         () => [...visibleFlutterTopics, ...visibleBaseTopics],
@@ -552,20 +979,32 @@ const DocumentationPage = () => {
     );
 
     const showFlutterGroup =
-        !normalizedQuery || visibleFlutterTopics.length > 0;
+        (activeFilter === "all" || activeFilter === "flutter") &&
+        (!normalizedQuery || visibleFlutterTopics.length > 0);
     const showFlutterChildren = normalizedQuery ? true : isFlutterOpen;
 
     const isSelectedTopicFromFlutter = selectedTopic
         ? FLUTTER_TOPICS.some((topic) => topic.id === selectedTopic.id)
         : false;
+    const resultsLabel =
+        visibleTopics.length === 1
+            ? "1 topico encontrado"
+            : `${visibleTopics.length} topicos encontrados`;
 
     return (
         <Layout>
             <div className="px-6 pt-8 pb-16 max-md:px-4 max-md:pt-5 max-md:pb-10">
                 <div className="mx-auto w-full max-w-334">
                     <div className="overflow-hidden rounded-5xl border-[1.5px] border-stroke-subtle bg-b-surface2 shadow-[0_18px_60px_-40px_rgba(0,0,0,0.5)]">
-                        <div className="border-b border-stroke-subtle px-6 py-4 max-md:px-4">
-                            <div className="flex items-center justify-between gap-4 max-md:flex-col max-md:items-start">
+                        <a
+                            className="sr-only z-20 rounded-full bg-b-surface2 px-3 py-2 text-small focus:not-sr-only focus:absolute focus:left-5 focus:top-5 focus:outline-none focus:ring-2 focus:ring-stroke-focus"
+                            href="#documentation-main"
+                        >
+                            Pular para o conteudo principal
+                        </a>
+
+                        <header className="border-b border-stroke-subtle bg-linear-to-r from-primary1/10 to-transparent px-6 py-5 max-md:px-4">
+                            <div className="flex items-start gap-4">
                                 <div className="flex items-center gap-3">
                                     <div className="flex size-9 items-center justify-center rounded-xl bg-primary1/15">
                                         <Icon className="size-5 fill-primary1" name="post" />
@@ -577,44 +1016,67 @@ const DocumentationPage = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 rounded-full border-[1.5px] border-stroke1 bg-b-surface1 px-3 py-1.5 text-hairline text-t-secondary">
-                                    <Icon
-                                        className="size-4 fill-t-secondary"
-                                        name="question-circle"
-                                    />
-                                    Conteudo para leitura leiga + tecnica
-                                </div>
                             </div>
-                            <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1">
-                                {DOC_TABS.map((tab, index) => (
-                                    <button
-                                        className={`shrink-0 rounded-full border-[1.5px] px-3 py-1.5 text-hairline transition-colors ${
-                                            index === 0
-                                                ? "border-primary1/25 bg-primary1/10 text-t-blue"
-                                                : "border-stroke1 text-t-secondary hover:border-stroke-highlight hover:text-t-primary"
-                                        }`}
-                                        key={tab}
-                                        type="button"
-                                    >
-                                        {tab}
-                                    </button>
-                                ))}
+
+                            <div
+                                aria-label="Filtros de topicos"
+                                className="mt-4 flex flex-wrap gap-2"
+                                role="toolbar"
+                            >
+                                {TOPIC_FILTERS.map((filter) => {
+                                    const isActive = activeFilter === filter.id;
+                                    const count = filterCountById[filter.id] ?? 0;
+
+                                    return (
+                                        <button
+                                            aria-pressed={isActive}
+                                            className={`inline-flex items-center gap-2 rounded-full border-[1.5px] px-3 py-1.5 text-hairline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2 ${
+                                                isActive
+                                                    ? "border-primary1/25 bg-primary1/10 text-t-blue"
+                                                    : "border-stroke1 text-t-secondary hover:border-stroke-highlight hover:text-t-primary"
+                                            }`}
+                                            key={filter.id}
+                                            onClick={() => setActiveFilter(filter.id)}
+                                            type="button"
+                                        >
+                                            <span>{filter.label}</span>
+                                            <span
+                                                className={`rounded-full border px-1.5 py-0.5 text-small ${
+                                                    isActive
+                                                        ? "border-primary1/25 text-t-blue"
+                                                        : "border-stroke1 text-t-tertiary"
+                                                }`}
+                                            >
+                                                {count}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
                             </div>
-                        </div>
+                        </header>
 
                         <div className="border-b border-stroke-subtle px-6 py-4 max-md:px-4">
+                            <label
+                                className="mb-2 block text-heading-thin text-t-secondary"
+                                htmlFor="docs-search"
+                            >
+                                Buscar na documentacao
+                            </label>
                             <div className="flex items-center gap-3 rounded-2xl border-[1.5px] border-stroke1 bg-b-surface1 px-4 py-3">
                                 <Icon className="size-5 fill-t-secondary" name="post" />
                                 <input
+                                    aria-describedby="docs-search-hint docs-search-status"
                                     className="w-full bg-transparent text-heading-thin text-t-primary outline-0 placeholder:text-t-tertiary"
+                                    id="docs-search"
                                     placeholder="Buscar em proposta, contrato, PRD + tasks ou configuracao Flutter..."
-                                    type="text"
+                                    ref={searchInputRef}
+                                    type="search"
                                     value={query}
                                     onChange={(event) => setQuery(event.target.value)}
                                 />
                                 {query && (
                                     <button
-                                        className="rounded-full px-2.5 py-1 text-small text-t-secondary transition-colors hover:bg-b-subtle hover:text-t-primary"
+                                        className="rounded-full px-2.5 py-1 text-small text-t-secondary transition-colors hover:bg-b-subtle hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface1"
                                         onClick={() => setQuery("")}
                                         type="button"
                                     >
@@ -622,116 +1084,135 @@ const DocumentationPage = () => {
                                     </button>
                                 )}
                             </div>
+                            <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-small text-t-secondary">
+                                <p id="docs-search-hint">Atalho: pressione / para focar a busca.</p>
+                                <p aria-live="polite" id="docs-search-status" role="status">
+                                    {resultsLabel}
+                                </p>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-[18rem_minmax(0,1fr)_14rem] max-2xl:grid-cols-[16.5rem_minmax(0,1fr)] max-md:grid-cols-1">
                             <aside className="border-r border-stroke-subtle px-4 py-5 max-md:border-r-0 max-md:border-b max-md:px-4">
-                                <div className="mb-4 text-heading-thin text-t-secondary">
-                                    Topicos principais
-                                </div>
+                                <nav aria-label="Topicos principais" className="sticky top-24">
+                                    <div className="mb-4 text-heading-thin text-t-secondary">
+                                        Topicos principais
+                                    </div>
 
-                                <div className="space-y-1.5">
-                                    {showFlutterGroup && (
-                                        <div className="rounded-xl border border-stroke1/70 bg-b-surface1/70">
-                                            <button
-                                                className="flex w-full items-center justify-between px-3 py-2.5 text-left"
-                                                onClick={() => {
-                                                    const nextOpen = !isFlutterOpen;
-                                                    setIsFlutterOpen(nextOpen);
+                                    <div className="space-y-1.5">
+                                        {showFlutterGroup && (
+                                            <div className="rounded-xl border border-stroke1/70 bg-b-surface1/70">
+                                                <button
+                                                    aria-controls="docs-flutter-subtopics"
+                                                    aria-expanded={showFlutterChildren}
+                                                    className="flex w-full items-center justify-between px-3 py-2.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset"
+                                                    onClick={() => {
+                                                        const nextOpen = !isFlutterOpen;
+                                                        setIsFlutterOpen(nextOpen);
 
-                                                    if (nextOpen) {
-                                                        const firstFlutterTopic =
-                                                            visibleFlutterTopics[0] ?? FLUTTER_TOPICS[0];
-                                                        if (firstFlutterTopic) {
-                                                            handleTopicSelect(firstFlutterTopic.id);
+                                                        if (nextOpen) {
+                                                            const firstFlutterTopic =
+                                                                visibleFlutterTopics[0] ?? FLUTTER_TOPICS[0];
+                                                            if (firstFlutterTopic) {
+                                                                handleTopicSelect(firstFlutterTopic.id);
+                                                            }
                                                         }
-                                                    }
-                                                }}
+                                                    }}
+                                                    type="button"
+                                                >
+                                                    <div>
+                                                        <div className="text-body-bold">
+                                                            {FLUTTER_GROUP.title}
+                                                        </div>
+                                                        <div className="text-hairline text-t-secondary">
+                                                            {FLUTTER_GROUP.summary}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="rounded-full border border-stroke1 px-2 py-0.5 text-small text-t-secondary">
+                                                            {visibleFlutterTopics.length}
+                                                        </span>
+                                                        <Icon
+                                                            className={`size-4 fill-t-secondary transition-transform ${
+                                                                showFlutterChildren ? "rotate-180" : ""
+                                                            }`}
+                                                            name="chevron"
+                                                        />
+                                                    </div>
+                                                </button>
+
+                                                {showFlutterChildren && (
+                                                    <div
+                                                        className="space-y-1 border-t border-stroke-subtle px-2 py-2"
+                                                        id="docs-flutter-subtopics"
+                                                    >
+                                                        {visibleFlutterTopics.map((topic) => (
+                                                            <button
+                                                                aria-current={
+                                                                    selectedTopic?.id === topic.id
+                                                                        ? "true"
+                                                                        : undefined
+                                                                }
+                                                                className={`w-full rounded-lg px-2.5 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-inset ${
+                                                                    selectedTopic?.id === topic.id
+                                                                        ? "bg-primary1/10 text-t-blue"
+                                                                        : "text-t-secondary hover:bg-b-subtle hover:text-t-primary"
+                                                                }`}
+                                                                key={topic.id}
+                                                                onClick={() => handleTopicSelect(topic.id)}
+                                                                type="button"
+                                                            >
+                                                                <div className="text-hairline font-medium">
+                                                                    {topic.title}
+                                                                </div>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+
+                                        {visibleBaseTopics.map((topic) => (
+                                            <button
+                                                aria-current={selectedTopic?.id === topic.id ? "true" : undefined}
+                                                className={`w-full rounded-xl border px-3 py-3 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2 ${
+                                                    selectedTopic?.id === topic.id
+                                                        ? "border-primary1/25 bg-primary1/10"
+                                                        : "border-transparent hover:border-stroke1 hover:bg-b-surface1"
+                                                }`}
+                                                key={topic.id}
+                                                onClick={() => handleTopicSelect(topic.id)}
                                                 type="button"
                                             >
-                                                <div>
-                                                    <div className="text-body-bold">
-                                                        {FLUTTER_GROUP.title}
-                                                    </div>
-                                                    <div className="text-hairline text-t-secondary">
-                                                        {FLUTTER_GROUP.summary}
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="rounded-full border border-stroke1 px-2 py-0.5 text-small text-t-secondary">
-                                                        {visibleFlutterTopics.length}
+                                                <div className="flex items-center justify-between gap-2">
+                                                    <span className="text-body-bold">{topic.title}</span>
+                                                    <span className="text-small text-t-tertiary">
+                                                        {topic.readTime}
                                                     </span>
-                                                    <Icon
-                                                        className={`size-4 fill-t-secondary transition-transform ${
-                                                            showFlutterChildren ? "rotate-180" : ""
-                                                        }`}
-                                                        name="chevron"
-                                                    />
+                                                </div>
+                                                <div className="mt-2 text-hairline text-t-secondary">
+                                                    {topic.summary}
                                                 </div>
                                             </button>
+                                        ))}
 
-                                            {showFlutterChildren && (
-                                                <div className="space-y-1 border-t border-stroke-subtle px-2 py-2">
-                                                    {visibleFlutterTopics.map((topic) => (
-                                                        <button
-                                                            className={`w-full rounded-lg px-2.5 py-2 text-left transition-colors ${
-                                                                selectedTopic?.id === topic.id
-                                                                    ? "bg-primary1/10 text-t-blue"
-                                                                    : "text-t-secondary hover:bg-b-subtle hover:text-t-primary"
-                                                            }`}
-                                                            key={topic.id}
-                                                            onClick={() => handleTopicSelect(topic.id)}
-                                                            type="button"
-                                                        >
-                                                            <div className="text-hairline font-medium">
-                                                                {topic.title}
-                                                            </div>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {visibleBaseTopics.map((topic) => (
-                                        <button
-                                            className={`w-full rounded-xl border px-3 py-3 text-left transition-colors ${
-                                                selectedTopic?.id === topic.id
-                                                    ? "border-primary1/25 bg-primary1/10"
-                                                    : "border-transparent hover:border-stroke1 hover:bg-b-surface1"
-                                            }`}
-                                            key={topic.id}
-                                            onClick={() => handleTopicSelect(topic.id)}
-                                            type="button"
-                                        >
-                                            <div className="flex items-center justify-between gap-2">
-                                                <span className="text-body-bold">{topic.title}</span>
-                                                <span className="text-small text-t-tertiary">
-                                                    {topic.readTime}
-                                                </span>
+                                        {visibleTopics.length === 0 && (
+                                            <div className="rounded-xl border border-dashed border-stroke1 px-3 py-3 text-hairline text-t-secondary">
+                                                Nenhum topico encontrado.
                                             </div>
-                                            <div className="mt-2 text-hairline text-t-secondary">
-                                                {topic.summary}
-                                            </div>
-                                        </button>
-                                    ))}
-
-                                    {visibleTopics.length === 0 && (
-                                        <div className="rounded-xl border border-dashed border-stroke1 px-3 py-3 text-hairline text-t-secondary">
-                                            Nenhum topico encontrado.
-                                        </div>
-                                    )}
-                                </div>
+                                        )}
+                                    </div>
+                                </nav>
                             </aside>
 
-                            <main className="px-7 py-6 max-md:px-4">
+                            <main className="px-7 py-6 max-md:px-4" id="documentation-main">
                                 {!selectedTopic ? (
                                     <div className="rounded-2xl border border-dashed border-stroke1 px-5 py-8 text-center text-t-secondary">
                                         Ajuste a busca para visualizar um topico.
                                     </div>
                                 ) : (
                                     <>
-                                        <div className="rounded-3xl border border-stroke-subtle bg-b-surface1 px-5 py-5">
+                                        <div className="rounded-3xl border border-stroke-subtle bg-linear-to-br from-primary1/8 via-b-surface1 to-b-surface1 px-5 py-5">
                                             <div className="mb-2 flex flex-wrap items-center gap-2">
                                                 <span className="inline-flex rounded-full border border-primary1/20 bg-primary1/10 px-2.5 py-1 text-small text-t-blue">
                                                     {selectedTopic.tag}
@@ -741,6 +1222,9 @@ const DocumentationPage = () => {
                                                         Modulo: {FLUTTER_GROUP.title}
                                                     </span>
                                                 )}
+                                                <span className="inline-flex rounded-full border border-stroke1 px-2.5 py-1 text-small text-t-secondary">
+                                                    Tempo: {selectedTopic.readTime}
+                                                </span>
                                             </div>
                                             <h1 className="text-h2 max-md:text-h4">
                                                 {selectedTopic.title}
@@ -748,35 +1232,36 @@ const DocumentationPage = () => {
                                             <p className="mt-2 text-body text-t-secondary">
                                                 {selectedTopic.summary}
                                             </p>
-                                            <div className="mt-4 flex flex-wrap gap-2 text-hairline text-t-secondary">
-                                                <span className="rounded-full border border-stroke1 px-2.5 py-1">
-                                                    Tempo: {selectedTopic.readTime}
-                                                </span>
-                                                <span className="rounded-full border border-stroke1 px-2.5 py-1">
-                                                    {selectedTopic.sections.length} bloco
-                                                    {selectedTopic.sections.length > 1 ? "s" : ""}
-                                                </span>
-                                            </div>
                                         </div>
 
-                                        <div className="mt-8 space-y-9">
-                                            {selectedTopic.sections.map((section) => {
+                                        <div className="mt-7 space-y-6">
+                                            {selectedTopic.sections.map((section, sectionIndex) => {
                                                 const anchorId = `${selectedTopic.id}-${section.id}`;
+                                                const sectionImage = section.image;
 
                                                 return (
-                                                    <section id={anchorId} key={section.id}>
-                                                        <h2 className="text-h4 max-md:text-h5">
-                                                            {section.title}
-                                                        </h2>
-                                                        <p className="mt-2 text-body text-t-secondary">
+                                                    <section
+                                                        className="scroll-mt-28 rounded-3xl border border-stroke-subtle bg-b-surface1/85 px-5 py-5"
+                                                        id={anchorId}
+                                                        key={section.id}
+                                                    >
+                                                        <div className="mb-2 flex items-center gap-2">
+                                                            <span className="inline-flex size-6 items-center justify-center rounded-full bg-primary1/10 text-small text-t-blue">
+                                                                {sectionIndex + 1}
+                                                            </span>
+                                                            <h2 className="text-h4 max-md:text-h5">
+                                                                {section.title}
+                                                            </h2>
+                                                        </div>
+                                                        <p className="text-body text-t-secondary">
                                                             {section.intro}
                                                         </p>
 
                                                         <ul className="mt-4 space-y-2">
-                                                            {section.bullets.map((bullet) => (
+                                                            {section.bullets.map((bullet, bulletIndex) => (
                                                                 <li
                                                                     className="flex items-start gap-2 text-body text-t-secondary"
-                                                                    key={bullet}
+                                                                    key={`${anchorId}-bullet-${bulletIndex}`}
                                                                 >
                                                                     <span className="mt-1.5 inline-flex size-1.5 shrink-0 rounded-full bg-primary1"></span>
                                                                     <span>{bullet}</span>
@@ -785,48 +1270,50 @@ const DocumentationPage = () => {
                                                         </ul>
 
                                                         {section.code && (
-                                                            <div className="mt-5 overflow-hidden rounded-2xl border border-stroke-subtle bg-b-surface1">
-                                                                <div className="flex items-center justify-between border-b border-stroke-subtle px-3 py-2">
-                                                                    <span className="text-hairline text-t-secondary">
-                                                                        {section.code.label}
-                                                                    </span>
-                                                                    <span className="rounded-full border border-stroke1 px-2 py-0.5 text-small text-t-secondary">
-                                                                        {section.code.language}
-                                                                    </span>
-                                                                </div>
-                                                                <pre className="overflow-x-auto px-4 py-4 text-hairline leading-6 text-t-secondary">
-                                                                    <code>{section.code.content}</code>
-                                                                </pre>
-                                                            </div>
+                                                            <CodeSnippet code={section.code} blockId={anchorId} />
                                                         )}
 
-                                                        {section.image && (
-                                                            <div className="mt-5 overflow-hidden rounded-2xl border border-stroke-subtle bg-b-surface1 p-2">
-                                                                <div className="relative h-64 w-full overflow-hidden rounded-xl max-md:h-52">
-                                                                    <Image
-                                                                        alt={section.image.alt}
-                                                                        className="h-full w-full object-cover"
-                                                                        fill
-                                                                        src={section.image.src}
-                                                                        sizes="(max-width: 767px) 100vw, 720px"
-                                                                    />
-                                                                </div>
-                                                                <div className="px-2 py-2 text-hairline text-t-secondary">
-                                                                    {section.image.caption}
-                                                                </div>
-                                                            </div>
+                                                        {sectionImage && (
+                                                            <figure className="mt-5 overflow-hidden rounded-2xl border border-stroke-subtle bg-b-surface1 p-2">
+                                                                <button
+                                                                    aria-label={`Abrir imagem: ${sectionImage.alt}`}
+                                                                    className="group w-full rounded-xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface1"
+                                                                    onClick={() => setExpandedImage(sectionImage)}
+                                                                    type="button"
+                                                                >
+                                                                    <div className="relative h-64 w-full overflow-hidden rounded-xl max-md:h-52">
+                                                                        <Image
+                                                                            alt={sectionImage.alt}
+                                                                            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.015]"
+                                                                            fill
+                                                                            src={sectionImage.src}
+                                                                            sizes="(max-width: 767px) 100vw, 720px"
+                                                                        />
+                                                                        <span className="pointer-events-none absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-black/35 px-2.5 py-1 text-small text-white">
+                                                                            <Icon
+                                                                                className="size-4 fill-current"
+                                                                                name="eye"
+                                                                            />
+                                                                            Ampliar
+                                                                        </span>
+                                                                    </div>
+                                                                </button>
+                                                                <figcaption className="px-2 py-2 text-hairline text-t-secondary">
+                                                                    {sectionImage.caption}
+                                                                </figcaption>
+                                                            </figure>
                                                         )}
                                                     </section>
                                                 );
                                             })}
                                         </div>
 
-                                        <div className="mt-8 rounded-3xl border border-stroke-subtle bg-b-surface1 px-5 py-5">
+                                        <div className="mt-6 rounded-3xl border border-stroke-subtle bg-b-surface1 px-5 py-5">
                                             <div className="text-body-bold">Topicos para pesquisar</div>
                                             <div className="mt-3 flex flex-wrap gap-2">
                                                 {selectedTopic.research.map((term) => (
                                                     <button
-                                                        className="rounded-full border border-stroke1 px-3 py-1.5 text-hairline text-t-secondary transition-colors hover:border-stroke-highlight hover:text-t-primary"
+                                                        className="rounded-full border border-stroke1 px-3 py-1.5 text-hairline text-t-secondary transition-colors hover:border-stroke-highlight hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface1"
                                                         key={term}
                                                         onClick={() => setQuery(term)}
                                                         type="button"
@@ -854,7 +1341,7 @@ const DocumentationPage = () => {
 
                             <aside className="border-l border-stroke-subtle px-4 py-6 max-2xl:hidden">
                                 {selectedTopic && (
-                                    <div className="sticky top-24">
+                                    <nav aria-label="Navegacao dentro do topico" className="sticky top-24">
                                         <div className="mb-3 flex items-center gap-2 text-heading-thin text-t-secondary">
                                             <Icon className="size-4 fill-t-secondary" name="align-right" />
                                             Neste topico
@@ -865,7 +1352,7 @@ const DocumentationPage = () => {
 
                                                 return (
                                                     <a
-                                                        className="block rounded-lg px-2.5 py-2 text-hairline text-t-secondary transition-colors hover:bg-b-surface1 hover:text-t-primary"
+                                                        className="block rounded-lg px-2.5 py-2 text-hairline text-t-secondary transition-colors hover:bg-b-surface1 hover:text-t-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stroke-focus focus-visible:ring-offset-2 focus-visible:ring-offset-b-surface2"
                                                         href={`#${anchorId}`}
                                                         key={section.id}
                                                     >
@@ -874,13 +1361,36 @@ const DocumentationPage = () => {
                                                 );
                                             })}
                                         </div>
-                                    </div>
+                                    </nav>
                                 )}
                             </aside>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <Modal
+                classWrapper="max-w-[68rem] rounded-3xl border border-stroke1 bg-b-surface2 p-4 max-md:p-3"
+                open={Boolean(expandedImage)}
+                onClose={() => setExpandedImage(null)}
+            >
+                {expandedImage && (
+                    <figure>
+                        <div className="relative h-[72vh] max-h-[42rem] w-full overflow-hidden rounded-2xl bg-b-surface1">
+                            <Image
+                                alt={expandedImage.alt}
+                                className="h-full w-full object-contain"
+                                fill
+                                src={expandedImage.src}
+                                sizes="(max-width: 767px) 100vw, 1100px"
+                            />
+                        </div>
+                        <figcaption className="mt-3 px-1 text-heading-thin text-t-secondary">
+                            {expandedImage.caption}
+                        </figcaption>
+                    </figure>
+                )}
+            </Modal>
         </Layout>
     );
 };
